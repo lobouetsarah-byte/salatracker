@@ -61,35 +61,52 @@ export const PrayerCard = ({ name, time, isNext, status, onStatusChange }: Praye
         )}
       </div>
 
-      {status !== "pending" && (
-        <div className="mb-3">{getStatusBadge()}</div>
-      )}
-
-      {status === "pending" && (
-        <div className="flex flex-col gap-2">
-          <p className="text-sm text-muted-foreground mb-2">Mark as:</p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => onStatusChange("on-time")}
-              className="flex-1 py-2 px-3 rounded-lg border border-success/30 bg-success/10 text-success hover:bg-success/20 transition-colors text-sm font-medium"
-            >
-              On Time
-            </button>
-            <button
-              onClick={() => onStatusChange("late")}
-              className="flex-1 py-2 px-3 rounded-lg border border-warning/30 bg-warning/10 text-warning hover:bg-warning/20 transition-colors text-sm font-medium"
-            >
-              Late
-            </button>
-            <button
-              onClick={() => onStatusChange("missed")}
-              className="flex-1 py-2 px-3 rounded-lg border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-sm font-medium"
-            >
-              Missed
-            </button>
-          </div>
+      <div className="flex flex-col gap-2">
+        {status !== "pending" && (
+          <div className="mb-2">{getStatusBadge()}</div>
+        )}
+        <p className="text-sm text-muted-foreground mb-2">
+          {status === "pending" ? "Mark as:" : "Change to:"}
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => onStatusChange("on-time")}
+            disabled={status === "on-time"}
+            className={cn(
+              "flex-1 py-2 px-3 rounded-lg border transition-colors text-sm font-medium",
+              status === "on-time"
+                ? "border-success bg-success/20 text-success cursor-not-allowed opacity-60"
+                : "border-success/30 bg-success/10 text-success hover:bg-success/20"
+            )}
+          >
+            On Time
+          </button>
+          <button
+            onClick={() => onStatusChange("late")}
+            disabled={status === "late"}
+            className={cn(
+              "flex-1 py-2 px-3 rounded-lg border transition-colors text-sm font-medium",
+              status === "late"
+                ? "border-warning bg-warning/20 text-warning cursor-not-allowed opacity-60"
+                : "border-warning/30 bg-warning/10 text-warning hover:bg-warning/20"
+            )}
+          >
+            Late
+          </button>
+          <button
+            onClick={() => onStatusChange("missed")}
+            disabled={status === "missed"}
+            className={cn(
+              "flex-1 py-2 px-3 rounded-lg border transition-colors text-sm font-medium",
+              status === "missed"
+                ? "border-destructive bg-destructive/20 text-destructive cursor-not-allowed opacity-60"
+                : "border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20"
+            )}
+          >
+            Missed
+          </button>
         </div>
-      )}
+      </div>
     </Card>
   );
 };

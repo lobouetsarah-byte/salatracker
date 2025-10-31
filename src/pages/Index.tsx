@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { PrayerCard } from "@/components/PrayerCard";
 import { WeeklyStats } from "@/components/WeeklyStats";
 import { Settings } from "@/components/Settings";
+import { Atkar } from "@/components/Atkar";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTracking } from "@/hooks/usePrayerTracking";
 import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
@@ -82,9 +83,10 @@ const Index = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="prayers" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="prayers">Prayers</TabsTrigger>
+            <TabsTrigger value="atkar">Atkar</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -107,6 +109,10 @@ const Index = () => {
                 onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
               />
             ))}
+          </TabsContent>
+
+          <TabsContent value="atkar">
+            <Atkar />
           </TabsContent>
 
           <TabsContent value="settings">
