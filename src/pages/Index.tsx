@@ -1,21 +1,26 @@
 import { useState, useEffect } from "react";
 import { PrayerCard } from "@/components/PrayerCard";
 import { WeeklyStats } from "@/components/WeeklyStats";
+import { Settings } from "@/components/Settings";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTracking } from "@/hooks/usePrayerTracking";
 import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
+import { useSettings } from "@/hooks/useSettings";
 import { MapPin, Calendar, Moon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const { prayerTimes, loading } = usePrayerTimes();
   const { updatePrayerStatus, getPrayerStatus, getWeeklyStats } = usePrayerTracking();
+  const { settings, updateSettings } = useSettings();
   const [nextPrayerIndex, setNextPrayerIndex] = useState<number>(0);
   const today = new Date().toISOString().split("T")[0];
 
   usePrayerNotifications(
     prayerTimes?.prayers || [],
-    getPrayerStatus
+    getPrayerStatus,
+    settings
   );
 
   useEffect(() => {
@@ -75,26 +80,39 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Weekly Stats */}
-        <WeeklyStats stats={weeklyStats} />
+        {/* Tabs */}
+        <Tabs defaultValue="prayers" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="prayers">Prayers</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
 
-        {/* Today's Prayers */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <span>Today's Prayers</span>
-          </h2>
-          
-          {prayerTimes?.prayers.map((prayer, index) => (
-            <PrayerCard
-              key={prayer.name}
-              name={prayer.name}
-              time={prayer.time}
-              isNext={index === nextPrayerIndex}
-              status={getPrayerStatus(today, prayer.name)}
-              onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
-            />
-          ))}
-        </div>
+          <TabsContent value="dashboard" className="space-y-4">
+            <WeeklyStats stats={weeklyStats} />
+          </TabsContent>
+
+          <TabsContent value="prayers" className="space-y-4">
+            <h2 className="text-2xl font-bold text-foreground">
+              Today's Prayers
+            </h2>
+            
+            {prayerTimes?.prayers.map((prayer, index) => (
+              <PrayerCard
+                key={prayer.name}
+                name={prayer.name}
+                time={prayer.time}
+                isNext={index === nextPrayerIndex}
+                status={getPrayerStatus(today, prayer.name)}
+                onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
+              />
+            ))}
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <Settings settings={settings} onUpdateSettings={updateSettings} />
+          </TabsContent>
+        </Tabs>
 
         {/* Footer */}
         <div className="text-center text-sm text-muted-foreground pt-8 border-t border-border">

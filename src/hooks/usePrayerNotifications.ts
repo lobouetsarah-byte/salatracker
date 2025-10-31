@@ -1,12 +1,15 @@
 import { useEffect, useRef } from "react";
 import { Prayer } from "./usePrayerTimes";
 import { PrayerStatus } from "./usePrayerTracking";
+import { NotificationSettings } from "./useSettings";
 
 export const usePrayerNotifications = (
   prayers: Prayer[],
-  getPrayerStatus: (date: string, prayerName: string) => PrayerStatus
+  getPrayerStatus: (date: string, prayerName: string) => PrayerStatus,
+  settings: NotificationSettings
 ) => {
   const intervalRef = useRef<number | null>(null);
+  const notifiedPrayersRef = useRef<Set<string>>(new Set());
 
   const requestNotificationPermission = async () => {
     if ("Notification" in window && Notification.permission === "default") {
@@ -26,7 +29,6 @@ export const usePrayerNotifications = (
 
   const checkPrayerReminders = () => {
     const now = new Date();
-    const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
     const today = now.toISOString().split("T")[0];
 
     prayers.forEach((prayer, index) => {
@@ -34,21 +36,42 @@ export const usePrayerNotifications = (
       const prayerDate = new Date(now);
       prayerDate.setHours(hours, minutes, 0, 0);
 
-      const nextPrayer = prayers[index + 1];
-      if (nextPrayer) {
-        const [nextHours, nextMinutes] = nextPrayer.time.split(":").map(Number);
-        const nextPrayerDate = new Date(now);
-        nextPrayerDate.setHours(nextHours, nextMinutes, 0, 0);
-        
-        const thirtyMinBefore = new Date(nextPrayerDate.getTime() - 30 * 60 * 1000);
-        
-        const status = getPrayerStatus(today, prayer.name);
-        
-        if (now >= thirtyMinBefore && status === "pending") {
+      const timeDiff = prayerDate.getTime() - now.getTime();
+      const minutesDiff = Math.floor(timeDiff / (1000 * 60));
+
+      // Prayer time notification (within 1 minute window)
+      if (settings.prayerTimeReminders && minutesDiff >= 0 && minutesDiff <= 1) {
+        const notificationKey = `${today}-${prayer.name}-time`;
+        if (!notifiedPrayersRef.current.has(notificationKey)) {
           sendNotification(
-            `⏰ Prayer Reminder`,
-            `You haven't marked ${prayer.name} prayer yet. ${nextPrayer.name} starts in 30 minutes!`
+            `🕌 Prayer Time`,
+            `It's time for ${prayer.name} prayer`
           );
+          notifiedPrayersRef.current.add(notificationKey);
+        }
+      }
+
+      // Missed prayer reminder (30 min before next prayer)
+      if (settings.missedPrayerReminders) {
+        const nextPrayer = prayers[index + 1];
+        if (nextPrayer) {
+          const [nextHours, nextMinutes] = nextPrayer.time.split(":").map(Number);
+          const nextPrayerDate = new Date(now);
+          nextPrayerDate.setHours(nextHours, nextMinutes, 0, 0);
+          
+          const thirtyMinBefore = new Date(nextPrayerDate.getTime() - 30 * 60 * 1000);
+          const status = getPrayerStatus(today, prayer.name);
+          
+          if (now >= thirtyMinBefore && status === "pending") {
+            const notificationKey = `${today}-${prayer.name}-missed`;
+            if (!notifiedPrayersRef.current.has(notificationKey)) {
+              sendNotification(
+                `⏰ Prayer Reminder`,
+                `You haven't marked ${prayer.name} prayer yet. ${nextPrayer.name} starts in 30 minutes!`
+              );
+              notifiedPrayersRef.current.add(notificationKey);
+            }
+          }
         }
       }
     });
