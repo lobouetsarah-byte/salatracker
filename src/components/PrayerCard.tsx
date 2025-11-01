@@ -59,8 +59,7 @@ export const PrayerCard = ({
   return (
     <>
       <Card 
-        className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-40" : ""} cursor-pointer`}
-        onClick={() => setDialogOpen(true)}
+        className={`p-3 sm:p-4 hover:shadow-lg transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-40" : ""}`}
       >
         <div className="flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
@@ -82,7 +81,6 @@ export const PrayerCard = ({
             {/* Dhikr checkbox */}
             {status !== "pending" && (
               <label
-                onClick={(e) => e.stopPropagation()}
                 className="mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors w-full cursor-pointer"
               >
                 <input
@@ -98,9 +96,10 @@ export const PrayerCard = ({
             )}
           </div>
 
-          {/* Status color box */}
+          {/* Status color box - clickable */}
           <div
-            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg hover:scale-105 flex-shrink-0`}
+            onClick={() => setDialogOpen(true)}
+            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg hover:scale-105 flex-shrink-0 cursor-pointer`}
           >
             {getStatusIcon()}
           </div>
