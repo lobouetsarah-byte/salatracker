@@ -22,7 +22,7 @@ import { NotificationPermissionPrompt } from "@/components/NotificationPermissio
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, guestMode, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
   const { prayerTimes, loading } = usePrayerTimes();
   const { updatePrayerStatus, deletePrayerStatus, getPrayerStatus, getStats, getCustomStats, loading: dataLoading } = usePrayerTrackingSync();
@@ -34,12 +34,12 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<string>("prayers");
   const today = new Date().toISOString().split("T")[0];
 
-  // Redirect to auth after splash screen if not logged in and not in guest mode
+  // Redirect to onboarding after splash screen if not logged in
   useEffect(() => {
-    if (!showSplash && !authLoading && !user && !guestMode) {
-      navigate("/auth");
+    if (!showSplash && !authLoading && !user) {
+      navigate("/onboarding");
     }
-  }, [showSplash, user, guestMode, authLoading, navigate]);
+  }, [showSplash, user, authLoading, navigate]);
 
   // Use native notifications on mobile, web notifications otherwise
   const isNative = Capacitor.isNativePlatform();

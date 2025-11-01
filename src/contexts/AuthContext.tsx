@@ -7,11 +7,10 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  guestMode: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  continueAsGuest: () => void;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,13 +19,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [guestMode, setGuestMode] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const isGuest = localStorage.getItem("guestMode") === "true";
-    setGuestMode(isGuest);
-  }, []);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -112,26 +105,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setGuestMode(false);
-    localStorage.removeItem("guestMode");
     toast({
       title: "Déconnexion",
       description: "Vous êtes maintenant déconnecté",
     });
   };
 
-  const continueAsGuest = () => {
-    setGuestMode(true);
-    localStorage.setItem("guestMode", "true");
-    setLoading(false);
-    toast({
-      title: "Mode invité",
-      description: "Connectez-vous pour sauvegarder vos progrès",
-    });
+  const deleteAccount = async () => {
+    if (!user) return;
+    
+    try {
+      // Delete user data from profiles table first
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', user.id);
+      
+      if (profileError) throw profileError;
+
+      // Sign out the user
+      await supabase.auth.signOut();
+      
+      toast({
+        title: "Compte supprimé",
+        description: "Votre compte a été supprimé avec succès",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le compte",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, guestMode, signIn, signUp, signOut, continueAsGuest }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

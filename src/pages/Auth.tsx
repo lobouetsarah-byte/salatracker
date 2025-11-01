@@ -15,7 +15,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, guestMode, loading: authLoading, signIn, signUp, continueAsGuest } = useAuth();
+  const { user, loading: authLoading, signIn } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -26,10 +26,10 @@ const Auth = () => {
   const activeTab = searchParams.get("tab") || "login";
 
   useEffect(() => {
-    if (user || guestMode) {
+    if (user) {
       navigate("/");
     }
-  }, [user, guestMode, navigate]);
+  }, [user, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,17 +42,8 @@ const Auth = () => {
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await signUp(email, password);
-    setLoading(false);
-    
-    if (!error) {
-      // After signup, automatically sign in
-      await signIn(email, password);
-      navigate("/");
-    }
+  const handleBackToOnboarding = () => {
+    navigate("/onboarding");
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -126,102 +117,51 @@ const Auth = () => {
                 </form>
               </div>
             ) : (
-              <Tabs defaultValue={activeTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">{t.login}</TabsTrigger>
-                  <TabsTrigger value="signup">{t.signup}</TabsTrigger>
-                </TabsList>
-              
-                <TabsContent value="login">
-                  <form onSubmit={handleSignIn} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email-login">{t.email}</Label>
-                      <Input
-                        id="email-login"
-                        type="email"
-                        placeholder={t.email}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password-login">{t.password}</Label>
-                      <Input
-                        id="password-login"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      variant="link"
-                      size="sm"
-                      onClick={() => setShowForgotPassword(true)}
-                      className="px-0 h-auto font-normal"
-                    >
-                      {t.forgotPassword}
-                    </Button>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "..." : t.signIn}
-                    </Button>
-                  </form>
-                </TabsContent>
-              
-                <TabsContent value="signup">
-                  <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email-signup">{t.email}</Label>
-                      <Input
-                        id="email-signup"
-                        type="email"
-                        placeholder={t.email}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password-signup">{t.password}</Label>
-                      <Input
-                        id="password-signup"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        minLength={6}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "..." : t.createAccount}
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-            )}
-            
-            {!showForgotPassword && (
-              <div className="mt-4 pt-4 border-t border-border">
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email-login">{t.email}</Label>
+                  <Input
+                    id="email-login"
+                    type="email"
+                    placeholder={t.email}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password-login">{t.password}</Label>
+                  <Input
+                    id="password-login"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    continueAsGuest();
-                    navigate("/");
-                  }}
+                  variant="link"
+                  size="sm"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="px-0 h-auto font-normal"
                 >
-                  <UserX className="mr-2 h-4 w-4" />
-                  {t.continueAsGuest}
+                  {t.forgotPassword}
                 </Button>
-                <p className="mt-2 text-xs text-muted-foreground text-center">
-                  {t.progressNotSaved}
-                </p>
-              </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "..." : t.signIn}
+                </Button>
+                <div className="text-center pt-4">
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={handleBackToOnboarding}
+                  >
+                    {t.createAccount}
+                  </Button>
+                </div>
+              </form>
             )}
           </CardContent>
         </Card>
