@@ -30,7 +30,7 @@ export const PrayerCard = ({
   onStatusDelete,
   onDhikrToggle,
 }: PrayerCardProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const getStatusColor = () => {
@@ -53,38 +53,39 @@ export const PrayerCard = ({
   };
 
   const hasSuccessBadge = status === "on-time" && dhikrDone;
-  const borderColor = isNext ? "border-l-primary" : isPast ? "border-l-muted" : "border-l-muted";
+  const borderColor = isNext && !isPast ? "border-l-primary" : isPast ? "border-l-muted-foreground/30" : "border-l-muted";
+  const cardBg = hasSuccessBadge ? "bg-gradient-to-br from-success/5 to-success/10" : "";
 
   return (
     <>
-      <Card className={`p-3 sm:p-4 hover:shadow-lg transition-all duration-300 border-l-4 ${borderColor}`}>
+      <Card className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-60" : ""}`}>
         <div className="flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <h3 className="text-lg sm:text-xl font-semibold text-foreground">{name}</h3>
               {isNext && (
-                <Badge variant="outline" className="text-xs border-muted-foreground text-muted-foreground">
+                <Badge variant="outline" className="text-xs border-muted-foreground/50 text-muted-foreground bg-muted/30">
                   {t.nextPrayer}
                 </Badge>
               )}
               {hasSuccessBadge && (
-                <Badge className="text-xs bg-success text-success-foreground">
-                  ✓ Succès
+                <Badge className="text-xs bg-success text-success-foreground shadow-sm">
+                  ✓ {language === "fr" ? "Succès" : "Success"}
                 </Badge>
               )}
             </div>
             <p className="text-xl sm:text-2xl font-bold text-primary">{time}</p>
             
             {/* Dhikr checkbox */}
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors">
               <input
                 type="checkbox"
                 checked={dhikrDone}
                 onChange={onDhikrToggle}
-                className="w-4 h-4 accent-primary cursor-pointer"
+                className="w-4 h-4 accent-primary cursor-pointer transition-transform hover:scale-110"
                 disabled={status === "pending"}
               />
-              <span className="text-xs sm:text-sm text-muted-foreground">
+              <span className="text-xs sm:text-sm text-muted-foreground font-medium">
                 {dhikrDone ? t.dhikrDone : t.dhikrPending}
               </span>
             </div>
@@ -93,7 +94,7 @@ export const PrayerCard = ({
           {/* Status color box */}
           <button
             onClick={() => setDialogOpen(true)}
-            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg ${getStatusColor()} transition-all flex items-center justify-center cursor-pointer shadow-md flex-shrink-0`}
+            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg ${getStatusColor()} transition-all duration-300 flex items-center justify-center cursor-pointer shadow-md hover:shadow-lg hover:scale-105 flex-shrink-0`}
           >
             {getStatusIcon()}
           </button>

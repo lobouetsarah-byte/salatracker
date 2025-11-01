@@ -9,10 +9,9 @@ import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
 import { useSettings } from "@/hooks/useSettings";
 import { useDhikrTracking } from "@/hooks/useDhikrTracking";
 import { useLanguage } from "@/hooks/useLanguage";
-import { MapPin, Calendar, Moon, BarChart3, Clock, BookOpen, Settings as SettingsIcon } from "lucide-react";
+import { MapPin, Calendar, BarChart3, Clock, BookOpen, Settings as SettingsIcon } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const { prayerTimes, loading } = usePrayerTimes();
@@ -22,6 +21,7 @@ const Index = () => {
   const { t } = useLanguage();
   const [nextPrayerIndex, setNextPrayerIndex] = useState<number>(0);
   const [statsPeriod, setStatsPeriod] = useState<"daily" | "weekly" | "monthly">("weekly");
+  const [activeTab, setActiveTab] = useState<string>("prayers");
   const today = new Date().toISOString().split("T")[0];
 
   usePrayerNotifications(
@@ -95,52 +95,49 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="prayers" className="w-full">
-          <TabsList className="hidden">
-            <TabsTrigger value="dashboard">{t.dashboard}</TabsTrigger>
-            <TabsTrigger value="prayers">{t.prayers}</TabsTrigger>
-            <TabsTrigger value="atkar">{t.atkar}</TabsTrigger>
-            <TabsTrigger value="settings">{t.settings}</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard" className="space-y-4 mt-0">
-            <WeeklyStats 
-              stats={stats} 
-              period={statsPeriod}
-              onPeriodChange={setStatsPeriod}
-            />
-          </TabsContent>
-
-          <TabsContent value="prayers" className="space-y-4 mt-0">
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground">
-              {t.prayers}
-            </h2>
-            
-            {prayerTimes?.prayers.map((prayer, index) => (
-              <PrayerCard
-                key={prayer.name}
-                name={prayer.name}
-                time={prayer.time}
-                isNext={index === nextPrayerIndex}
-                isPast={isPrayerPast(prayer.time)}
-                status={getPrayerStatus(today, prayer.name)}
-                dhikrDone={getDhikrStatus(today, prayer.name)}
-                onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
-                onStatusDelete={() => deletePrayerStatus(today, prayer.name)}
-                onDhikrToggle={() => toggleDhikr(today, prayer.name)}
+        {/* Content */}
+        <div className="space-y-6">
+          {activeTab === "dashboard" && (
+            <div className="space-y-4">
+              <WeeklyStats 
+                stats={stats} 
+                period={statsPeriod}
+                onPeriodChange={setStatsPeriod}
               />
-            ))}
-          </TabsContent>
+            </div>
+          )}
 
-          <TabsContent value="atkar" className="mt-0">
+          {activeTab === "prayers" && (
+            <div className="space-y-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+                {t.prayers}
+              </h2>
+              
+              {prayerTimes?.prayers.map((prayer, index) => (
+                <PrayerCard
+                  key={prayer.name}
+                  name={prayer.name}
+                  time={prayer.time}
+                  isNext={index === nextPrayerIndex}
+                  isPast={isPrayerPast(prayer.time)}
+                  status={getPrayerStatus(today, prayer.name)}
+                  dhikrDone={getDhikrStatus(today, prayer.name)}
+                  onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
+                  onStatusDelete={() => deletePrayerStatus(today, prayer.name)}
+                  onDhikrToggle={() => toggleDhikr(today, prayer.name)}
+                />
+              ))}
+            </div>
+          )}
+
+          {activeTab === "atkar" && (
             <Atkar />
-          </TabsContent>
+          )}
 
-          <TabsContent value="settings" className="mt-0">
+          {activeTab === "settings" && (
             <Settings settings={settings} onUpdateSettings={updateSettings} />
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
 
         {/* Footer */}
         <div className="text-center text-xs sm:text-sm text-muted-foreground pt-8 border-t border-border">
@@ -150,28 +147,54 @@ const Index = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border shadow-lg z-50">
         <div className="max-w-4xl mx-auto">
-          <Tabs defaultValue="prayers" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-16 rounded-none bg-transparent">
-              <TabsTrigger value="dashboard" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
-                <BarChart3 className="w-5 h-5" />
-                <span className="text-xs">{t.dashboard}</span>
-              </TabsTrigger>
-              <TabsTrigger value="prayers" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
-                <Clock className="w-5 h-5" />
-                <span className="text-xs">{t.prayers}</span>
-              </TabsTrigger>
-              <TabsTrigger value="atkar" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
-                <BookOpen className="w-5 h-5" />
-                <span className="text-xs">{t.atkar}</span>
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
-                <SettingsIcon className="w-5 h-5" />
-                <span className="text-xs">{t.settings}</span>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="grid grid-cols-4 h-16">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+                activeTab === "dashboard" 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <BarChart3 className="w-5 h-5" />
+              <span className="text-xs font-medium">{t.dashboard}</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("prayers")}
+              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+                activeTab === "prayers" 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <Clock className="w-5 h-5" />
+              <span className="text-xs font-medium">{t.prayers}</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("atkar")}
+              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+                activeTab === "atkar" 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <BookOpen className="w-5 h-5" />
+              <span className="text-xs font-medium">{t.atkar}</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("settings")}
+              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+                activeTab === "settings" 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <SettingsIcon className="w-5 h-5" />
+              <span className="text-xs font-medium">{t.settings}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
