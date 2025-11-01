@@ -7,9 +7,11 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  guestMode: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  continueAsGuest: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,7 +20,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [guestMode, setGuestMode] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const isGuest = localStorage.getItem("guestMode") === "true";
+    setGuestMode(isGuest);
+  }, []);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -104,14 +112,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setGuestMode(false);
+    localStorage.removeItem("guestMode");
     toast({
       title: "Déconnexion",
       description: "Vous êtes maintenant déconnecté",
     });
   };
 
+  const continueAsGuest = () => {
+    setGuestMode(true);
+    localStorage.setItem("guestMode", "true");
+    setLoading(false);
+    toast({
+      title: "Mode invité",
+      description: "Connectez-vous pour sauvegarder vos progrès",
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, guestMode, signIn, signUp, signOut, continueAsGuest }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { SplashScreen } from "@/components/SplashScreen";
 import { PrayerCard } from "@/components/PrayerCard";
 import { WeeklyStats } from "@/components/WeeklyStats";
 import { Settings } from "@/components/Settings";
@@ -8,9 +9,11 @@ import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTrackingSync } from "@/hooks/usePrayerTrackingSync";
 import { useDhikrTrackingSync } from "@/hooks/useDhikrTrackingSync";
 import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
+import { useNativeNotifications } from "@/hooks/useNativeNotifications";
 import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/AuthContext";
+import { Capacitor } from "@capacitor/core";
 import { MapPin, Calendar, BarChart3, Clock, BookOpen, Settings as SettingsIcon, LogOut } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,7 +21,8 @@ import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, guestMode, loading: authLoading, signOut } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
   const { prayerTimes, loading } = usePrayerTimes();
   const { updatePrayerStatus, deletePrayerStatus, getPrayerStatus, getStats, getCustomStats, loading: dataLoading } = usePrayerTrackingSync();
   const { toggleDhikr, getDhikrStatus } = useDhikrTrackingSync();
@@ -29,18 +33,29 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<string>("prayers");
   const today = new Date().toISOString().split("T")[0];
 
-  // Redirect to auth if not logged in
+  // Redirect to auth if not logged in and not in guest mode
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!authLoading && !user && !guestMode) {
       navigate("/auth");
     }
-  }, [user, authLoading, navigate]);
+  }, [user, guestMode, authLoading, navigate]);
 
-  usePrayerNotifications(
-    prayerTimes?.prayers || [],
-    getPrayerStatus,
-    settings
-  );
+  // Use native notifications on mobile, web notifications otherwise
+  const isNative = Capacitor.isNativePlatform();
+  
+  if (isNative) {
+    useNativeNotifications(
+      prayerTimes?.prayers || [],
+      getPrayerStatus,
+      settings
+    );
+  } else {
+    usePrayerNotifications(
+      prayerTimes?.prayers || [],
+      getPrayerStatus,
+      settings
+    );
+  }
 
   useEffect(() => {
     if (prayerTimes?.prayers) {
@@ -72,6 +87,10 @@ const Index = () => {
     navigate("/auth");
   };
 
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
   if (loading || authLoading || dataLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 p-6">
@@ -101,14 +120,25 @@ const Index = () => {
                 {t.appTitle}
               </h1>
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleSignOut}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="w-5 h-5" />
-            </Button>
+            {user ? (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleSignOut}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate("/auth")}
+                className="text-xs"
+              >
+                Se connecter
+              </Button>
+            )}
           </div>
           
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">

@@ -30,12 +30,18 @@ export const usePrayerNotifications = (
 
   const sendNotification = (title: string, body: string, playSound: boolean = false) => {
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification(title, {
+      const notification = new Notification(title, {
         body,
-        icon: "/placeholder.svg",
-        badge: "/placeholder.svg",
+        icon: "/favicon.png",
+        badge: "/favicon.png",
         tag: title,
+        requireInteraction: true,
       });
+
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
 
       if (playSound) {
         playAdhan();
