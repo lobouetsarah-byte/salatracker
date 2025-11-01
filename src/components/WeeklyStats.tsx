@@ -27,11 +27,11 @@ export const WeeklyStats = ({ stats, period, onPeriodChange }: WeeklyStatsProps)
   };
 
   return (
-    <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5">
-      <div className="flex items-center justify-between mb-4">
+    <Card className="p-4 sm:p-6 bg-white dark:bg-card">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-primary" />
-          <h2 className="text-2xl font-bold text-foreground">{getPeriodTitle()}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">{getPeriodTitle()}</h2>
         </div>
         <div className="flex gap-2">
           <Button
@@ -58,43 +58,43 @@ export const WeeklyStats = ({ stats, period, onPeriodChange }: WeeklyStatsProps)
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="text-center p-4 rounded-lg bg-card">
-          <div className="text-3xl font-bold text-foreground">{stats.total}</div>
-          <div className="text-sm text-muted-foreground">{t.totalPrayers}</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="text-center p-3 sm:p-4 rounded-lg bg-muted">
+          <div className="text-2xl sm:text-3xl font-bold text-foreground">{stats.total}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground">{t.totalPrayers}</div>
         </div>
-        <div className="text-center p-4 rounded-lg bg-success/10 border border-success/20">
+        <div className="text-center p-3 sm:p-4 rounded-lg bg-success/10 border border-success/20">
           <div className="flex items-center justify-center gap-1 mb-1">
             <CheckCircle2 className="w-4 h-4 text-success" />
-            <div className="text-3xl font-bold text-success">{stats.onTime}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-success">{stats.onTime}</div>
           </div>
-          <div className="text-sm text-success">{t.onTime}</div>
+          <div className="text-xs sm:text-sm text-success">{t.onTime}</div>
         </div>
-        <div className="text-center p-4 rounded-lg bg-warning/10 border border-warning/20">
+        <div className="text-center p-3 sm:p-4 rounded-lg bg-warning/10 border border-warning/20">
           <div className="flex items-center justify-center gap-1 mb-1">
             <AlertCircle className="w-4 h-4 text-warning" />
-            <div className="text-3xl font-bold text-warning">{stats.late}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-warning">{stats.late}</div>
           </div>
-          <div className="text-sm text-warning">{t.late}</div>
+          <div className="text-xs sm:text-sm text-warning">{t.late}</div>
         </div>
-        <div className="text-center p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+        <div className="text-center p-3 sm:p-4 rounded-lg bg-destructive/10 border border-destructive/20">
           <div className="flex items-center justify-center gap-1 mb-1">
             <XCircle className="w-4 h-4 text-destructive" />
-            <div className="text-3xl font-bold text-destructive">{stats.missed}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-destructive">{stats.missed}</div>
           </div>
-          <div className="text-sm text-destructive">{t.missed}</div>
+          <div className="text-xs sm:text-sm text-destructive">{t.missed}</div>
         </div>
       </div>
 
-      <div className="relative w-full h-8 bg-muted rounded-full overflow-hidden">
+      <div className="relative w-full h-6 sm:h-8 bg-muted rounded-full overflow-hidden">
         <div
-          className="absolute left-0 top-0 h-full bg-gradient-to-r from-success to-primary transition-all duration-500 flex items-center justify-center text-white text-sm font-semibold"
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-success to-primary transition-all duration-500 flex items-center justify-center text-white text-xs sm:text-sm font-semibold"
           style={{ width: `${completionRate}%` }}
         >
           {completionRate > 10 && `${completionRate}%`}
         </div>
       </div>
-      <p className="text-center mt-2 text-sm text-muted-foreground">
+      <p className="text-center mt-2 text-xs sm:text-sm text-muted-foreground">
         {t.completionRate}: {completionRate}%
       </p>
     </Card>

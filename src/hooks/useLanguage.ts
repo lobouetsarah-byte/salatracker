@@ -63,7 +63,7 @@ interface Translations {
 
 const translations: Record<Language, Translations> = {
   fr: {
-    appTitle: "Suivi des Prières",
+    appTitle: "Salatrack",
     dashboard: "Tableau de bord",
     prayers: "Prières",
     atkar: "Atkar",
@@ -104,7 +104,7 @@ const translations: Record<Language, Translations> = {
     prayerTimesProvider: "Horaires de prière fournis par Aladhan API",
   },
   en: {
-    appTitle: "Prayer Tracker",
+    appTitle: "Salatrack",
     dashboard: "Dashboard",
     prayers: "Prayers",
     atkar: "Atkar",
