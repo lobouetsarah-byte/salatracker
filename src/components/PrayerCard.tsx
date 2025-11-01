@@ -58,7 +58,7 @@ export const PrayerCard = ({
 
   return (
     <>
-      <Card className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-60" : ""}`}>
+      <Card className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-40" : ""}`}>
         <div className="flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -77,18 +77,22 @@ export const PrayerCard = ({
             <p className="text-xl sm:text-2xl font-bold text-primary">{time}</p>
             
             {/* Dhikr checkbox */}
-            <div className="mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors">
+            <button
+              onClick={onDhikrToggle}
+              disabled={status === "pending"}
+              className="mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            >
               <input
                 type="checkbox"
                 checked={dhikrDone}
-                onChange={onDhikrToggle}
-                className="w-4 h-4 accent-primary cursor-pointer transition-transform hover:scale-110"
+                onChange={() => {}}
+                className="w-4 h-4 accent-primary cursor-pointer transition-transform hover:scale-110 pointer-events-none"
                 disabled={status === "pending"}
               />
               <span className="text-xs sm:text-sm text-muted-foreground font-medium">
                 {dhikrDone ? t.dhikrDone : t.dhikrPending}
               </span>
-            </div>
+            </button>
           </div>
 
           {/* Status color box */}

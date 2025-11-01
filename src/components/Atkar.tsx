@@ -2,9 +2,10 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Clock, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2 } from "lucide-react";
 
 interface Dhikr {
   id: string;
@@ -12,6 +13,7 @@ interface Dhikr {
   nameEn: string;
   preview: string;
   previewEn: string;
+  estimatedTime: string;
   sentences: {
     arabic: string;
     phonetic: string;
@@ -23,17 +25,35 @@ interface Dhikr {
 
 const morningAtkar: Dhikr[] = [
   {
+    id: "morning-invocation",
+    name: "Invocation du matin",
+    nameEn: "Morning Invocation",
+    preview: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ...",
+    previewEn: "We have reached morning...",
+    estimatedTime: "1 min",
+    sentences: [
+      {
+        arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+        phonetic: "Aṣbaḥnā wa aṣbaḥa al-mulku lillāh, walḥamdu lillāh, lā ilāha illā Allāhu waḥdahu lā sharīka lah, lahu al-mulk wa lahu al-ḥamd wa huwa 'alā kulli shay'in qadīr",
+        translation: "We have reached morning and the sovereignty belongs to Allah, and all praise is due to Allah. There is no god but Allah alone with no partner. To Him belongs the dominion and to Him is all praise, and He has power over all things.",
+        translationFr: "Nous voici au matin et le royaume appartient à Allah. Louange à Allah, il n'y a de divinité qu'Allah, Unique, sans associé. À Lui la royauté, à Lui la louange et Il est capable de toute chose."
+      }
+    ],
+    repetitions: 1
+  },
+  {
     id: "ayat-kursi",
     name: "Ayat al-Kursi",
     nameEn: "Ayat al-Kursi",
     preview: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...",
     previewEn: "Allah! There is no deity except Him...",
+    estimatedTime: "1 min",
     sentences: [
       {
-        arabic: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ",
-        phonetic: "Allāhu lā ilāha illā huwa al-ḥayyu al-qayyūm, lā ta'khudhuhu sinatun wa lā nawm",
-        translation: "Allah! There is no deity except Him, the Ever-Living, the Sustainer. Neither drowsiness overtakes Him nor sleep.",
-        translationFr: "Allah! Il n'y a de divinité que Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent."
+        arabic: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+        phonetic: "Allāhu lā ilāha illā huwa al-ḥayyu al-qayyūm, lā ta'khudhuhu sinatun wa lā nawm, lahu mā fī as-samāwāti wa mā fī al-arḍ...",
+        translation: "Allah! There is no deity except Him, the Ever-Living, the Sustainer. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on earth...",
+        translationFr: "Allah! Il n'y a de divinité que Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent. À Lui appartient tout ce qui est dans les cieux et sur la terre..."
       }
     ],
     repetitions: 1
@@ -44,30 +64,13 @@ const morningAtkar: Dhikr[] = [
     nameEn: "Surah Al-Ikhlas",
     preview: "قُلْ هُوَ اللَّهُ أَحَدٌ...",
     previewEn: "Say: He is Allah, the One...",
+    estimatedTime: "30 sec",
     sentences: [
       {
-        arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ",
-        phonetic: "Qul huwa Allāhu aḥad",
-        translation: "Say: He is Allah, the One",
-        translationFr: "Dis : Il est Allah, Unique"
-      },
-      {
-        arabic: "اللَّهُ الصَّمَدُ",
-        phonetic: "Allāhu aṣ-ṣamad",
-        translation: "Allah, the Eternal Refuge",
-        translationFr: "Allah, Le Seul à être imploré"
-      },
-      {
-        arabic: "لَمْ يَلِدْ وَلَمْ يُولَدْ",
-        phonetic: "Lam yalid wa lam yūlad",
-        translation: "He neither begets nor is born",
-        translationFr: "Il n'a jamais engendré, n'a pas été engendré"
-      },
-      {
-        arabic: "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
-        phonetic: "Wa lam yakun lahu kufuwan aḥad",
-        translation: "Nor is there to Him any equivalent",
-        translationFr: "Et nul n'est égal à Lui"
+        arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ، اللَّهُ الصَّمَدُ، لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
+        phonetic: "Qul huwa Allāhu aḥad, Allāhu aṣ-ṣamad, lam yalid wa lam yūlad, wa lam yakun lahu kufuwan aḥad",
+        translation: "Say: He is Allah, the One. Allah, the Eternal Refuge. He neither begets nor is born, nor is there to Him any equivalent.",
+        translationFr: "Dis : Il est Allah, Unique. Allah, Le Seul à être imploré. Il n'a jamais engendré, n'a pas été engendré, et nul n'est égal à Lui."
       }
     ],
     repetitions: 3
@@ -78,18 +81,13 @@ const morningAtkar: Dhikr[] = [
     nameEn: "Surah Al-Falaq",
     preview: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ...",
     previewEn: "Say: I seek refuge in the Lord of daybreak...",
+    estimatedTime: "30 sec",
     sentences: [
       {
-        arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ",
-        phonetic: "Qul a'ūdhu bi-rabbi al-falaq",
-        translation: "Say: I seek refuge in the Lord of daybreak",
-        translationFr: "Dis : Je cherche protection auprès du Seigneur de l'aube"
-      },
-      {
-        arabic: "مِن شَرِّ مَا خَلَقَ",
-        phonetic: "Min sharri mā khalaq",
-        translation: "From the evil of that which He created",
-        translationFr: "Contre le mal des êtres qu'Il a créés"
+        arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، مِن شَرِّ مَا خَلَقَ، وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ، وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ، وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+        phonetic: "Qul a'ūdhu bi-rabbi al-falaq, min sharri mā khalaq, wa min sharri ghāsiqin idhā waqab...",
+        translation: "Say: I seek refuge in the Lord of daybreak, from the evil of that which He created, and from the evil of darkness when it settles...",
+        translationFr: "Dis : Je cherche protection auprès du Seigneur de l'aube, contre le mal des êtres qu'Il a créés, contre le mal de l'obscurité quand elle s'approfondit..."
       }
     ],
     repetitions: 3
@@ -100,31 +98,147 @@ const morningAtkar: Dhikr[] = [
     nameEn: "Surah An-Nas",
     preview: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ...",
     previewEn: "Say: I seek refuge in the Lord of mankind...",
+    estimatedTime: "30 sec",
     sentences: [
       {
-        arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ",
-        phonetic: "Qul a'ūdhu bi-rabbi an-nās",
-        translation: "Say: I seek refuge in the Lord of mankind",
-        translationFr: "Dis : Je cherche protection auprès du Seigneur des hommes"
-      },
-      {
-        arabic: "مَلِكِ النَّاسِ",
-        phonetic: "Maliki an-nās",
-        translation: "The Sovereign of mankind",
-        translationFr: "Le Roi des hommes"
+        arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ، مَلِكِ النَّاسِ، إِلَٰهِ النَّاسِ، مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
+        phonetic: "Qul a'ūdhu bi-rabbi an-nās, maliki an-nās, ilāhi an-nās, min sharri al-waswāsi al-khannās",
+        translation: "Say: I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer.",
+        translationFr: "Dis : Je cherche protection auprès du Seigneur des hommes, Le Roi des hommes, Dieu des hommes, contre le mal du mauvais conseiller, furtif."
       }
     ],
     repetitions: 3
+  },
+  {
+    id: "morning-tasbih",
+    name: "Tasbih du matin",
+    nameEn: "Morning Tasbih",
+    preview: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ...",
+    previewEn: "Glory be to Allah and praise be to Him...",
+    estimatedTime: "2 min",
+    sentences: [
+      {
+        arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)",
+        phonetic: "Subḥāna Allāhi wa biḥamdih (100 fois)",
+        translation: "Glory be to Allah and praise be to Him (100 times)",
+        translationFr: "Gloire et pureté à Allah et par Sa louange (100 fois)"
+      }
+    ],
+    repetitions: 100
   }
 ];
 
-const eveningAtkar: Dhikr[] = [...morningAtkar];
+const eveningAtkar: Dhikr[] = [
+  {
+    id: "evening-invocation",
+    name: "Invocation du soir",
+    nameEn: "Evening Invocation",
+    preview: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ...",
+    previewEn: "We have reached evening...",
+    estimatedTime: "1 min",
+    sentences: [
+      {
+        arabic: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+        phonetic: "Amsaynā wa amsā al-mulku lillāh, walḥamdu lillāh, lā ilāha illā Allāhu waḥdahu lā sharīka lah, lahu al-mulk wa lahu al-ḥamd wa huwa 'alā kulli shay'in qadīr",
+        translation: "We have reached evening and the sovereignty belongs to Allah, and all praise is due to Allah. There is no god but Allah alone with no partner. To Him belongs the dominion and to Him is all praise, and He has power over all things.",
+        translationFr: "Nous voici au soir et le royaume appartient à Allah. Louange à Allah, il n'y a de divinité qu'Allah, Unique, sans associé. À Lui la royauté, à Lui la louange et Il est capable de toute chose."
+      }
+    ],
+    repetitions: 1
+  },
+  {
+    id: "ayat-kursi-evening",
+    name: "Ayat al-Kursi",
+    nameEn: "Ayat al-Kursi",
+    preview: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...",
+    previewEn: "Allah! There is no deity except Him...",
+    estimatedTime: "1 min",
+    sentences: [
+      {
+        arabic: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+        phonetic: "Allāhu lā ilāha illā huwa al-ḥayyu al-qayyūm, lā ta'khudhuhu sinatun wa lā nawm, lahu mā fī as-samāwāti wa mā fī al-arḍ...",
+        translation: "Allah! There is no deity except Him, the Ever-Living, the Sustainer. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on earth...",
+        translationFr: "Allah! Il n'y a de divinité que Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent. À Lui appartient tout ce qui est dans les cieux et sur la terre..."
+      }
+    ],
+    repetitions: 1
+  },
+  {
+    id: "surah-ikhlas-evening",
+    name: "Sourate Al-Ikhlas",
+    nameEn: "Surah Al-Ikhlas",
+    preview: "قُلْ هُوَ اللَّهُ أَحَدٌ...",
+    previewEn: "Say: He is Allah, the One...",
+    estimatedTime: "30 sec",
+    sentences: [
+      {
+        arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ، اللَّهُ الصَّمَدُ، لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
+        phonetic: "Qul huwa Allāhu aḥad, Allāhu aṣ-ṣamad, lam yalid wa lam yūlad, wa lam yakun lahu kufuwan aḥad",
+        translation: "Say: He is Allah, the One. Allah, the Eternal Refuge. He neither begets nor is born, nor is there to Him any equivalent.",
+        translationFr: "Dis : Il est Allah, Unique. Allah, Le Seul à être imploré. Il n'a jamais engendré, n'a pas été engendré, et nul n'est égal à Lui."
+      }
+    ],
+    repetitions: 3
+  },
+  {
+    id: "surah-falaq-evening",
+    name: "Sourate Al-Falaq",
+    nameEn: "Surah Al-Falaq",
+    preview: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ...",
+    previewEn: "Say: I seek refuge in the Lord of daybreak...",
+    estimatedTime: "30 sec",
+    sentences: [
+      {
+        arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، مِن شَرِّ مَا خَلَقَ، وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ، وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ، وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+        phonetic: "Qul a'ūdhu bi-rabbi al-falaq, min sharri mā khalaq, wa min sharri ghāsiqin idhā waqab...",
+        translation: "Say: I seek refuge in the Lord of daybreak, from the evil of that which He created, and from the evil of darkness when it settles...",
+        translationFr: "Dis : Je cherche protection auprès du Seigneur de l'aube, contre le mal des êtres qu'Il a créés, contre le mal de l'obscurité quand elle s'approfondit..."
+      }
+    ],
+    repetitions: 3
+  },
+  {
+    id: "surah-nas-evening",
+    name: "Sourate An-Nas",
+    nameEn: "Surah An-Nas",
+    preview: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ...",
+    previewEn: "Say: I seek refuge in the Lord of mankind...",
+    estimatedTime: "30 sec",
+    sentences: [
+      {
+        arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ، مَلِكِ النَّاسِ، إِلَٰهِ النَّاسِ، مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
+        phonetic: "Qul a'ūdhu bi-rabbi an-nās, maliki an-nās, ilāhi an-nās, min sharri al-waswāsi al-khannās",
+        translation: "Say: I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer.",
+        translationFr: "Dis : Je cherche protection auprès du Seigneur des hommes, Le Roi des hommes, Dieu des hommes, contre le mal du mauvais conseiller, furtif."
+      }
+    ],
+    repetitions: 3
+  },
+  {
+    id: "evening-tasbih",
+    name: "Tasbih du soir",
+    nameEn: "Evening Tasbih",
+    preview: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ...",
+    previewEn: "Glory be to Allah and praise be to Him...",
+    estimatedTime: "2 min",
+    sentences: [
+      {
+        arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)",
+        phonetic: "Subḥāna Allāhi wa biḥamdih (100 fois)",
+        translation: "Glory be to Allah and praise be to Him (100 times)",
+        translationFr: "Gloire et pureté à Allah et par Sa louange (100 fois)"
+      }
+    ],
+    repetitions: 100
+  }
+];
 
 export const Atkar = () => {
   const { t, language } = useLanguage();
   const [selectedDhikr, setSelectedDhikr] = useState<Dhikr | null>(null);
   const [currentSentence, setCurrentSentence] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"morning" | "evening">("morning");
   const [completedMorning, setCompletedMorning] = useState<Set<string>>(new Set());
   const [completedEvening, setCompletedEvening] = useState<Set<string>>(new Set());
 
@@ -138,19 +252,22 @@ export const Atkar = () => {
     }
   }, []);
 
-  const handleDhikrClick = (dhikr: Dhikr) => {
+  const handleDhikrClick = (dhikr: Dhikr, type: "morning" | "evening") => {
     setSelectedDhikr(dhikr);
     setCurrentSentence(0);
+    setActiveTab(type);
     setDialogOpen(true);
   };
 
-  const handleMarkComplete = (dhikr: Dhikr, type: "morning" | "evening") => {
-    const today = new Date().toISOString().split("T")[0];
-    const newCompleted = type === "morning" 
-      ? new Set([...completedMorning, dhikr.id])
-      : new Set([...completedEvening, dhikr.id]);
+  const handleMarkComplete = () => {
+    if (!selectedDhikr) return;
     
-    if (type === "morning") {
+    const today = new Date().toISOString().split("T")[0];
+    const newCompleted = activeTab === "morning" 
+      ? new Set([...completedMorning, selectedDhikr.id])
+      : new Set([...completedEvening, selectedDhikr.id]);
+    
+    if (activeTab === "morning") {
       setCompletedMorning(newCompleted);
     } else {
       setCompletedEvening(newCompleted);
@@ -158,7 +275,7 @@ export const Atkar = () => {
 
     const stored = localStorage.getItem(`atkar-${today}`);
     const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
-    data[type] = Array.from(newCompleted);
+    data[activeTab] = Array.from(newCompleted);
     localStorage.setItem(`atkar-${today}`, JSON.stringify(data));
 
     setDialogOpen(false);
@@ -176,40 +293,36 @@ export const Atkar = () => {
     }
   };
 
+  const getTotalTime = (dhikrList: Dhikr[]) => {
+    let totalMinutes = 0;
+    dhikrList.forEach((dhikr) => {
+      const time = dhikr.estimatedTime;
+      if (time.includes("min")) {
+        totalMinutes += parseInt(time);
+      } else if (time.includes("sec")) {
+        totalMinutes += 0.5;
+      }
+    });
+    return Math.ceil(totalMinutes);
+  };
+
+  const allMorningCompleted = morningAtkar.every(d => completedMorning.has(d.id));
+  const allEveningCompleted = eveningAtkar.every(d => completedEvening.has(d.id));
+
   const renderDhikrList = (dhikrList: Dhikr[], type: "morning" | "evening") => {
     const completed = type === "morning" ? completedMorning : completedEvening;
-    const allCompleted = dhikrList.every(d => completed.has(d.id));
-    const estimatedTime = dhikrList.length * 2; // 2 min par dhikr
 
     return (
       <div className="space-y-3">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg sm:text-xl font-bold text-foreground">
-              {type === "morning" ? (language === "fr" ? "Adhkar du matin" : "Morning Adhkar") : (language === "fr" ? "Adhkar du soir" : "Evening Adhkar")}
-            </h3>
-            {allCompleted && (
-              <Badge className="bg-success text-success-foreground">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                {language === "fr" ? "Terminé" : "Complete"}
-              </Badge>
-            )}
-          </div>
-          <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-            <Clock className="w-4 h-4" />
-            <span>~{estimatedTime} min</span>
-          </div>
-        </div>
-
         {dhikrList.map((dhikr) => {
           const isCompleted = completed.has(dhikr.id);
           return (
             <Card
               key={dhikr.id}
               className={`p-3 sm:p-4 cursor-pointer hover:shadow-lg transition-all ${
-                isCompleted ? "bg-success/5 border-success/20" : ""
+                isCompleted ? "bg-success/10 border-success" : ""
               }`}
-              onClick={() => handleDhikrClick(dhikr)}
+              onClick={() => handleDhikrClick(dhikr, type)}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
@@ -218,14 +331,16 @@ export const Atkar = () => {
                       {language === "fr" ? dhikr.name : dhikr.nameEn}
                     </h4>
                     {isCompleted && (
-                      <CheckCircle className="w-4 h-4 text-success flex-shrink-0" />
+                      <Badge className="bg-success text-success-foreground text-xs">
+                        <Check className="w-3 h-3" />
+                      </Badge>
                     )}
                   </div>
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">
                     {language === "fr" ? dhikr.preview : dhikr.previewEn}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {dhikr.repetitions}x
+                    ⏱ {dhikr.estimatedTime}
                   </p>
                 </div>
               </div>
@@ -237,18 +352,54 @@ export const Atkar = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+    <div className="space-y-6 pb-6">
+      <h2 className="text-xl sm:text-2xl font-bold text-foreground text-center">
         {language === "fr" ? "Adhkar quotidiens" : "Daily Adhkar"}
       </h2>
 
-      {renderDhikrList(morningAtkar, "morning")}
-      {renderDhikrList(eveningAtkar, "evening")}
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "morning" | "evening")} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="morning" className="flex flex-col gap-1">
+            <span>{language === "fr" ? "Matin" : "Morning"}</span>
+            <div className="flex items-center gap-2">
+              {allMorningCompleted && (
+                <Badge className="bg-success text-success-foreground text-xs px-1 py-0">
+                  <Check className="w-3 h-3" />
+                </Badge>
+              )}
+              <span className="text-xs text-muted-foreground">
+                ~{getTotalTime(morningAtkar)} min
+              </span>
+            </div>
+          </TabsTrigger>
+          <TabsTrigger value="evening" className="flex flex-col gap-1">
+            <span>{language === "fr" ? "Soir" : "Evening"}</span>
+            <div className="flex items-center gap-2">
+              {allEveningCompleted && (
+                <Badge className="bg-success text-success-foreground text-xs px-1 py-0">
+                  <Check className="w-3 h-3" />
+                </Badge>
+              )}
+              <span className="text-xs text-muted-foreground">
+                ~{getTotalTime(eveningAtkar)} min
+              </span>
+            </div>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="morning">
+          {renderDhikrList(morningAtkar, "morning")}
+        </TabsContent>
+
+        <TabsContent value="evening">
+          {renderDhikrList(eveningAtkar, "evening")}
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">
+            <DialogTitle className="text-lg sm:text-xl text-center">
               {selectedDhikr && (language === "fr" ? selectedDhikr.name : selectedDhikr.nameEn)}
             </DialogTitle>
           </DialogHeader>
@@ -269,6 +420,25 @@ export const Atkar = () => {
                     ? selectedDhikr.sentences[currentSentence].translationFr 
                     : selectedDhikr.sentences[currentSentence].translation}
                 </p>
+              </div>
+
+              {/* Audio button */}
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="gap-2"
+                  onClick={() => {
+                    const utterance = new SpeechSynthesisUtterance(
+                      selectedDhikr.sentences[currentSentence].arabic
+                    );
+                    utterance.lang = "ar-SA";
+                    speechSynthesis.speak(utterance);
+                  }}
+                >
+                  <Volume2 className="w-5 h-5" />
+                  {language === "fr" ? "Écouter" : "Listen"}
+                </Button>
               </div>
 
               <div className="flex items-center justify-between pt-4 border-t">
@@ -295,22 +465,28 @@ export const Atkar = () => {
                 </Button>
               </div>
 
-              {currentSentence === selectedDhikr.sentences.length - 1 && (
-                <div className="grid grid-cols-2 gap-3 pt-4">
-                  <Button
-                    onClick={() => handleMarkComplete(selectedDhikr, "morning")}
-                    className="w-full bg-success hover:bg-success/90"
-                  >
-                    {language === "fr" ? "Marquer Matin" : "Mark Morning"}
-                  </Button>
-                  <Button
-                    onClick={() => handleMarkComplete(selectedDhikr, "evening")}
-                    className="w-full bg-success hover:bg-success/90"
-                  >
-                    {language === "fr" ? "Marquer Soir" : "Mark Evening"}
-                  </Button>
-                </div>
-              )}
+              {/* Mark as complete button */}
+              <div className="pt-4">
+                <Button
+                  onClick={handleMarkComplete}
+                  className="w-full bg-success hover:bg-success/90 text-success-foreground"
+                  size="lg"
+                  disabled={
+                    activeTab === "morning"
+                      ? completedMorning.has(selectedDhikr.id)
+                      : completedEvening.has(selectedDhikr.id)
+                  }
+                >
+                  <Check className="w-5 h-5 mr-2" />
+                  {activeTab === "morning"
+                    ? completedMorning.has(selectedDhikr.id)
+                      ? (language === "fr" ? "✓ Déjà fait" : "✓ Already done")
+                      : (language === "fr" ? "Marquer comme fait (Matin)" : "Mark as done (Morning)")
+                    : completedEvening.has(selectedDhikr.id)
+                      ? (language === "fr" ? "✓ Déjà fait" : "✓ Already done")
+                      : (language === "fr" ? "Marquer comme fait (Soir)" : "Mark as done (Evening)")}
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
