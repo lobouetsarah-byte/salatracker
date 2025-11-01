@@ -30,13 +30,36 @@ export const usePrayerTracking = () => {
     localStorage.setItem("prayerTracking", JSON.stringify(newData));
   };
 
+  const deletePrayerStatus = (date: string, prayerName: string) => {
+    if (prayerData[date]) {
+      const newDateData = { ...prayerData[date] };
+      delete newDateData[prayerName];
+      
+      const newData = {
+        ...prayerData,
+        [date]: newDateData,
+      };
+      setPrayerData(newData);
+      localStorage.setItem("prayerTracking", JSON.stringify(newData));
+    }
+  };
+
   const getPrayerStatus = (date: string, prayerName: string): PrayerStatus => {
     return prayerData[date]?.[prayerName] || "pending";
   };
 
-  const getWeeklyStats = () => {
+  const getStats = (period: "daily" | "weekly" | "monthly") => {
     const today = new Date();
-    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    let startDate: Date;
+
+    if (period === "daily") {
+      startDate = new Date(today);
+      startDate.setHours(0, 0, 0, 0);
+    } else if (period === "weekly") {
+      startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else {
+      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    }
     
     let onTime = 0;
     let late = 0;
@@ -45,7 +68,7 @@ export const usePrayerTracking = () => {
 
     Object.keys(prayerData).forEach((dateStr) => {
       const date = new Date(dateStr);
-      if (date >= weekAgo && date <= today) {
+      if (date >= startDate && date <= today) {
         Object.values(prayerData[dateStr]).forEach((status) => {
           total++;
           if (status === "on-time") onTime++;
@@ -58,9 +81,13 @@ export const usePrayerTracking = () => {
     return { onTime, late, missed, total };
   };
 
+  const getWeeklyStats = () => getStats("weekly");
+
   return {
     updatePrayerStatus,
+    deletePrayerStatus,
     getPrayerStatus,
     getWeeklyStats,
+    getStats,
   };
 };

@@ -10,6 +10,7 @@ export const usePrayerNotifications = (
 ) => {
   const intervalRef = useRef<number | null>(null);
   const notifiedPrayersRef = useRef<Set<string>>(new Set());
+  const adhanAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const requestNotificationPermission = async () => {
     if ("Notification" in window && Notification.permission === "default") {
@@ -17,13 +18,28 @@ export const usePrayerNotifications = (
     }
   };
 
-  const sendNotification = (title: string, body: string) => {
+  const playAdhan = () => {
+    // Using a free adhan audio URL
+    if (!adhanAudioRef.current) {
+      adhanAudioRef.current = new Audio("https://www.islamcan.com/audio/adhan/adhan-makkah.mp3");
+    }
+    adhanAudioRef.current.play().catch((error) => {
+      console.log("Could not play adhan:", error);
+    });
+  };
+
+  const sendNotification = (title: string, body: string, playSound: boolean = false) => {
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification(title, {
         body,
         icon: "/placeholder.svg",
         badge: "/placeholder.svg",
+        tag: title,
       });
+
+      if (playSound) {
+        playAdhan();
+      }
     }
   };
 
@@ -39,13 +55,14 @@ export const usePrayerNotifications = (
       const timeDiff = prayerDate.getTime() - now.getTime();
       const minutesDiff = Math.floor(timeDiff / (1000 * 60));
 
-      // Prayer time notification (within 1 minute window)
+      // Prayer time notification (within 1 minute window) - play adhan
       if (settings.prayerTimeReminders && minutesDiff >= 0 && minutesDiff <= 1) {
         const notificationKey = `${today}-${prayer.name}-time`;
         if (!notifiedPrayersRef.current.has(notificationKey)) {
           sendNotification(
-            `🕌 Prayer Time`,
-            `It's time for ${prayer.name} prayer`
+            `🕌 ${prayer.name}`,
+            `C'est l'heure de la prière ${prayer.name}`,
+            true
           );
           notifiedPrayersRef.current.add(notificationKey);
         }
@@ -66,8 +83,9 @@ export const usePrayerNotifications = (
             const notificationKey = `${today}-${prayer.name}-missed`;
             if (!notifiedPrayersRef.current.has(notificationKey)) {
               sendNotification(
-                `⏰ Prayer Reminder`,
-                `You haven't marked ${prayer.name} prayer yet. ${nextPrayer.name} starts in 30 minutes!`
+                `⏰ Rappel`,
+                `Vous n'avez pas marqué la prière ${prayer.name}. ${nextPrayer.name} commence dans 30 minutes !`,
+                false
               );
               notifiedPrayersRef.current.add(notificationKey);
             }
@@ -89,6 +107,10 @@ export const usePrayerNotifications = (
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      if (adhanAudioRef.current) {
+        adhanAudioRef.current.pause();
+        adhanAudioRef.current = null;
+      }
     };
-  }, [prayers]);
+  }, [prayers, settings]);
 };

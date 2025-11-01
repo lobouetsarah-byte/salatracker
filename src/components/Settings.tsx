@@ -1,8 +1,10 @@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Clock } from "lucide-react";
+import { Bell, Clock, Languages } from "lucide-react";
 import { NotificationSettings } from "@/hooks/useSettings";
+import { useLanguage, Language } from "@/hooks/useLanguage";
+import { Button } from "@/components/ui/button";
 
 interface SettingsProps {
   settings: NotificationSettings;
@@ -10,16 +12,48 @@ interface SettingsProps {
 }
 
 export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
+  const { language, updateLanguage, t } = useLanguage();
+
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bell className="w-5 h-5" />
-            Notification Settings
+            <Languages className="w-5 h-5" />
+            {t.languageSettings}
           </CardTitle>
           <CardDescription>
-            Manage your prayer reminder notifications
+            {t.language}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-3">
+            <Button
+              onClick={() => updateLanguage("fr")}
+              variant={language === "fr" ? "default" : "outline"}
+              className="flex-1"
+            >
+              {t.french}
+            </Button>
+            <Button
+              onClick={() => updateLanguage("en")}
+              variant={language === "en" ? "default" : "outline"}
+              className="flex-1"
+            >
+              {t.english}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="w-5 h-5" />
+            {t.notificationSettings}
+          </CardTitle>
+          <CardDescription>
+            {t.notificationSettings}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -27,10 +61,10 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
             <div className="space-y-1 flex-1">
               <Label htmlFor="prayer-time" className="text-base font-medium flex items-center gap-2">
                 <Bell className="w-4 h-4" />
-                Prayer Time Notifications
+                {t.prayerTimeNotifications}
               </Label>
               <p className="text-sm text-muted-foreground">
-                Get notified when it's time for each prayer
+                {language === "fr" ? "Soyez notifié lors de chaque heure de prière" : "Get notified when it's time for each prayer"}
               </p>
             </div>
             <Switch
@@ -46,10 +80,13 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
             <div className="space-y-1 flex-1">
               <Label htmlFor="missed-prayer" className="text-base font-medium flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                Missed Prayer Reminders
+                {t.missedPrayerReminders}
               </Label>
               <p className="text-sm text-muted-foreground">
-                Get reminded 30 minutes before next prayer if you haven't checked the previous one
+                {language === "fr" 
+                  ? "Rappel 30 minutes avant la prochaine prière si la précédente n'est pas cochée" 
+                  : "Get reminded 30 minutes before next prayer if you haven't checked the previous one"
+                }
               </p>
             </div>
             <Switch
@@ -65,16 +102,10 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>About Notifications</CardTitle>
+          <CardTitle>{t.aboutNotifications}</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>
-            Browser notifications require your permission. If you haven't granted permission yet, 
-            you'll be prompted when notifications are enabled.
-          </p>
-          <p>
-            Make sure notifications are allowed in your browser settings for the best experience.
-          </p>
+        <CardContent className="text-sm text-muted-foreground">
+          <p>{t.notificationPermission}</p>
         </CardContent>
       </Card>
     </div>

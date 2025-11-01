@@ -7,15 +7,20 @@ import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTracking } from "@/hooks/usePrayerTracking";
 import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
 import { useSettings } from "@/hooks/useSettings";
+import { useDhikrTracking } from "@/hooks/useDhikrTracking";
+import { useLanguage } from "@/hooks/useLanguage";
 import { MapPin, Calendar, Moon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const { prayerTimes, loading } = usePrayerTimes();
-  const { updatePrayerStatus, getPrayerStatus, getWeeklyStats } = usePrayerTracking();
+  const { updatePrayerStatus, deletePrayerStatus, getPrayerStatus, getStats } = usePrayerTracking();
+  const { toggleDhikr, getDhikrStatus } = useDhikrTracking();
   const { settings, updateSettings } = useSettings();
+  const { t } = useLanguage();
   const [nextPrayerIndex, setNextPrayerIndex] = useState<number>(0);
+  const [statsPeriod, setStatsPeriod] = useState<"daily" | "weekly" | "monthly">("weekly");
   const today = new Date().toISOString().split("T")[0];
 
   usePrayerNotifications(
@@ -39,7 +44,7 @@ const Index = () => {
     }
   }, [prayerTimes]);
 
-  const weeklyStats = getWeeklyStats();
+  const stats = getStats(statsPeriod);
 
   if (loading) {
     return (
@@ -65,7 +70,7 @@ const Index = () => {
           <div className="flex items-center justify-center gap-3 mb-2">
             <Moon className="w-8 h-8 text-primary" />
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Prayer Tracker
+              {t.appTitle}
             </h1>
           </div>
           
@@ -84,19 +89,23 @@ const Index = () => {
         {/* Tabs */}
         <Tabs defaultValue="prayers" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="prayers">Prayers</TabsTrigger>
-            <TabsTrigger value="atkar">Atkar</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="dashboard">{t.dashboard}</TabsTrigger>
+            <TabsTrigger value="prayers">{t.prayers}</TabsTrigger>
+            <TabsTrigger value="atkar">{t.atkar}</TabsTrigger>
+            <TabsTrigger value="settings">{t.settings}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-4">
-            <WeeklyStats stats={weeklyStats} />
+            <WeeklyStats 
+              stats={stats} 
+              period={statsPeriod}
+              onPeriodChange={setStatsPeriod}
+            />
           </TabsContent>
 
           <TabsContent value="prayers" className="space-y-4">
             <h2 className="text-2xl font-bold text-foreground">
-              Today's Prayers
+              {t.prayers}
             </h2>
             
             {prayerTimes?.prayers.map((prayer, index) => (
@@ -106,7 +115,10 @@ const Index = () => {
                 time={prayer.time}
                 isNext={index === nextPrayerIndex}
                 status={getPrayerStatus(today, prayer.name)}
+                dhikrDone={getDhikrStatus(today, prayer.name)}
                 onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
+                onStatusDelete={() => deletePrayerStatus(today, prayer.name)}
+                onDhikrToggle={() => toggleDhikr(today, prayer.name)}
               />
             ))}
           </TabsContent>
@@ -122,8 +134,8 @@ const Index = () => {
 
         {/* Footer */}
         <div className="text-center text-sm text-muted-foreground pt-8 border-t border-border">
-          <p>May Allah accept all your prayers</p>
-          <p className="mt-1">Prayer times provided by Aladhan API</p>
+          <p>{t.footer}</p>
+          <p className="mt-1">{t.prayerTimesProvider}</p>
         </div>
       </div>
     </div>
