@@ -140,28 +140,13 @@ const Onboarding = () => {
         <Card className="shadow-xl">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">
-              {step === 0 ? (language === "fr" ? "Bienvenue" : "Welcome") : (language === "fr" ? "Créer un compte" : "Create Account")}
+              {language === "fr" ? "Créer un compte" : "Create Account"}
             </CardTitle>
             <CardDescription>
-              {step > 0 && (language === "fr" ? `Étape ${step} sur 4` : `Step ${step} of 4`)}
+              {language === "fr" ? `Étape ${step} sur 4` : `Step ${step} of 4`}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {step === 0 && (
-              <div className="space-y-4">
-                <p className="text-center text-muted-foreground mb-6">
-                  {language === "fr" ? "Commencez votre voyage spirituel" : "Start your spiritual journey"}
-                </p>
-                <Button onClick={() => setStep(1)} className="w-full h-12" size="lg">
-                  {language === "fr" ? "Créer un compte" : "Create Account"}
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-                <Button onClick={() => navigate("/auth")} variant="outline" className="w-full h-12" size="lg">
-                  {language === "fr" ? "J'ai déjà un compte" : "I already have an account"}
-                </Button>
-              </div>
-            )}
-
             {step === 1 && (
               <div className="space-y-4">
                 <div className="space-y-2">

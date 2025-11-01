@@ -34,10 +34,10 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<string>("prayers");
   const today = new Date().toISOString().split("T")[0];
 
-  // Redirect to onboarding after splash screen if not logged in
+  // Redirect to auth after splash screen if not logged in
   useEffect(() => {
     if (!showSplash && !authLoading && !user) {
-      navigate("/onboarding");
+      navigate("/auth");
     }
   }, [showSplash, user, authLoading, navigate]);
 
