@@ -94,37 +94,46 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
             {t.myAccount}
           </CardTitle>
           <CardDescription>
-            {user ? user.email : t.continueAsGuest}
+            {user ? user.email : guestMode ? t.continueAsGuest : t.trackProgress}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {user ? (
             <>
+              {/* Current email display */}
+              <div className="p-3 bg-muted/30 rounded-lg">
+                <p className="text-sm text-muted-foreground">{t.email}</p>
+                <p className="font-medium">{user.email}</p>
+              </div>
+
+              {/* Update email */}
               <div className="space-y-2">
                 <Label htmlFor="new-email" className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
                   {t.updateEmail}
                 </Label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="new-email"
                     type="email"
-                    placeholder={t.email}
+                    placeholder={language === "fr" ? "Nouvel email" : "New email"}
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
+                    className="flex-1"
                   />
-                  <Button onClick={handleUpdateEmail} disabled={loading || !newEmail}>
-                    {t.updateEmail}
+                  <Button onClick={handleUpdateEmail} disabled={loading || !newEmail} className="w-full sm:w-auto">
+                    {language === "fr" ? "Modifier" : "Update"}
                   </Button>
                 </div>
               </div>
 
+              {/* Update password */}
               <div className="space-y-2">
                 <Label htmlFor="new-password" className="flex items-center gap-2">
                   <Lock className="w-4 h-4" />
                   {t.updatePassword}
                 </Label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="new-password"
                     type="password"
@@ -132,34 +141,47 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     minLength={6}
+                    className="flex-1"
                   />
-                  <Button onClick={handleUpdatePassword} disabled={loading || !newPassword}>
-                    {t.updatePassword}
+                  <Button onClick={handleUpdatePassword} disabled={loading || !newPassword} className="w-full sm:w-auto">
+                    {language === "fr" ? "Modifier" : "Update"}
                   </Button>
                 </div>
               </div>
 
-              <Button 
-                variant="destructive" 
-                className="w-full"
-                onClick={handleSignOut}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                {t.signOut}
-              </Button>
+              {/* Sign out button */}
+              <div className="pt-4 border-t">
+                <Button 
+                  variant="destructive" 
+                  className="w-full"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t.signOut}
+                </Button>
+              </div>
             </>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground text-center">
                 {t.trackProgress}
               </p>
-              <Button 
-                className="w-full"
-                onClick={handleSignIn}
-              >
-                <LogIn className="w-4 h-4 mr-2" />
-                {t.signIn}
-              </Button>
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleSignIn}
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  {t.signIn}
+                </Button>
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate("/auth")}
+                >
+                  {t.createAccount}
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>

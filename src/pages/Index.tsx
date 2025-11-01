@@ -14,7 +14,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/AuthContext";
 import { Capacitor } from "@capacitor/core";
-import { MapPin, Calendar, BarChart3, Clock, BookOpen, Settings as SettingsIcon, LogOut } from "lucide-react";
+import { MapPin, Calendar, BarChart3, Clock, BookOpen, Settings as SettingsIcon } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -34,12 +34,12 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<string>("prayers");
   const today = new Date().toISOString().split("T")[0];
 
-  // Redirect to auth if not logged in and not in guest mode
+  // Redirect to auth after splash screen if not logged in and not in guest mode
   useEffect(() => {
-    if (!authLoading && !user && !guestMode) {
+    if (!showSplash && !authLoading && !user && !guestMode) {
       navigate("/auth");
     }
-  }, [user, guestMode, authLoading, navigate]);
+  }, [showSplash, user, guestMode, authLoading, navigate]);
 
   // Use native notifications on mobile, web notifications otherwise
   const isNative = Capacitor.isNativePlatform();
@@ -113,33 +113,11 @@ const Index = () => {
       <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-10"></div>
-            <div className="flex items-center gap-3">
-              <img src={salatrackLogo} alt="Salatrack" className="w-10 h-10 sm:w-12 sm:h-12" />
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                {t.appTitle}
-              </h1>
-            </div>
-            {user ? (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={handleSignOut}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <LogOut className="w-5 h-5" />
-              </Button>
-            ) : (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate("/auth")}
-                className="text-xs"
-              >
-                Se connecter
-              </Button>
-            )}
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <img src={salatrackLogo} alt="Salatrack" className="w-10 h-10 sm:w-12 sm:h-12" />
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              {t.appTitle}
+            </h1>
           </div>
           
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
