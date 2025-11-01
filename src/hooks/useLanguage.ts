@@ -64,7 +64,7 @@ interface Translations {
 const translations: Record<Language, Translations> = {
   fr: {
     appTitle: "Salatrack",
-    dashboard: "Tableau de bord",
+    dashboard: "Progrès",
     prayers: "Prières",
     atkar: "Atkar",
     settings: "Paramètres",

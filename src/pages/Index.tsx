@@ -18,6 +18,7 @@ import { MapPin, Calendar, BarChart3, Clock, BookOpen, Settings as SettingsIcon,
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { NotificationPermissionPrompt } from "@/components/NotificationPermissionPrompt";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -152,6 +153,9 @@ const Index = () => {
             </div>
           </div>
         </div>
+
+        {/* Notifications permission prompt */}
+        <NotificationPermissionPrompt />
 
         {/* Content */}
         <div className="space-y-6">
