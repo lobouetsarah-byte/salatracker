@@ -22,7 +22,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export const SettingsAccount = () => {
+interface SettingsAccountProps {
+  onLogout?: () => void;
+}
+
+export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
   const { user, signOut, deleteAccount } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -145,13 +149,21 @@ export const SettingsAccount = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/onboarding");
+    if (onLogout) {
+      onLogout();
+    } else {
+      await signOut();
+      navigate("/auth");
+    }
   };
 
   const handleDeleteAccount = async () => {
     await deleteAccount();
-    navigate("/onboarding");
+    if (onLogout) {
+      onLogout();
+    } else {
+      navigate("/auth");
+    }
   };
 
   if (!user) {

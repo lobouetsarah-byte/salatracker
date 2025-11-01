@@ -24,6 +24,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { prayerTimes, loading } = usePrayerTimes();
   const { updatePrayerStatus, deletePrayerStatus, getPrayerStatus, getStats, getCustomStats, loading: dataLoading } = usePrayerTrackingSync();
   const { toggleDhikr, getDhikrStatus } = useDhikrTrackingSync();
@@ -40,6 +41,18 @@ const Index = () => {
       navigate("/auth");
     }
   }, [showSplash, user, authLoading, navigate]);
+
+  // Handle logout splash screen
+  useEffect(() => {
+    if (isLoggingOut && showSplash) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+        setIsLoggingOut(false);
+        navigate("/auth");
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoggingOut, showSplash, navigate]);
 
   // Use native notifications on mobile, web notifications otherwise
   const isNative = Capacitor.isNativePlatform();
@@ -84,12 +97,17 @@ const Index = () => {
   const stats = getStats(statsPeriod);
 
   const handleSignOut = async () => {
+    setIsLoggingOut(true);
     await signOut();
-    navigate("/auth");
+    setShowSplash(true);
   };
 
   if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+    return <SplashScreen onComplete={() => {
+      if (!isLoggingOut) {
+        setShowSplash(false);
+      }
+    }} />;
   }
 
   if (loading || authLoading || dataLoading) {
@@ -176,7 +194,7 @@ const Index = () => {
           )}
 
           {activeTab === "settings" && (
-            <Settings settings={settings} onUpdateSettings={updateSettings} />
+            <Settings settings={settings} onUpdateSettings={updateSettings} onLogout={handleSignOut} />
           )}
         </div>
 

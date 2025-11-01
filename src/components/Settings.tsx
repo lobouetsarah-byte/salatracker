@@ -10,9 +10,10 @@ import { Link } from "react-router-dom";
 interface SettingsProps {
   settings: NotificationSettings;
   onUpdateSettings: (settings: Partial<NotificationSettings>) => void;
+  onLogout?: () => void;
 }
 
-export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
+export const Settings = ({ settings, onUpdateSettings, onLogout }: SettingsProps) => {
   const { language, t } = useLanguage();
 
   return (
@@ -23,7 +24,7 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
       </div>
       
       {/* My Account Section */}
-      <SettingsAccount />
+      <SettingsAccount onLogout={onLogout} />
 
       {/* Notification Settings */}
       <Card className="shadow-lg border-primary/10 hover:shadow-xl transition-shadow duration-300">
