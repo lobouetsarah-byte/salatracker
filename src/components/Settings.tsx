@@ -1,12 +1,11 @@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Clock, Languages, Sunrise, Sunset } from "lucide-react";
+import { Bell, Clock, Sunrise, Sunset } from "lucide-react";
 import { NotificationSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Button } from "@/components/ui/button";
 import { SettingsAccount } from "./SettingsAccount";
-import { SettingsPermissions } from "./SettingsPermissions";
+import { Link } from "react-router-dom";
 
 interface SettingsProps {
   settings: NotificationSettings;
@@ -14,52 +13,17 @@ interface SettingsProps {
 }
 
 export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
-  const { language, updateLanguage, t } = useLanguage();
+  const { language, t } = useLanguage();
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <h2 className="text-2xl font-bold text-foreground">{t.settings}</h2>
-        <p className="text-sm text-muted-foreground">{language === "fr" ? "Gérez vos préférences et votre compte" : "Manage your preferences and account"}</p>
+        <p className="text-sm text-muted-foreground">Gérez vos préférences et votre compte</p>
       </div>
       
       {/* My Account Section */}
       <SettingsAccount />
-      
-      {/* Language Settings */}
-      <Card className="shadow-lg border-primary/10 hover:shadow-xl transition-shadow duration-300">
-        <CardHeader className="space-y-3">
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Languages className="w-5 h-5 text-primary" />
-            </div>
-            {t.languageSettings}
-          </CardTitle>
-          <CardDescription className="text-sm">
-            {t.language}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              onClick={() => updateLanguage("fr")}
-              variant={language === "fr" ? "default" : "outline"}
-              className="h-14 text-base font-semibold"
-              size="lg"
-            >
-              🇫🇷 {t.french}
-            </Button>
-            <Button
-              onClick={() => updateLanguage("en")}
-              variant={language === "en" ? "default" : "outline"}
-              className="h-14 text-base font-semibold"
-              size="lg"
-            >
-              🇬🇧 {t.english}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Notification Settings */}
       <Card className="shadow-lg border-primary/10 hover:shadow-xl transition-shadow duration-300">
@@ -71,7 +35,7 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
             {t.notificationSettings}
           </CardTitle>
           <CardDescription className="text-sm">
-            {language === "fr" ? "Gérez vos notifications" : "Manage your notifications"}
+            Gérez vos notifications
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -84,7 +48,7 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
                 {t.prayerTimeNotifications}
               </Label>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {language === "fr" ? "Soyez notifié lors de chaque heure de prière" : "Get notified when it's time for each prayer"}
+                Soyez notifié lors de chaque heure de prière
               </p>
             </div>
             <Switch
@@ -106,10 +70,7 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
                 {t.missedPrayerReminders}
               </Label>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {language === "fr" 
-                  ? "Rappel 30 minutes avant la prochaine prière si la précédente n'est pas cochée" 
-                  : "Get reminded 30 minutes before next prayer if you haven't checked the previous one"
-                }
+                Rappel 30 minutes avant la prochaine prière si la précédente n'est pas cochée
               </p>
             </div>
             <Switch
@@ -128,13 +89,10 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
                 <div className="p-1.5 rounded bg-primary/20">
                   <Sunrise className="w-4 h-4 text-primary" />
                 </div>
-                {language === "fr" ? "Rappel adhkar du matin" : "Morning adhkar reminder"}
+                Rappel adhkar du matin
               </Label>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {language === "fr" 
-                  ? "Notification quotidienne pour les invocations du matin" 
-                  : "Daily reminder for morning supplications"
-                }
+                Notification quotidienne pour les invocations du matin
               </p>
             </div>
             <Switch
@@ -153,13 +111,10 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
                 <div className="p-1.5 rounded bg-primary/20">
                   <Sunset className="w-4 h-4 text-primary" />
                 </div>
-                {language === "fr" ? "Rappel adhkar du soir" : "Evening adhkar reminder"}
+                Rappel adhkar du soir
               </Label>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {language === "fr" 
-                  ? "Notification quotidienne pour les invocations du soir" 
-                  : "Daily reminder for evening supplications"
-                }
+                Notification quotidienne pour les invocations du soir
               </p>
             </div>
             <Switch
@@ -174,9 +129,6 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
         </CardContent>
       </Card>
 
-      {/* Permissions Section */}
-      <SettingsPermissions />
-
       <Card className="shadow-lg bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
@@ -190,6 +142,17 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
           <p>{t.notificationPermission}</p>
         </CardContent>
       </Card>
+
+      {/* Legal Links */}
+      <div className="text-center text-xs text-muted-foreground pt-4 space-x-4">
+        <Link to="/terms" className="hover:text-primary transition-colors underline">
+          Conditions Générales
+        </Link>
+        <span>•</span>
+        <Link to="/privacy" className="hover:text-primary transition-colors underline">
+          Politique de Confidentialité
+        </Link>
+      </div>
     </div>
   );
 };

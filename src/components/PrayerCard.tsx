@@ -54,29 +54,30 @@ export const PrayerCard = ({
 
   const hasSuccessBadge = status === "on-time" && dhikrDone;
   const borderColor = isNext && !isPast ? "border-l-primary" : isPast ? "border-l-muted-foreground/30" : "border-l-muted";
-  const cardBg = hasSuccessBadge ? "bg-gradient-to-br from-success/5 to-success/10" : "";
+  const cardBg = hasSuccessBadge ? "bg-gradient-to-br from-success/5 to-success/10" : isPast ? "bg-muted/20" : "";
+  const textOpacity = isPast ? "opacity-50" : "";
 
   return (
     <>
       <Card 
-        className={`p-3 sm:p-4 hover:shadow-lg transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-40" : ""}`}
+        className={`p-3 sm:p-4 hover:shadow-lg transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-60 grayscale" : ""}`}
       >
         <div className="flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <h3 className="text-lg sm:text-xl font-semibold text-foreground">{name}</h3>
-              {isNext && (
-                <Badge variant="outline" className="text-xs border-muted-foreground/30 text-muted-foreground/70 bg-muted/20">
+              <h3 className={`text-lg sm:text-xl font-semibold text-foreground ${textOpacity}`}>{name}</h3>
+              {isNext && !isPast && (
+                <Badge variant="outline" className="text-xs border-primary/50 text-primary bg-primary/10">
                   {t.nextPrayer}
                 </Badge>
               )}
               {hasSuccessBadge && (
                 <Badge className="text-xs bg-success text-success-foreground shadow-sm">
-                  ✓ {language === "fr" ? "Succès" : "Success"}
+                  ✓ Succès
                 </Badge>
               )}
             </div>
-            <p className="text-xl sm:text-2xl font-bold text-primary">{time}</p>
+            <p className={`text-xl sm:text-2xl font-bold ${isPast ? "text-muted-foreground" : "text-primary"}`}>{time}</p>
             
             {/* Dhikr checkbox */}
             {status !== "pending" && (

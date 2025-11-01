@@ -152,11 +152,16 @@ const Auth = () => {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "..." : t.signIn}
                 </Button>
-                <div className="text-center pt-4">
+                <div className="text-center pt-4 border-t border-border mt-4">
+                  <p className="text-sm text-muted-foreground mb-3 mt-4">
+                    Pas encore de compte ?
+                  </p>
                   <Button
                     type="button"
-                    variant="link"
+                    variant="outline"
                     onClick={handleBackToOnboarding}
+                    className="w-full"
+                    size="lg"
                   >
                     {t.createAccount}
                   </Button>
