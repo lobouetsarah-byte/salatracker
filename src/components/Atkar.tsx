@@ -241,6 +241,20 @@ export const Atkar = () => {
   const [activeTab, setActiveTab] = useState<"morning" | "evening">("morning");
   const [completedMorning, setCompletedMorning] = useState<Set<string>>(new Set());
   const [completedEvening, setCompletedEvening] = useState<Set<string>>(new Set());
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Load voices on component mount
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      const loadVoices = () => {
+        window.speechSynthesis.getVoices();
+      };
+      loadVoices();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -304,6 +318,49 @@ export const Atkar = () => {
       }
     });
     return Math.ceil(totalMinutes);
+  };
+
+  const playAudio = (text: string) => {
+    if (!('speechSynthesis' in window)) {
+      console.error('Speech synthesis not supported');
+      return;
+    }
+
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    setIsPlaying(true);
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ar-SA';
+    utterance.rate = 0.7;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    
+    // Get available voices
+    const voices = window.speechSynthesis.getVoices();
+    const arabicVoice = voices.find(voice => 
+      voice.lang.startsWith('ar') || voice.lang.includes('ar-SA')
+    );
+    
+    if (arabicVoice) {
+      utterance.voice = arabicVoice;
+    }
+    
+    utterance.onend = () => setIsPlaying(false);
+    utterance.onerror = () => {
+      console.error('Speech synthesis error');
+      setIsPlaying(false);
+    };
+    
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopAudio = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
+    }
   };
 
   const allMorningCompleted = morningAtkar.every(d => completedMorning.has(d.id));
@@ -423,21 +480,30 @@ export const Atkar = () => {
               </div>
 
               {/* Audio button */}
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-2">
                 <Button
                   variant="outline"
                   size="lg"
                   className="gap-2"
                   onClick={() => {
-                    const utterance = new SpeechSynthesisUtterance(
-                      selectedDhikr.sentences[currentSentence].arabic
-                    );
-                    utterance.lang = "ar-SA";
-                    speechSynthesis.speak(utterance);
+                    if (isPlaying) {
+                      stopAudio();
+                    } else {
+                      playAudio(selectedDhikr.sentences[currentSentence].arabic);
+                    }
                   }}
                 >
-                  <Volume2 className="w-5 h-5" />
-                  {language === "fr" ? "Écouter" : "Listen"}
+                  {isPlaying ? (
+                    <>
+                      <Pause className="w-5 h-5" />
+                      {language === "fr" ? "Arrêter" : "Stop"}
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-5 h-5" />
+                      {language === "fr" ? "Écouter" : "Listen"}
+                    </>
+                  )}
                 </Button>
               </div>
 

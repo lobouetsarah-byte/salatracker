@@ -59,8 +59,8 @@ export const PrayerCard = ({
   return (
     <>
       <Card 
+        className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-40" : ""} cursor-pointer`}
         onClick={() => setDialogOpen(true)}
-        className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-60" : ""} cursor-pointer`}
       >
         <div className="flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
@@ -80,32 +80,22 @@ export const PrayerCard = ({
             <p className="text-xl sm:text-2xl font-bold text-primary">{time}</p>
             
             {/* Dhikr checkbox */}
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                if (status !== "pending") {
-                  onDhikrToggle();
-                }
-              }}
-              className={`mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors w-full ${
-                status === "pending" ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-              }`}
-            >
-              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
-                dhikrDone 
-                  ? "bg-primary border-primary" 
-                  : "border-muted-foreground/50 bg-background"
-              }`}>
-                {dhikrDone && (
-                  <svg className="w-3 h-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </div>
-              <span className="text-xs sm:text-sm text-muted-foreground font-medium">
-                {dhikrDone ? t.dhikrDone : t.dhikrPending}
-              </span>
-            </div>
+            {status !== "pending" && (
+              <label
+                onClick={(e) => e.stopPropagation()}
+                className="mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors w-full cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={dhikrDone}
+                  onChange={onDhikrToggle}
+                  className="w-4 h-4 rounded border-2 border-muted-foreground/50 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+                />
+                <span className="text-xs sm:text-sm text-muted-foreground font-medium">
+                  {dhikrDone ? t.dhikrDone : t.dhikrPending}
+                </span>
+              </label>
+            )}
           </div>
 
           {/* Status color box */}
