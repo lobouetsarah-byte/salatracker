@@ -56,9 +56,37 @@ interface Translations {
   aboutNotifications: string;
   notificationPermission: string;
   
+  // Account
+  myAccount: string;
+  email: string;
+  password: string;
+  newPassword: string;
+  currentPassword: string;
+  updateEmail: string;
+  updatePassword: string;
+  signOut: string;
+  signIn: string;
+  forgotPassword: string;
+  resetPassword: string;
+  sendResetLink: string;
+  backToLogin: string;
+  checkEmail: string;
+  resetEmailSent: string;
+  
+  // Auth
+  login: string;
+  signup: string;
+  createAccount: string;
+  continueAsGuest: string;
+  progressNotSaved: string;
+  trackProgress: string;
+  
   // Messages
   footer: string;
   prayerTimesProvider: string;
+  emailUpdated: string;
+  passwordUpdated: string;
+  errorOccurred: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -100,12 +128,36 @@ const translations: Record<Language, Translations> = {
     english: "English",
     aboutNotifications: "À propos des notifications",
     notificationPermission: "Les notifications du navigateur nécessitent votre autorisation. Si vous n'avez pas encore accordé l'autorisation, vous serez invité lorsque les notifications seront activées. Assurez-vous que les notifications sont autorisées dans les paramètres de votre navigateur pour une meilleure expérience.",
+    myAccount: "Mon compte",
+    email: "Email",
+    password: "Mot de passe",
+    newPassword: "Nouveau mot de passe",
+    currentPassword: "Mot de passe actuel",
+    updateEmail: "Modifier l'email",
+    updatePassword: "Modifier le mot de passe",
+    signOut: "Se déconnecter",
+    signIn: "Se connecter",
+    forgotPassword: "Mot de passe oublié ?",
+    resetPassword: "Réinitialiser le mot de passe",
+    sendResetLink: "Envoyer le lien",
+    backToLogin: "Retour à la connexion",
+    checkEmail: "Vérifiez votre email",
+    resetEmailSent: "Un lien de réinitialisation a été envoyé à votre adresse email",
+    login: "Connexion",
+    signup: "Inscription",
+    createAccount: "Créer un compte",
+    continueAsGuest: "Continuer sans compte",
+    progressNotSaved: "Vos progrès ne seront pas sauvegardés",
+    trackProgress: "Suivre vos progrès",
     footer: "Qu'Allah accepte toutes vos prières",
     prayerTimesProvider: "Horaires de prière fournis par Aladhan API",
+    emailUpdated: "Email mis à jour avec succès",
+    passwordUpdated: "Mot de passe mis à jour avec succès",
+    errorOccurred: "Une erreur s'est produite",
   },
   en: {
     appTitle: "Salatrack",
-    dashboard: "Dashboard",
+    dashboard: "Progress",
     prayers: "Prayers",
     atkar: "Atkar",
     settings: "Settings",
@@ -141,8 +193,32 @@ const translations: Record<Language, Translations> = {
     english: "English",
     aboutNotifications: "About Notifications",
     notificationPermission: "Browser notifications require your permission. If you haven't granted permission yet, you'll be prompted when notifications are enabled. Make sure notifications are allowed in your browser settings for the best experience.",
+    myAccount: "My Account",
+    email: "Email",
+    password: "Password",
+    newPassword: "New password",
+    currentPassword: "Current password",
+    updateEmail: "Update email",
+    updatePassword: "Update password",
+    signOut: "Sign out",
+    signIn: "Sign in",
+    forgotPassword: "Forgot password?",
+    resetPassword: "Reset password",
+    sendResetLink: "Send reset link",
+    backToLogin: "Back to login",
+    checkEmail: "Check your email",
+    resetEmailSent: "A reset link has been sent to your email address",
+    login: "Login",
+    signup: "Sign up",
+    createAccount: "Create account",
+    continueAsGuest: "Continue as guest",
+    progressNotSaved: "Your progress will not be saved",
+    trackProgress: "Track your progress",
     footer: "May Allah accept all your prayers",
     prayerTimesProvider: "Prayer times provided by Aladhan API",
+    emailUpdated: "Email updated successfully",
+    passwordUpdated: "Password updated successfully",
+    errorOccurred: "An error occurred",
   },
 };
 

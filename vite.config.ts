@@ -15,11 +15,14 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.png", "robots.txt"],
+      includeAssets: ["favicon.png", "robots.txt", "sw.js"],
+      strategies: "injectManifest",
+      srcDir: "public",
+      filename: "sw.js",
       manifest: {
         name: "Salatrack - Suivi des Prières",
         short_name: "Salatrack",
-        description: "Application de suivi des prières quotidiennes",
+        description: "Application de suivi des prières quotidiennes avec notifications",
         theme_color: "#10b981",
         background_color: "#f0fdf4",
         display: "standalone",
@@ -40,6 +43,19 @@ export default defineConfig(({ mode }) => ({
             purpose: "any maskable",
           },
         ],
+        categories: ["lifestyle", "health"],
+        shortcuts: [
+          {
+            name: "Voir les prières",
+            short_name: "Prières",
+            url: "/?tab=prayers",
+            icons: [{ src: "/favicon.png", sizes: "192x192" }]
+          }
+        ],
+      },
+      devOptions: {
+        enabled: true,
+        type: "module",
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
