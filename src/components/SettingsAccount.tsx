@@ -38,19 +38,23 @@ export const SettingsAccount = () => {
   const goalOptions = [
     { 
       id: "track_progress", 
-      label: language === "fr" ? "Suivre mes progrès" : "Track my progress" 
+      label: language === "fr" ? "Suivre mes progrès" : "Track my progress",
+      icon: "📊"
     },
     { 
       id: "consistent_prayer", 
-      label: language === "fr" ? "Être plus assidue dans ma salat" : "Be more consistent in my prayers" 
+      label: language === "fr" ? "Être plus assidue dans ma salat" : "Be more consistent in my prayers",
+      icon: "📅"
     },
     { 
       id: "dhikr", 
-      label: language === "fr" ? "Faire mes invocations" : "Do my supplications" 
+      label: language === "fr" ? "Faire mes invocations" : "Do my supplications",
+      icon: "📖"
     },
     { 
       id: "start_praying", 
-      label: language === "fr" ? "Commencer à prier" : "Start praying" 
+      label: language === "fr" ? "Commencer à prier" : "Start praying",
+      icon: "✨"
     },
   ];
 
@@ -250,20 +254,29 @@ export const SettingsAccount = () => {
             </div>
             {showEditGoals ? (
               <div className="space-y-3">
-                {goalOptions.map((goal) => (
-                  <div
-                    key={goal.id}
-                    className="flex items-center space-x-3 p-3 rounded-lg border cursor-pointer hover:bg-accent/5"
-                    onClick={() => toggleGoal(goal.id)}
-                  >
-                    <Checkbox
-                      checked={selectedGoals.includes(goal.id)}
-                      onCheckedChange={() => toggleGoal(goal.id)}
-                    />
-                    <Label className="flex-1 cursor-pointer">{goal.label}</Label>
-                  </div>
-                ))}
-                <Button onClick={handleUpdateGoals} disabled={loading} className="w-full">
+                {goalOptions.map((goal) => {
+                  const isSelected = selectedGoals.includes(goal.id);
+                  return (
+                    <div
+                      key={goal.id}
+                      onClick={() => toggleGoal(goal.id)}
+                      className={`
+                        flex items-center gap-3 p-3 rounded-lg cursor-pointer
+                        transition-all duration-200 border-2
+                        ${isSelected 
+                          ? 'bg-primary/10 border-primary' 
+                          : 'border-border hover:border-primary/50 hover:bg-primary/5'
+                        }
+                      `}
+                    >
+                      <span className="text-2xl">{goal.icon}</span>
+                      <span className={`flex-1 ${isSelected ? 'font-semibold text-primary' : ''}`}>
+                        {goal.label}
+                      </span>
+                    </div>
+                  );
+                })}
+                <Button onClick={handleUpdateGoals} disabled={loading} className="w-full mt-4">
                   {language === "fr" ? "Enregistrer" : "Save"}
                 </Button>
               </div>

@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, TrendingUp, Calendar, BookOpen, Sparkles } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 
 const Onboarding = () => {
@@ -27,19 +26,23 @@ const Onboarding = () => {
   const goalOptions = [
     { 
       id: "track_progress", 
-      label: language === "fr" ? "Suivre mes progrès" : "Track my progress" 
+      label: language === "fr" ? "Suivre mes progrès" : "Track my progress",
+      icon: TrendingUp
     },
     { 
       id: "consistent_prayer", 
-      label: language === "fr" ? "Être plus assidue dans ma salat" : "Be more consistent in my prayers" 
+      label: language === "fr" ? "Être plus assidue dans ma salat" : "Be more consistent in my prayers",
+      icon: Calendar
     },
     { 
       id: "dhikr", 
-      label: language === "fr" ? "Faire mes invocations" : "Do my supplications" 
+      label: language === "fr" ? "Faire mes invocations" : "Do my supplications",
+      icon: BookOpen
     },
     { 
       id: "start_praying", 
-      label: language === "fr" ? "Commencer à prier" : "Start praying" 
+      label: language === "fr" ? "Commencer à prier" : "Start praying",
+      icon: Sparkles
     },
   ];
 
@@ -137,13 +140,28 @@ const Onboarding = () => {
         <Card className="shadow-xl">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">
-              {language === "fr" ? "Bienvenue" : "Welcome"}
+              {step === 0 ? (language === "fr" ? "Bienvenue" : "Welcome") : (language === "fr" ? "Créer un compte" : "Create Account")}
             </CardTitle>
             <CardDescription>
-              {language === "fr" ? `Étape ${step} sur 4` : `Step ${step} of 4`}
+              {step > 0 && (language === "fr" ? `Étape ${step} sur 4` : `Step ${step} of 4`)}
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {step === 0 && (
+              <div className="space-y-4">
+                <p className="text-center text-muted-foreground mb-6">
+                  {language === "fr" ? "Commencez votre voyage spirituel" : "Start your spiritual journey"}
+                </p>
+                <Button onClick={() => setStep(1)} className="w-full h-12" size="lg">
+                  {language === "fr" ? "Créer un compte" : "Create Account"}
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+                <Button onClick={() => navigate("/auth")} variant="outline" className="w-full h-12" size="lg">
+                  {language === "fr" ? "J'ai déjà un compte" : "I already have an account"}
+                </Button>
+              </div>
+            )}
+
             {step === 1 && (
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -169,28 +187,42 @@ const Onboarding = () => {
             {step === 2 && (
               <div className="space-y-4">
                 <div className="space-y-3">
-                  <Label>
+                  <Label className="text-lg">
                     {language === "fr" ? "Quels sont vos objectifs ?" : "What are your goals?"}
                   </Label>
                   <p className="text-sm text-muted-foreground">
                     {language === "fr" ? "Sélectionnez un ou plusieurs" : "Select one or more"}
                   </p>
-                  {goalOptions.map((goal) => (
-                    <div
-                      key={goal.id}
-                      className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/5 transition-colors cursor-pointer"
-                      onClick={() => toggleGoal(goal.id)}
-                    >
-                      <Checkbox
-                        id={goal.id}
-                        checked={goals.includes(goal.id)}
-                        onCheckedChange={() => toggleGoal(goal.id)}
-                      />
-                      <Label htmlFor={goal.id} className="flex-1 cursor-pointer">
-                        {goal.label}
-                      </Label>
-                    </div>
-                  ))}
+                  <div className="grid gap-3 mt-4">
+                    {goalOptions.map((goal) => {
+                      const Icon = goal.icon;
+                      const isSelected = goals.includes(goal.id);
+                      return (
+                        <div
+                          key={goal.id}
+                          onClick={() => toggleGoal(goal.id)}
+                          className={`
+                            flex items-center gap-4 p-4 rounded-xl cursor-pointer
+                            transition-all duration-300 border-2
+                            ${isSelected 
+                              ? 'bg-primary/10 border-primary shadow-lg scale-[1.02]' 
+                              : 'bg-card border-border hover:border-primary/50 hover:bg-primary/5'
+                            }
+                          `}
+                        >
+                          <div className={`
+                            p-3 rounded-lg transition-colors
+                            ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}
+                          `}>
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <span className={`flex-1 font-medium ${isSelected ? 'text-primary' : ''}`}>
+                            {goal.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <Button onClick={handleBack} variant="outline" className="flex-1 h-12">
