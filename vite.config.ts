@@ -15,10 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.png", "robots.txt", "sw.js"],
-      strategies: "injectManifest",
-      srcDir: "public",
-      filename: "sw.js",
+      includeAssets: ["favicon.png", "robots.txt"],
       manifest: {
         name: "Salatrack - Suivi des Prières",
         short_name: "Salatrack",
