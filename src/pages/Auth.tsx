@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, guestMode, loading: authLoading, signIn, signUp, continueAsGuest } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -22,6 +23,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const activeTab = searchParams.get("tab") || "login";
 
   useEffect(() => {
     if (user || guestMode) {
@@ -124,7 +126,7 @@ const Auth = () => {
                 </form>
               </div>
             ) : (
-              <Tabs defaultValue="login" className="w-full">
+              <Tabs defaultValue={activeTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">{t.login}</TabsTrigger>
                   <TabsTrigger value="signup">{t.signup}</TabsTrigger>
