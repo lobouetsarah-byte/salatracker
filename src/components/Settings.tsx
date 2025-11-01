@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Clock, Languages, User, Mail, Lock, LogOut, LogIn } from "lucide-react";
+import { Bell, Clock, Languages, User, Mail, Lock, LogOut, LogIn, Sunrise, Sunset } from "lucide-react";
 import { NotificationSettings } from "@/hooks/useSettings";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
@@ -162,26 +162,21 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
               </div>
             </>
           ) : (
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground text-center">
-                {t.trackProgress}
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <Button 
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleSignIn}
-                >
-                  <LogIn className="w-4 h-4 mr-2" />
-                  {t.signIn}
-                </Button>
-                <Button 
-                  className="w-full"
-                  onClick={() => navigate("/auth")}
-                >
-                  {t.createAccount}
-                </Button>
-              </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Button 
+                variant="outline"
+                className="w-full"
+                onClick={handleSignIn}
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                {t.signIn}
+              </Button>
+              <Button 
+                className="w-full"
+                onClick={() => navigate("/auth")}
+              >
+                {t.createAccount}
+              </Button>
             </div>
           )}
         </CardContent>
@@ -268,6 +263,52 @@ export const Settings = ({ settings, onUpdateSettings }: SettingsProps) => {
               checked={settings.missedPrayerReminders}
               onCheckedChange={(checked) =>
                 onUpdateSettings({ missedPrayerReminders: checked })
+              }
+              className="data-[state=checked]:bg-primary"
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+            <div className="space-y-1 flex-1">
+              <Label htmlFor="morning-adhkar" className="text-base font-medium flex items-center gap-2 cursor-pointer">
+                <Sunrise className="w-4 h-4 text-primary" />
+                {language === "fr" ? "Rappel adhkar du matin" : "Morning adhkar reminder"}
+              </Label>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {language === "fr" 
+                  ? "Notification quotidienne pour les invocations du matin" 
+                  : "Daily reminder for morning supplications"
+                }
+              </p>
+            </div>
+            <Switch
+              id="morning-adhkar"
+              checked={settings.morningAdhkarReminder}
+              onCheckedChange={(checked) =>
+                onUpdateSettings({ morningAdhkarReminder: checked })
+              }
+              className="data-[state=checked]:bg-primary"
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+            <div className="space-y-1 flex-1">
+              <Label htmlFor="evening-adhkar" className="text-base font-medium flex items-center gap-2 cursor-pointer">
+                <Sunset className="w-4 h-4 text-primary" />
+                {language === "fr" ? "Rappel adhkar du soir" : "Evening adhkar reminder"}
+              </Label>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {language === "fr" 
+                  ? "Notification quotidienne pour les invocations du soir" 
+                  : "Daily reminder for evening supplications"
+                }
+              </p>
+            </div>
+            <Switch
+              id="evening-adhkar"
+              checked={settings.eveningAdhkarReminder}
+              onCheckedChange={(checked) =>
+                onUpdateSettings({ eveningAdhkarReminder: checked })
               }
               className="data-[state=checked]:bg-primary"
             />

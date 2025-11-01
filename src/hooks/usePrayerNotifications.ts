@@ -52,6 +52,34 @@ export const usePrayerNotifications = (
   const checkPrayerReminders = () => {
     const now = new Date();
     const today = now.toISOString().split("T")[0];
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
+    // Morning adhkar reminder (7:00 AM)
+    if (settings.morningAdhkarReminder && currentHour === 7 && currentMinute === 0) {
+      const notificationKey = `${today}-morning-adhkar`;
+      if (!notifiedPrayersRef.current.has(notificationKey)) {
+        sendNotification(
+          "☀️ Adhkar du matin",
+          "N'oubliez pas de réciter vos invocations du matin",
+          false
+        );
+        notifiedPrayersRef.current.add(notificationKey);
+      }
+    }
+
+    // Evening adhkar reminder (5:00 PM)
+    if (settings.eveningAdhkarReminder && currentHour === 17 && currentMinute === 0) {
+      const notificationKey = `${today}-evening-adhkar`;
+      if (!notifiedPrayersRef.current.has(notificationKey)) {
+        sendNotification(
+          "🌙 Adhkar du soir",
+          "N'oubliez pas de réciter vos invocations du soir",
+          false
+        );
+        notifiedPrayersRef.current.add(notificationKey);
+      }
+    }
 
     prayers.forEach((prayer, index) => {
       const [hours, minutes] = prayer.time.split(":").map(Number);

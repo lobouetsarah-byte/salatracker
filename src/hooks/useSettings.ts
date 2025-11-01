@@ -3,12 +3,16 @@ import { useState, useEffect } from "react";
 export interface NotificationSettings {
   prayerTimeReminders: boolean;
   missedPrayerReminders: boolean;
+  morningAdhkarReminder: boolean;
+  eveningAdhkarReminder: boolean;
 }
 
 export const useSettings = () => {
   const [settings, setSettings] = useState<NotificationSettings>({
     prayerTimeReminders: true,
     missedPrayerReminders: true,
+    morningAdhkarReminder: true,
+    eveningAdhkarReminder: true,
   });
 
   useEffect(() => {
