@@ -30,12 +30,44 @@ export const WeeklyStats = ({ stats, period, onPeriodChange }: WeeklyStatsProps)
     return t.weeklyProgress;
   };
 
+  const getPeriodDate = () => {
+    const today = new Date();
+    
+    if (period === "daily") {
+      return today.toLocaleDateString('fr-FR', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+    
+    if (period === "weekly") {
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      
+      return `${startOfWeek.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - ${endOfWeek.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+    }
+    
+    if (period === "monthly") {
+      return today.toLocaleDateString('fr-FR', { 
+        month: 'long', 
+        year: 'numeric' 
+      });
+    }
+  };
+
   return (
     <Card className="p-4 sm:p-6 bg-white dark:bg-card shadow-md">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-primary" />
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground">{getPeriodTitle()}</h2>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground">{getPeriodTitle()}</h2>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground ml-7">{getPeriodDate()}</p>
         </div>
         <div className="flex gap-2">
           <Button

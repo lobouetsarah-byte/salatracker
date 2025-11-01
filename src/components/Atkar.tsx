@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2, Pause } from "lucide-react";
 
 interface Dhikr {
   id: string;

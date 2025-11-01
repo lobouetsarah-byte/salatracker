@@ -58,13 +58,16 @@ export const PrayerCard = ({
 
   return (
     <>
-      <Card className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-40" : ""}`}>
+      <Card 
+        onClick={() => setDialogOpen(true)}
+        className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-60" : ""} cursor-pointer`}
+      >
         <div className="flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <h3 className="text-lg sm:text-xl font-semibold text-foreground">{name}</h3>
               {isNext && (
-                <Badge variant="outline" className="text-xs border-muted-foreground/50 text-muted-foreground bg-muted/30">
+                <Badge variant="outline" className="text-xs border-muted-foreground/30 text-muted-foreground/70 bg-muted/20">
                   {t.nextPrayer}
                 </Badge>
               )}
@@ -77,31 +80,40 @@ export const PrayerCard = ({
             <p className="text-xl sm:text-2xl font-bold text-primary">{time}</p>
             
             {/* Dhikr checkbox */}
-            <button
-              onClick={onDhikrToggle}
-              disabled={status === "pending"}
-              className="mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                if (status !== "pending") {
+                  onDhikrToggle();
+                }
+              }}
+              className={`mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors w-full ${
+                status === "pending" ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+              }`}
             >
-              <input
-                type="checkbox"
-                checked={dhikrDone}
-                onChange={() => {}}
-                className="w-4 h-4 accent-primary cursor-pointer transition-transform hover:scale-110 pointer-events-none"
-                disabled={status === "pending"}
-              />
+              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
+                dhikrDone 
+                  ? "bg-primary border-primary" 
+                  : "border-muted-foreground/50 bg-background"
+              }`}>
+                {dhikrDone && (
+                  <svg className="w-3 h-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
               <span className="text-xs sm:text-sm text-muted-foreground font-medium">
                 {dhikrDone ? t.dhikrDone : t.dhikrPending}
               </span>
-            </button>
+            </div>
           </div>
 
           {/* Status color box */}
-          <button
-            onClick={() => setDialogOpen(true)}
-            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg ${getStatusColor()} transition-all duration-300 flex items-center justify-center cursor-pointer shadow-md hover:shadow-lg hover:scale-105 flex-shrink-0`}
+          <div
+            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg hover:scale-105 flex-shrink-0`}
           >
             {getStatusIcon()}
-          </button>
+          </div>
         </div>
       </Card>
 
