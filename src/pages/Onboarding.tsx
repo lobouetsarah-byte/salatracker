@@ -9,6 +9,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
 import { ArrowRight, ArrowLeft, TrendingUp, Calendar, BookOpen, Sparkles } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
+import { z } from "zod";
+
+// Validation schemas
+const firstNameSchema = z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters");
+const emailSchema = z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters");
+const passwordSchema = z.string().min(8, "Password must be at least 8 characters").max(72, "Password must be less than 72 characters");
+const goalsSchema = z.array(z.enum(["track_progress", "consistent_prayer", "dhikr", "start_praying"])).min(1, "Select at least one goal");
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -55,19 +62,38 @@ const Onboarding = () => {
   };
 
   const handleNext = () => {
-    if (step === 1 && !firstName.trim()) {
-      toast({
-        title: language === "fr" ? "Prénom requis" : "First name required",
-        variant: "destructive",
-      });
-      return;
+    if (step === 1) {
+      const result = firstNameSchema.safeParse(firstName);
+      if (!result.success) {
+        toast({
+          title: language === "fr" ? "Prénom invalide" : "Invalid first name",
+          description: result.error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
     }
-    if (step === 2 && goals.length === 0) {
-      toast({
-        title: language === "fr" ? "Sélectionnez au moins un objectif" : "Select at least one goal",
-        variant: "destructive",
-      });
-      return;
+    if (step === 2) {
+      const result = goalsSchema.safeParse(goals);
+      if (!result.success) {
+        toast({
+          title: language === "fr" ? "Objectifs invalides" : "Invalid goals",
+          description: result.error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    if (step === 3) {
+      const result = emailSchema.safeParse(email);
+      if (!result.success) {
+        toast({
+          title: language === "fr" ? "Email invalide" : "Invalid email",
+          description: result.error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
     }
     setStep(prev => prev + 1);
   };
@@ -79,9 +105,43 @@ const Onboarding = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
+    // Validate all inputs
+    const firstNameResult = firstNameSchema.safeParse(firstName);
+    const emailResult = emailSchema.safeParse(email);
+    const passwordResult = passwordSchema.safeParse(password);
+    const goalsResult = goalsSchema.safeParse(goals);
+    
+    if (!firstNameResult.success) {
       toast({
-        title: language === "fr" ? "Tous les champs sont requis" : "All fields required",
+        title: language === "fr" ? "Prénom invalide" : "Invalid first name",
+        description: firstNameResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!emailResult.success) {
+      toast({
+        title: language === "fr" ? "Email invalide" : "Invalid email",
+        description: emailResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!passwordResult.success) {
+      toast({
+        title: language === "fr" ? "Mot de passe invalide" : "Invalid password",
+        description: passwordResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!goalsResult.success) {
+      toast({
+        title: language === "fr" ? "Objectifs invalides" : "Invalid goals",
+        description: goalsResult.error.errors[0].message,
         variant: "destructive",
       });
       return;
@@ -90,13 +150,13 @@ const Onboarding = () => {
     setLoading(true);
     
     try {
-      // Sign up with metadata
+      // Sign up with validated data
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
+        email: emailResult.data,
+        password: passwordResult.data,
         options: {
           data: {
-            first_name: firstName,
+            first_name: firstNameResult.data,
           },
           emailRedirectTo: `${window.location.origin}/`,
         },
@@ -104,11 +164,11 @@ const Onboarding = () => {
 
       if (signUpError) throw signUpError;
 
-      // Update profile with goals
+      // Update profile with validated goals
       if (data.user) {
         const { error: updateError } = await supabase
           .from('profiles')
-          .update({ goals })
+          .update({ goals: goalsResult.data })
           .eq('id', data.user.id);
 
         if (updateError) throw updateError;
@@ -262,11 +322,11 @@ const Onboarding = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    minLength={6}
+                    minLength={8}
                     className="h-12"
                   />
                   <p className="text-xs text-muted-foreground">
-                    {language === "fr" ? "Minimum 6 caractères" : "Minimum 6 characters"}
+                    {language === "fr" ? "Minimum 8 caractères" : "Minimum 8 characters"}
                   </p>
                 </div>
                 <div className="flex gap-2">

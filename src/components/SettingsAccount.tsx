@@ -10,6 +10,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
+import { z } from "zod";
+
+// Validation schemas
+const firstNameSchema = z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters");
+const goalsSchema = z.array(z.enum(["track_progress", "consistent_prayer", "dhikr", "start_praying"]));
 import {
   AlertDialog,
   AlertDialogAction,
@@ -85,13 +90,24 @@ export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
   };
 
   const handleUpdateFirstName = async () => {
-    if (!user || !newFirstName.trim()) return;
+    if (!user) return;
+    
+    // Validate first name
+    const result = firstNameSchema.safeParse(newFirstName);
+    if (!result.success) {
+      toast({
+        title: language === "fr" ? "Prénom invalide" : "Invalid first name",
+        description: result.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
     
     setLoading(true);
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ first_name: newFirstName })
+        .update({ first_name: result.data })
         .eq('id', user.id);
       
       if (error) throw error;
@@ -115,11 +131,22 @@ export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
   const handleUpdateGoals = async () => {
     if (!user) return;
     
+    // Validate goals
+    const result = goalsSchema.safeParse(selectedGoals);
+    if (!result.success) {
+      toast({
+        title: language === "fr" ? "Objectifs invalides" : "Invalid goals",
+        description: result.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ goals: selectedGoals })
+        .update({ goals: result.data })
         .eq('id', user.id);
       
       if (error) throw error;
