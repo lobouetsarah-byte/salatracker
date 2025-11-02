@@ -178,7 +178,7 @@ const Onboarding = () => {
         title: language === "fr" ? "Compte créé avec succès !" : "Account created successfully!",
       });
 
-      navigate("/app");
+      navigate("/");
     } catch (error: any) {
       toast({
         title: language === "fr" ? "Erreur" : "Error",
