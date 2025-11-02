@@ -95,19 +95,30 @@ export default function Landing() {
               Fiable pour les musulmans du monde entier
             </Badge>
             
-            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white leading-tight">
-              Ne Manquez Plus
-              <br />
-              <span className="bg-gradient-to-r from-blue-200 to-white bg-clip-text text-transparent">
-                Aucune Prière
-              </span>
+            <p className="text-base sm:text-lg text-white/80 mb-2">
+              Spécialement conçu pour la Oumma
+            </p>
+            
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-6">
+              Ne manquez plus aucunes prières
             </h1>
             
-            <p className="text-base sm:text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed px-4">
-              Rappels automatiques 30 minutes avant chaque prière + Adhkar complets + Statistiques
-            </p>
+            <div className="space-y-3 mb-8 max-w-xl mx-auto">
+              <div className="flex items-center gap-3 text-white/90 text-base sm:text-lg">
+                <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                <span>Suivi de vos progrès</span>
+              </div>
+              <div className="flex items-center gap-3 text-white/90 text-base sm:text-lg">
+                <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                <span>Rappel avant la prochaine prière</span>
+              </div>
+              <div className="flex items-center gap-3 text-white/90 text-base sm:text-lg">
+                <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                <span>Adhkars du matin et du soirs</span>
+              </div>
+            </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               {user ? (
                 <Button 
                   size="lg" 
@@ -128,25 +139,25 @@ export default function Landing() {
                 </Button>
               )}
               <a href="#features">
-                <Button size="lg" variant="outline" className="text-white border-white/30 hover:bg-white/10 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="text-white border-white/30 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto w-full sm:w-auto pointer-events-auto cursor-pointer">
                   Découvrir
                 </Button>
               </a>
             </div>
 
             {/* Trust Badges */}
-            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 pt-6 sm:pt-8 text-xs sm:text-sm text-white/80">
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="flex flex-wrap justify-center gap-6 sm:gap-8 pt-8 text-sm sm:text-base text-white/90 font-medium">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                 <span>100% Gratuit</span>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Rappel 30min</span>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span>0 Prière Manquée</span>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Adhkar Audio</span>
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span>Adhkars Audios</span>
               </div>
             </div>
           </div>
@@ -277,7 +288,7 @@ export default function Landing() {
           <p className="text-base sm:text-xl mb-6 sm:mb-8 text-white/90">
             Gratuit · Sans publicité · Authentique
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-md mx-auto">
+          <div className="flex justify-center max-w-md mx-auto">
             {user ? (
               <Button 
                 size="lg" 
@@ -288,19 +299,12 @@ export default function Landing() {
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             ) : (
-              <>
-                <Link to="/onboarding" className="flex-1">
-                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto hover-scale w-full">
-                    Créer mon compte
-                    <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
-                  </Button>
-                </Link>
-                <Link to="/auth" className="flex-1">
-                  <Button size="lg" variant="outline" className="text-white border-white/30 hover:bg-white/10 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto w-full">
-                    Connexion
-                  </Button>
-                </Link>
-              </>
+              <Link to="/onboarding" className="w-full">
+                <Button size="lg" className="bg-white text-primary hover:bg-white/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto hover-scale w-full">
+                  Commencer Gratuitement
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </Link>
             )}
           </div>
         </div>
@@ -318,7 +322,7 @@ export default function Landing() {
             </Link>
           </div>
           <p className="text-xs sm:text-sm">
-            © 2024 Salatrack. Tous droits réservés.
+            © 2025 Salatrack. Tous droits réservés.
           </p>
         </div>
       </footer>
