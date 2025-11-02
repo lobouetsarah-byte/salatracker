@@ -60,37 +60,37 @@ export const PrayerCard = ({
   return (
     <>
       <Card 
-        className={`p-3 sm:p-4 hover:shadow-lg transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-60 grayscale" : ""}`}
+        className={`p-4 sm:p-5 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-60 grayscale" : ""} backdrop-blur-sm hover:scale-[1.01]`}
       >
-        <div className="flex items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center justify-between gap-4 sm:gap-5">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <h3 className={`text-lg sm:text-xl font-semibold text-foreground ${textOpacity}`}>{name}</h3>
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              <h3 className={`text-xl sm:text-2xl font-bold text-foreground ${textOpacity}`}>{name}</h3>
               {isNext && !isPast && (
-                <Badge variant="outline" className="text-xs border-primary/50 text-primary bg-primary/10">
+                <Badge variant="outline" className="text-xs border-primary/50 text-primary bg-primary/10 animate-pulse">
                   {t.nextPrayer}
                 </Badge>
               )}
               {hasSuccessBadge && (
-                <Badge className="text-xs bg-success text-success-foreground shadow-sm">
+                <Badge className="text-xs bg-success text-success-foreground shadow-sm animate-fade-in">
                   ✓ Succès
                 </Badge>
               )}
             </div>
-            <p className={`text-xl sm:text-2xl font-bold ${isPast ? "text-muted-foreground" : "text-primary"}`}>{time}</p>
+            <p className={`text-2xl sm:text-3xl font-bold mb-3 ${isPast ? "text-muted-foreground" : "bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"}`}>{time}</p>
             
             {/* Dhikr checkbox */}
             {status !== "pending" && (
               <label
-                className="mt-3 flex items-center gap-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors w-full cursor-pointer"
+                className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-muted/30 to-muted/50 hover:from-muted/50 hover:to-muted/70 transition-all duration-300 w-full cursor-pointer border border-border/30 hover:border-primary/30"
               >
                 <input
                   type="checkbox"
                   checked={dhikrDone}
                   onChange={onDhikrToggle}
-                  className="w-4 h-4 rounded border-2 border-muted-foreground/50 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+                  className="w-5 h-5 rounded-md border-2 border-muted-foreground/50 text-primary focus:ring-2 focus:ring-primary cursor-pointer transition-all"
                 />
-                <span className="text-xs sm:text-sm text-muted-foreground font-medium">
+                <span className="text-sm sm:text-base font-medium">
                   {dhikrDone ? t.dhikrDone : t.dhikrPending}
                 </span>
               </label>
@@ -100,7 +100,7 @@ export const PrayerCard = ({
           {/* Status color box - clickable */}
           <div
             onClick={() => setDialogOpen(true)}
-            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg hover:scale-105 flex-shrink-0 cursor-pointer`}
+            className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 flex-shrink-0 cursor-pointer`}
           >
             {getStatusIcon()}
           </div>

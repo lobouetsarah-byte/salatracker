@@ -130,22 +130,24 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 pb-20">
       <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <img src={salatrackLogo} alt="Salatrack" className="w-10 h-10 sm:w-12 sm:h-12" />
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <div className="bg-primary/10 p-3 rounded-2xl backdrop-blur-sm">
+              <img src={salatrackLogo} alt="Salatrack" className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent">
               {t.appTitle}
             </h1>
           </div>
           
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <span>{prayerTimes?.date}</span>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base">
+            <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
+              <Calendar className="w-4 h-4 text-primary" />
+              <span className="font-medium">{prayerTimes?.date}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              <span>{prayerTimes?.location}</span>
+            <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
+              <MapPin className="w-4 h-4 text-primary" />
+              <span className="font-medium">{prayerTimes?.location}</span>
             </div>
           </div>
         </div>
@@ -167,24 +169,32 @@ const Index = () => {
           )}
 
           {activeTab === "prayers" && (
-            <div className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
-                {t.prayers}
-              </h2>
+            <div className="space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  {t.prayers}
+                </h2>
+                <div className="bg-primary/10 px-3 py-1 rounded-full">
+                  <span className="text-sm font-medium text-primary">
+                    {stats.onTime + stats.late}/{stats.total}
+                  </span>
+                </div>
+              </div>
               
               {prayerTimes?.prayers.map((prayer, index) => (
-                <PrayerCard
-                  key={prayer.name}
-                  name={prayer.name}
-                  time={prayer.time}
-                  isNext={index === nextPrayerIndex}
-                  isPast={isPrayerPast(prayer.time)}
-                  status={getPrayerStatus(today, prayer.name)}
-                  dhikrDone={getDhikrStatus(today, prayer.name)}
-                  onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
-                  onStatusDelete={() => deletePrayerStatus(today, prayer.name)}
-                  onDhikrToggle={() => toggleDhikr(today, prayer.name)}
-                />
+                <div key={prayer.name} className="animate-scale-in" style={{ animationDelay: `${index * 50}ms` }}>
+                  <PrayerCard
+                    name={prayer.name}
+                    time={prayer.time}
+                    isNext={index === nextPrayerIndex}
+                    isPast={isPrayerPast(prayer.time)}
+                    status={getPrayerStatus(today, prayer.name)}
+                    dhikrDone={getDhikrStatus(today, prayer.name)}
+                    onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
+                    onStatusDelete={() => deletePrayerStatus(today, prayer.name)}
+                    onDhikrToggle={() => toggleDhikr(today, prayer.name)}
+                  />
+                </div>
               ))}
             </div>
           )}
