@@ -38,7 +38,7 @@ const Auth = () => {
     setLoading(false);
     
     if (!error) {
-      navigate("/app");
+      navigate("/");
     }
   };
 

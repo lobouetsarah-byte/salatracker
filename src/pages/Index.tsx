@@ -216,51 +216,63 @@ const Index = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border shadow-lg z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-border/50 shadow-2xl z-50">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-4 h-16">
+          <div className="grid grid-cols-4 h-16 sm:h-18">
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+              className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 relative ${
                 activeTab === "dashboard" 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "text-primary" 
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <BarChart3 className="w-5 h-5" />
+              {activeTab === "dashboard" && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full" />
+              )}
+              <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="text-xs font-medium">{t.dashboard}</span>
             </button>
             <button
               onClick={() => setActiveTab("prayers")}
-              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+              className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 relative ${
                 activeTab === "prayers" 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "text-primary" 
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Clock className="w-5 h-5" />
+              {activeTab === "prayers" && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full" />
+              )}
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="text-xs font-medium">{t.prayers}</span>
             </button>
             <button
               onClick={() => setActiveTab("atkar")}
-              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+              className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 relative ${
                 activeTab === "atkar" 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "text-primary" 
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <BookOpen className="w-5 h-5" />
+              {activeTab === "atkar" && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full" />
+              )}
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="text-xs font-medium">{t.atkar}</span>
             </button>
             <button
               onClick={() => setActiveTab("settings")}
-              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+              className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 relative ${
                 activeTab === "settings" 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "text-primary" 
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <SettingsIcon className="w-5 h-5" />
+              {activeTab === "settings" && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full" />
+              )}
+              <SettingsIcon className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="text-xs font-medium">{t.settings}</span>
             </button>
           </div>
