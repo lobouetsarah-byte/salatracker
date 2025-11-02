@@ -27,7 +27,7 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate("/app");
     }
   }, [user, navigate]);
 
@@ -38,7 +38,7 @@ const Auth = () => {
     setLoading(false);
     
     if (!error) {
-      navigate("/");
+      navigate("/app");
     }
   };
 
