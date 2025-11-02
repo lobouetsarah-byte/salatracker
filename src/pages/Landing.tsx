@@ -46,11 +46,7 @@ export default function Landing() {
   ];
 
   const handleGetStarted = () => {
-    if (user) {
-      navigate("/app");
-    } else {
-      navigate("/onboarding");
-    }
+    navigate("/onboarding");
   };
 
   return (
@@ -112,14 +108,25 @@ export default function Landing() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4">
-              <Button 
-                size="lg" 
-                onClick={handleGetStarted}
-                className="bg-white text-primary hover:bg-white/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto hover-scale"
-              >
-                {user ? "Ouvrir l'App" : "Commencer Gratuitement"}
-                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
-              </Button>
+              {user ? (
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate("/app")}
+                  className="bg-white text-primary hover:bg-white/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto hover-scale"
+                >
+                  Ouvrir l'App
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              ) : (
+                <Button 
+                  size="lg" 
+                  onClick={handleGetStarted}
+                  className="bg-white text-primary hover:bg-white/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto hover-scale"
+                >
+                  Commencer Gratuitement
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              )}
               <a href="#features">
                 <Button size="lg" variant="outline" className="text-white border-white/30 hover:bg-white/10 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto w-full sm:w-auto">
                   Découvrir
@@ -237,14 +244,25 @@ export default function Landing() {
                   <span className="text-sm sm:text-base">Interface intuitive</span>
                 </div>
               </div>
-              <Button 
-                size="lg" 
-                onClick={handleGetStarted}
-                className="bg-primary text-white hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto hover-scale"
-              >
-                {user ? "Ouvrir l'Application" : "Commencer Maintenant"}
-                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
-              </Button>
+              {user ? (
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate("/app")}
+                  className="bg-primary text-white hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto hover-scale"
+                >
+                  Ouvrir l'Application
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              ) : (
+                <Button 
+                  size="lg" 
+                  onClick={handleGetStarted}
+                  className="bg-primary text-white hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto hover-scale"
+                >
+                  Commencer Maintenant
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>
