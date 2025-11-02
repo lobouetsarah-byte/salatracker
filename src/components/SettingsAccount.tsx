@@ -235,11 +235,10 @@ export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
         <CardContent className="space-y-4">
           {/* Email */}
           <div className="space-y-2">
-            <Label className="flex items-center gap-2 text-base font-semibold">
-              <Mail className="w-4 h-4 text-primary" />
+            <Label className="text-base font-semibold">
               {t.email}
             </Label>
-            <p className="text-muted-foreground pl-6">{user.email}</p>
+            <p className="text-muted-foreground">{user.email}</p>
           </div>
 
           <Separator />
@@ -357,17 +356,6 @@ export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
           </Button>
         </CardContent>
       </Card>
-
-      {/* Legal Links */}
-      <div className="flex justify-center gap-4 text-xs text-muted-foreground pt-4">
-        <Link to="/terms" className="hover:underline">
-          {language === "fr" ? "CGV" : "Terms"}
-        </Link>
-        <span>•</span>
-        <Link to="/privacy" className="hover:underline">
-          {language === "fr" ? "Confidentialité" : "Privacy"}
-        </Link>
-      </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
