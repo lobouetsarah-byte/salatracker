@@ -1,11 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, XCircle, Trash2 } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, Trash2, LogIn } from "lucide-react";
 import { PrayerStatus } from "@/hooks/usePrayerTracking";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface PrayerCardProps {
   name: string;
@@ -31,7 +33,10 @@ export const PrayerCard = ({
   onDhikrToggle,
 }: PrayerCardProps) => {
   const { t, language } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false);
 
   const getStatusColor = () => {
     if (status === "pending") return "bg-muted hover:bg-muted/80";
@@ -48,8 +53,29 @@ export const PrayerCard = ({
   };
 
   const handleStatusClick = (newStatus: PrayerStatus) => {
+    if (!user) {
+      setDialogOpen(false);
+      setLoginPromptOpen(true);
+      return;
+    }
     onStatusChange(newStatus);
     setDialogOpen(false);
+  };
+
+  const handleDhikrToggle = () => {
+    if (!user) {
+      setLoginPromptOpen(true);
+      return;
+    }
+    onDhikrToggle();
+  };
+
+  const handleStatusDialogOpen = () => {
+    if (!user) {
+      setLoginPromptOpen(true);
+      return;
+    }
+    setDialogOpen(true);
   };
 
   const hasSuccessBadge = status === "on-time" && dhikrDone;
@@ -87,7 +113,7 @@ export const PrayerCard = ({
                 <input
                   type="checkbox"
                   checked={dhikrDone}
-                  onChange={onDhikrToggle}
+                  onChange={handleDhikrToggle}
                   className="w-5 h-5 rounded-md border-2 border-muted-foreground/50 text-primary focus:ring-2 focus:ring-primary cursor-pointer transition-all"
                 />
                 <span className="text-sm sm:text-base font-medium">
@@ -99,7 +125,7 @@ export const PrayerCard = ({
 
           {/* Status color box - clickable */}
           <div
-            onClick={() => setDialogOpen(true)}
+            onClick={handleStatusDialogOpen}
             className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 flex-shrink-0 cursor-pointer`}
           >
             {getStatusIcon()}
@@ -154,6 +180,28 @@ export const PrayerCard = ({
                 {t.deleteStatus}
               </Button>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Login prompt dialog */}
+      <Dialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Connexion requise</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <p className="text-muted-foreground">
+              Vous devez vous connecter pour utiliser les fonctionnalités de suivi des prières.
+            </p>
+            <Button
+              onClick={() => navigate("/auth")}
+              className="w-full"
+              size="lg"
+            >
+              <LogIn className="w-5 h-5 mr-2" />
+              Se connecter
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

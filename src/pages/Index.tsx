@@ -35,12 +35,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<string>("prayers");
   const today = new Date().toISOString().split("T")[0];
 
-  // Redirect to auth page after splash screen if not logged in
-  useEffect(() => {
-    if (!showSplash && !authLoading && !user) {
-      navigate("/auth");
-    }
-  }, [showSplash, user, authLoading, navigate]);
+  // No automatic redirect - users can use the app without logging in
 
   // Handle logout splash screen
   useEffect(() => {
@@ -110,7 +105,7 @@ const Index = () => {
     }} />;
   }
 
-  if (loading || authLoading || dataLoading) {
+  if (loading || dataLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 p-6">
         <div className="max-w-4xl mx-auto space-y-6">
