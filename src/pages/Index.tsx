@@ -41,6 +41,7 @@ const Index = () => {
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const selectedDateString = selectedDate.toISOString().split("T")[0];
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   // No automatic redirect - users can use the app without logging in
 
@@ -152,10 +153,29 @@ const Index = () => {
           </div>
           
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base">
-            <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-              <CalendarIcon className="w-4 h-4 text-primary" />
-              <span className="font-medium">{prayerTimes?.date}</span>
-            </div>
+            <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50 hover:bg-card/70 hover:border-primary/30 transition-all cursor-pointer">
+                  <CalendarIcon className="w-4 h-4 text-primary" />
+                  <span className="font-medium">{format(selectedDate, "dd MMMM yyyy", { locale: fr })}</span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="center">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      setSelectedDate(date);
+                      setDatePickerOpen(false);
+                    }
+                  }}
+                  disabled={(date) => date > new Date()}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
             <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
               <MapPin className="w-4 h-4 text-primary" />
               <span className="font-medium">{prayerTimes?.location}</span>
@@ -181,7 +201,7 @@ const Index = () => {
 
           {activeTab === "prayers" && (
             <div className="space-y-4 animate-fade-in">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {t.prayers}
                 </h2>
@@ -190,33 +210,6 @@ const Index = () => {
                     {stats.onTime + stats.late}/{stats.total}
                   </span>
                 </div>
-              </div>
-
-              {/* Date Picker */}
-              <div className="flex justify-center mb-4">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full sm:w-auto justify-start text-left font-normal bg-card/50 backdrop-blur-sm border-border/50",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP", { locale: fr }) : <span>Choisir une date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="center">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => date && setSelectedDate(date)}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
               </div>
               
               {prayerTimes?.prayers.map((prayer, index) => (
