@@ -14,11 +14,16 @@ import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/AuthContext";
 import { Capacitor } from "@capacitor/core";
-import { MapPin, Calendar, BarChart3, Clock, BookOpen, Settings as SettingsIcon } from "lucide-react";
+import { MapPin, Calendar as CalendarIcon, BarChart3, Clock, BookOpen, Settings as SettingsIcon } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { NotificationPermissionPrompt } from "@/components/NotificationPermissionPrompt";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -34,6 +39,8 @@ const Index = () => {
   const [statsPeriod, setStatsPeriod] = useState<"daily" | "weekly" | "monthly">("weekly");
   const [activeTab, setActiveTab] = useState<string>("prayers");
   const today = new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const selectedDateString = selectedDate.toISOString().split("T")[0];
 
   // No automatic redirect - users can use the app without logging in
 
@@ -83,6 +90,15 @@ const Index = () => {
 
   const isPrayerPast = (prayerTime: string) => {
     const now = new Date();
+    const selectedIsToday = selectedDateString === today;
+    
+    // If selected date is in the past, all prayers are past
+    if (selectedDateString < today) return true;
+    
+    // If selected date is in the future, no prayers are past
+    if (selectedDateString > today) return false;
+    
+    // If selected date is today, check the time
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
     const [hours, minutes] = prayerTime.split(":").map(Number);
     const prayerMinutes = hours * 60 + minutes;
@@ -137,7 +153,7 @@ const Index = () => {
           
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base">
             <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-              <Calendar className="w-4 h-4 text-primary" />
+              <CalendarIcon className="w-4 h-4 text-primary" />
               <span className="font-medium">{prayerTimes?.date}</span>
             </div>
             <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
@@ -165,7 +181,7 @@ const Index = () => {
 
           {activeTab === "prayers" && (
             <div className="space-y-4 animate-fade-in">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {t.prayers}
                 </h2>
@@ -175,19 +191,46 @@ const Index = () => {
                   </span>
                 </div>
               </div>
+
+              {/* Date Picker */}
+              <div className="flex justify-center mb-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full sm:w-auto justify-start text-left font-normal bg-card/50 backdrop-blur-sm border-border/50",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "PPP", { locale: fr }) : <span>Choisir une date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => date && setSelectedDate(date)}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
               
               {prayerTimes?.prayers.map((prayer, index) => (
                 <div key={prayer.name} className="animate-scale-in" style={{ animationDelay: `${index * 50}ms` }}>
                   <PrayerCard
                     name={prayer.name}
                     time={prayer.time}
-                    isNext={index === nextPrayerIndex}
+                    isNext={index === nextPrayerIndex && selectedDateString === today}
                     isPast={isPrayerPast(prayer.time)}
-                    status={getPrayerStatus(today, prayer.name)}
-                    dhikrDone={getDhikrStatus(today, prayer.name)}
-                    onStatusChange={(status) => updatePrayerStatus(today, prayer.name, status)}
-                    onStatusDelete={() => deletePrayerStatus(today, prayer.name)}
-                    onDhikrToggle={() => toggleDhikr(today, prayer.name)}
+                    status={getPrayerStatus(selectedDateString, prayer.name)}
+                    dhikrDone={getDhikrStatus(selectedDateString, prayer.name)}
+                    onStatusChange={(status) => updatePrayerStatus(selectedDateString, prayer.name, status)}
+                    onStatusDelete={() => deletePrayerStatus(selectedDateString, prayer.name)}
+                    onDhikrToggle={() => toggleDhikr(selectedDateString, prayer.name)}
                   />
                 </div>
               ))}
