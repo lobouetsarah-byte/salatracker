@@ -23,8 +23,12 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div className="animate-bounce">
-        <img src={salatrackLogo} alt="Salatracker" className="w-32 h-32 drop-shadow-2xl" />
+      <div className="animate-scale-in">
+        <img 
+          src={salatrackLogo} 
+          alt="Salatracker" 
+          className="w-32 h-32 animate-fade-in rounded-2xl shadow-lg bg-white" 
+        />
       </div>
       <h1 className="mt-6 text-4xl font-bold text-primary drop-shadow-lg">
         Salatracker
