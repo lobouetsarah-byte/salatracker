@@ -23,8 +23,8 @@ export const usePrayerNotifications = (
     if (!adhanAudioRef.current) {
       adhanAudioRef.current = new Audio("https://www.islamcan.com/audio/adhan/adhan-makkah.mp3");
     }
-    adhanAudioRef.current.play().catch((error) => {
-      console.log("Could not play adhan:", error);
+    adhanAudioRef.current.play().catch(() => {
+      // Silent fail - audio playback not critical
     });
   };
 

@@ -41,7 +41,7 @@ export const useDhikrTrackingSync = () => {
 
       setDhikrData(formatted);
     } catch (error) {
-      console.error("Error loading dhikr data:", error);
+      // Silent fail - data will be loaded from localStorage
     }
   };
 
@@ -64,7 +64,7 @@ export const useDhikrTrackingSync = () => {
 
         if (error) throw error;
       } catch (error) {
-        console.error("Error updating dhikr status:", error);
+        // Silent fail - data will be saved to localStorage
       }
     }
 

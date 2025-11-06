@@ -19,13 +19,16 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: "Salatrack - Suivi des Prières",
         short_name: "Salatrack",
-        description: "Application de suivi des prières quotidiennes avec notifications",
-        theme_color: "#10b981",
-        background_color: "#f0fdf4",
+        description: "Application de suivi des prières quotidiennes avec notifications intelligentes",
+        theme_color: "#1e3a8a",
+        background_color: "#ffffff",
         display: "standalone",
         orientation: "portrait",
         scope: "/",
-        start_url: "/",
+        start_url: "https://salatrack.app/",
+        id: "com.salatrack.app",
+        lang: "fr",
+        dir: "ltr",
         icons: [
           {
             src: "/favicon.png",
@@ -34,18 +37,24 @@ export default defineConfig(({ mode }) => ({
             purpose: "any maskable",
           },
           {
-            src: "/favicon.png",
+            src: "/icon-512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
           },
         ],
-        categories: ["lifestyle", "health"],
+        categories: ["lifestyle", "productivity", "utilities"],
         shortcuts: [
           {
             name: "Voir les prières",
             short_name: "Prières",
             url: "/?tab=prayers",
+            icons: [{ src: "/favicon.png", sizes: "192x192" }]
+          },
+          {
+            name: "Statistiques",
+            short_name: "Stats",
+            url: "/?tab=stats",
             icons: [{ src: "/favicon.png", sizes: "192x192" }]
           }
         ],

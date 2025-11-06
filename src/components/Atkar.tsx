@@ -358,7 +358,6 @@ export const Atkar = () => {
 
   const playAudio = (text: string) => {
     if (!('speechSynthesis' in window)) {
-      console.error('Speech synthesis not supported');
       return;
     }
 
@@ -385,7 +384,6 @@ export const Atkar = () => {
     
     utterance.onend = () => setIsPlaying(false);
     utterance.onerror = () => {
-      console.error('Speech synthesis error');
       setIsPlaying(false);
     };
     

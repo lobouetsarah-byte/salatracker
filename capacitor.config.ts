@@ -1,13 +1,10 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.eb5850f6b56448dd8bc4c681675a0d22',
-  appName: 'salat-tracker-buddy',
+  appId: 'com.salatrack.app',
+  appName: 'Salatrack',
   webDir: 'dist',
-  server: {
-    url: 'https://eb5850f6-b564-48dd-8bc4-c681675a0d22.lovableproject.com?forceHideBadge=true',
-    cleartext: true
-  },
+  backgroundColor: '#1e3a8a',
   plugins: {
     LocalNotifications: {
       smallIcon: "ic_stat_icon_config_sample",
@@ -16,6 +13,12 @@ const config: CapacitorConfig = {
     },
     PushNotifications: {
       presentationOptions: ["badge", "sound", "alert"],
+    },
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: "#1e3a8a",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: false,
     },
   },
 };

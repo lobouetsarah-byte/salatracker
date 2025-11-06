@@ -45,7 +45,6 @@ export const usePrayerTrackingSync = () => {
       setPrayerData(formatted);
       setLoading(false);
     } catch (error) {
-      console.error("Error loading prayer data:", error);
       setLoading(false);
     }
   };
@@ -67,7 +66,7 @@ export const usePrayerTrackingSync = () => {
 
         if (error) throw error;
       } catch (error) {
-        console.error("Error updating prayer status:", error);
+        // Silent fail - data will be saved to localStorage
       }
     }
 
@@ -98,7 +97,7 @@ export const usePrayerTrackingSync = () => {
 
         if (error) throw error;
       } catch (error) {
-        console.error("Error deleting prayer status:", error);
+        // Silent fail - data will be deleted from localStorage
       }
     }
 
