@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.salatrack.app',
-  appName: 'Salatrack',
+  appId: 'com.salatracker.app',
+  appName: 'Salatracker',
   webDir: 'dist',
   backgroundColor: '#1e3a8a',
   plugins: {

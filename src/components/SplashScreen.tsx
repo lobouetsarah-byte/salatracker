@@ -24,10 +24,10 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       }`}
     >
       <div className="animate-bounce">
-        <img src={salatrackLogo} alt="Salatrack" className="w-32 h-32 drop-shadow-2xl" />
+        <img src={salatrackLogo} alt="Salatracker" className="w-32 h-32 drop-shadow-2xl" />
       </div>
       <h1 className="mt-6 text-4xl font-bold text-white drop-shadow-lg">
-        Salatrack
+        Salatracker
       </h1>
       <p className="mt-2 text-white/90 text-sm">Suivez vos prières au quotidien</p>
     </div>

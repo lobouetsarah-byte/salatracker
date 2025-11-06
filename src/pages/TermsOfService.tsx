@@ -32,14 +32,14 @@ const TermsOfService = () => {
                 <section>
                   <h2 className="text-xl font-semibold mb-3">1. Acceptation des conditions</h2>
                   <p className="text-muted-foreground">
-                    En utilisant Salatrack, vous acceptez ces conditions générales de vente. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre application.
+                    En utilisant Salatracker, vous acceptez ces conditions générales de vente. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre application.
                   </p>
                 </section>
 
                 <section>
                   <h2 className="text-xl font-semibold mb-3">2. Description du service</h2>
                   <p className="text-muted-foreground">
-                    Salatrack est une application mobile qui vous aide à suivre vos prières quotidiennes et vos invocations. L'application fournit des horaires de prière, des rappels et des statistiques personnelles.
+                    Salatracker est une application mobile qui vous aide à suivre vos prières quotidiennes et vos invocations. L'application fournit des horaires de prière, des rappels et des statistiques personnelles.
                   </p>
                 </section>
 
@@ -60,14 +60,14 @@ const TermsOfService = () => {
                 <section>
                   <h2 className="text-xl font-semibold mb-3">5. Propriété intellectuelle</h2>
                   <p className="text-muted-foreground">
-                    Tous les droits de propriété intellectuelle relatifs à l'application et à son contenu appartiennent à Salatrack. Vous n'avez pas le droit de copier, modifier ou distribuer notre contenu sans autorisation.
+                    Tous les droits de propriété intellectuelle relatifs à l'application et à son contenu appartiennent à Salatracker. Vous n'avez pas le droit de copier, modifier ou distribuer notre contenu sans autorisation.
                   </p>
                 </section>
 
                 <section>
                   <h2 className="text-xl font-semibold mb-3">6. Limitation de responsabilité</h2>
                   <p className="text-muted-foreground">
-                    Salatrack ne sera pas responsable des dommages indirects, accessoires ou consécutifs résultant de l'utilisation ou de l'impossibilité d'utiliser l'application.
+                    Salatracker ne sera pas responsable des dommages indirects, accessoires ou consécutifs résultant de l'utilisation ou de l'impossibilité d'utiliser l'application.
                   </p>
                 </section>
 
@@ -90,14 +90,14 @@ const TermsOfService = () => {
                 <section>
                   <h2 className="text-xl font-semibold mb-3">1. Acceptance of Terms</h2>
                   <p className="text-muted-foreground">
-                    By using Salatrack, you accept these terms of service. If you do not accept these terms, please do not use our application.
+                    By using Salatracker, you accept these terms of service. If you do not accept these terms, please do not use our application.
                   </p>
                 </section>
 
                 <section>
                   <h2 className="text-xl font-semibold mb-3">2. Service Description</h2>
                   <p className="text-muted-foreground">
-                    Salatrack is a mobile application that helps you track your daily prayers and supplications. The app provides prayer times, reminders, and personal statistics.
+                    Salatracker is a mobile application that helps you track your daily prayers and supplications. The app provides prayer times, reminders, and personal statistics.
                   </p>
                 </section>
 
@@ -118,14 +118,14 @@ const TermsOfService = () => {
                 <section>
                   <h2 className="text-xl font-semibold mb-3">5. Intellectual Property</h2>
                   <p className="text-muted-foreground">
-                    All intellectual property rights relating to the application and its content belong to Salatrack. You do not have the right to copy, modify, or distribute our content without permission.
+                    All intellectual property rights relating to the application and its content belong to Salatracker. You do not have the right to copy, modify, or distribute our content without permission.
                   </p>
                 </section>
 
                 <section>
                   <h2 className="text-xl font-semibold mb-3">6. Limitation of Liability</h2>
                   <p className="text-muted-foreground">
-                    Salatrack will not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use the application.
+                    Salatracker will not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use the application.
                   </p>
                 </section>
 

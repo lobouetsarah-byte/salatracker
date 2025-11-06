@@ -91,7 +91,7 @@ interface Translations {
 
 const translations: Record<Language, Translations> = {
   fr: {
-    appTitle: "Salatrack",
+    appTitle: "Salatracker",
     dashboard: "Progrès",
     prayers: "Prières",
     atkar: "Atkar",
@@ -156,7 +156,7 @@ const translations: Record<Language, Translations> = {
     errorOccurred: "Une erreur s'est produite",
   },
   en: {
-    appTitle: "Salatrack",
+    appTitle: "Salatracker",
     dashboard: "Progress",
     prayers: "Prayers",
     atkar: "Atkar",

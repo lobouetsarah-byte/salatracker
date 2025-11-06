@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://salatrack.app/</loc>
+    <loc>https://app.salatracker.com/</loc>
     <lastmod>2025-01-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://salatrack.app/auth</loc>
+    <loc>https://app.salatracker.com/auth</loc>
     <lastmod>2025-01-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://salatrack.app/onboarding</loc>
+    <loc>https://app.salatracker.com/onboarding</loc>
     <lastmod>2025-01-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://salatrack.app/privacy</loc>
+    <loc>https://app.salatracker.com/privacy</loc>
     <lastmod>2025-01-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://salatrack.app/terms</loc>
+    <loc>https://app.salatracker.com/terms</loc>
     <lastmod>2025-01-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>

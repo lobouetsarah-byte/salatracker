@@ -79,7 +79,7 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <div className="w-full max-w-md space-y-4">
         <div className="text-center mb-6">
-          <img src={salatrackLogo} alt="Salatrack" className="w-20 h-20 mx-auto mb-4" />
+          <img src={salatrackLogo} alt="Salatracker" className="w-20 h-20 mx-auto mb-4" />
         </div>
         
         <Card className="w-full">
