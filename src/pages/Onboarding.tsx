@@ -191,7 +191,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-white p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
           <img src={salatrackLogo} alt="Salatracker" className="w-20 h-20 mx-auto mb-4" />

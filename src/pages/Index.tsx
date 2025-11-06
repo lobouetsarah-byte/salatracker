@@ -124,7 +124,7 @@ const Index = () => {
 
   if (loading || dataLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 p-6">
+      <div className="min-h-screen bg-white dark:bg-white p-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-48 w-full" />
@@ -139,7 +139,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 pb-20">
+    <div className="min-h-screen bg-white dark:bg-white pb-20">
       <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in">
