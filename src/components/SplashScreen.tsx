@@ -23,11 +23,12 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div className="animate-scale-in">
+      <div className="relative">
+        <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-2xl animate-pulse"></div>
         <img 
           src={salatrackLogo} 
           alt="Salatracker" 
-          className="w-32 h-32 animate-fade-in rounded-2xl shadow-lg bg-white" 
+          className="relative w-40 h-40 rounded-3xl shadow-2xl bg-white p-4 animate-scale-in" 
         />
       </div>
       <h1 className="mt-6 text-4xl font-bold text-primary drop-shadow-lg">
