@@ -11,6 +11,10 @@ import salatrackLogo from "@/assets/salatrack-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
+import { z } from "zod";
+
+const emailSchema = z.string().trim().email("Email invalide").max(255, "Email trop long");
+const passwordSchema = z.string().min(8, "Minimum 8 caractères").max(72, "Maximum 72 caractères");
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -23,6 +27,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [cooldownUntil, setCooldownUntil] = useState<Date | null>(null);
   const activeTab = searchParams.get("tab") || "login";
 
   useEffect(() => {
@@ -33,11 +39,65 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check cooldown
+    if (cooldownUntil && new Date() < cooldownUntil) {
+      const remainingSeconds = Math.ceil((cooldownUntil.getTime() - Date.now()) / 1000);
+      toast({
+        title: "Trop de tentatives",
+        description: `Veuillez patienter ${remainingSeconds} secondes`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate input
+    const emailResult = emailSchema.safeParse(email);
+    const passwordResult = passwordSchema.safeParse(password);
+    
+    if (!emailResult.success) {
+      toast({
+        title: "Email invalide",
+        description: emailResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!passwordResult.success) {
+      toast({
+        title: "Mot de passe invalide",
+        description: passwordResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(emailResult.data, passwordResult.data);
     setLoading(false);
     
-    if (!error) {
+    if (error) {
+      const newAttempts = loginAttempts + 1;
+      setLoginAttempts(newAttempts);
+      
+      if (newAttempts >= 5) {
+        const cooldown = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+        setCooldownUntil(cooldown);
+        toast({
+          title: "Trop de tentatives échouées",
+          description: "Veuillez patienter 5 minutes avant de réessayer",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erreur de connexion",
+          description: "Email ou mot de passe incorrect",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setLoginAttempts(0);
+      setCooldownUntil(null);
       navigate("/");
     }
   };
@@ -50,9 +110,20 @@ const Auth = () => {
     e.preventDefault();
     if (!resetEmail) return;
     
+    // Validate email
+    const emailResult = emailSchema.safeParse(resetEmail);
+    if (!emailResult.success) {
+      toast({
+        title: "Email invalide",
+        description: emailResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      const { error } = await supabase.auth.resetPasswordForEmail(emailResult.data, {
         redirectTo: `${window.location.origin}/auth`,
       });
       

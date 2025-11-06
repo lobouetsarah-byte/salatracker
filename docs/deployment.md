@@ -1,5 +1,7 @@
 # 🚀 Guide de Déploiement - Salatrack
 
+> **Note :** Pour un guide complet de transformation en application native Android/iOS, consultez [guide-app-native.md](./guide-app-native.md).
+
 ## Table des matières
 1. [PWA sur Lovable](#pwa-sur-lovable)
 2. [Domaine personnalisé](#domaine-personnalisé)
