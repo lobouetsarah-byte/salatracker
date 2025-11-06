@@ -19,17 +19,17 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-primary via-accent to-primary/80 transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-white transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
       <div className="animate-bounce">
         <img src={salatrackLogo} alt="Salatracker" className="w-32 h-32 drop-shadow-2xl" />
       </div>
-      <h1 className="mt-6 text-4xl font-bold text-white drop-shadow-lg">
+      <h1 className="mt-6 text-4xl font-bold text-primary drop-shadow-lg">
         Salatracker
       </h1>
-      <p className="mt-2 text-white/90 text-sm">Suivez vos prières au quotidien</p>
+      <p className="mt-2 text-muted-foreground text-sm">Suivez vos prières au quotidien</p>
     </div>
   );
 };
