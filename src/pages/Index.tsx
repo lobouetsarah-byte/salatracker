@@ -152,35 +152,37 @@ const Index = () => {
             </h1>
           </div>
           
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base">
-            <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-              <PopoverTrigger asChild>
-                <button className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50 hover:bg-card/70 hover:border-primary/30 transition-all cursor-pointer">
-                  <CalendarIcon className="w-4 h-4 text-primary" />
-                  <span className="font-medium">{format(selectedDate, "dd MMMM yyyy", { locale: fr })}</span>
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="center">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => {
-                    if (date) {
-                      setSelectedDate(date);
-                      setDatePickerOpen(false);
-                    }
-                  }}
-                  disabled={(date) => date > new Date()}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-            <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-              <MapPin className="w-4 h-4 text-primary" />
-              <span className="font-medium">{prayerTimes?.location}</span>
+          {activeTab === "prayers" && (
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base">
+              <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                <PopoverTrigger asChild>
+                  <button className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50 hover:bg-card/70 hover:border-primary/30 transition-all cursor-pointer">
+                    <CalendarIcon className="w-4 h-4 text-primary" />
+                    <span className="font-medium">{format(selectedDate, "dd MMMM yyyy", { locale: fr })}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="center">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        setSelectedDate(date);
+                        setDatePickerOpen(false);
+                      }
+                    }}
+                    disabled={(date) => date > new Date()}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+              <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span className="font-medium">{prayerTimes?.location}</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Notifications permission prompt */}

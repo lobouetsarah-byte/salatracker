@@ -458,9 +458,11 @@ export const Atkar = () => {
                   <Check className="w-3 h-3" />
                 </Badge>
               )}
-              <span className="text-xs text-muted-foreground">
-                ~{getTotalTime(morningAtkar)} min
-              </span>
+              {activeTab === "morning" && (
+                <span className="text-xs text-muted-foreground">
+                  ~{getTotalTime(morningAtkar)} min
+                </span>
+              )}
             </div>
           </TabsTrigger>
           <TabsTrigger value="evening" className="flex flex-col gap-1">
@@ -471,9 +473,11 @@ export const Atkar = () => {
                   <Check className="w-3 h-3" />
                 </Badge>
               )}
-              <span className="text-xs text-muted-foreground">
-                ~{getTotalTime(eveningAtkar)} min
-              </span>
+              {activeTab === "evening" && (
+                <span className="text-xs text-muted-foreground">
+                  ~{getTotalTime(eveningAtkar)} min
+                </span>
+              )}
             </div>
           </TabsTrigger>
         </TabsList>
