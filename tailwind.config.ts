@@ -116,14 +116,14 @@ export default {
         },
         "scale-in": {
           "0%": {
-            transform: "scale(0.5) rotate(-10deg)",
+            transform: "scale(0.3)",
             opacity: "0"
           },
           "50%": {
-            transform: "scale(1.05) rotate(2deg)",
+            transform: "scale(1.05)",
           },
           "100%": {
-            transform: "scale(1) rotate(0deg)",
+            transform: "scale(1)",
             opacity: "1"
           }
         },
@@ -140,7 +140,7 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.6s ease-out",
-        "scale-in": "scale-in 1s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "scale-in": "scale-in 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
         "fadeIn": "fadeIn 0.4s ease-out forwards",
       },
     },
