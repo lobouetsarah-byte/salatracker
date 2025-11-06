@@ -27,7 +27,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         <img 
           src={salatrackLogo} 
           alt="Salatracker" 
-          className="w-40 h-40 rounded-3xl shadow-2xl bg-white p-6 animate-scale-in" 
+          className="w-40 h-40 animate-scale-in" 
         />
       </div>
       <h1 className="mt-6 text-4xl font-bold text-primary drop-shadow-lg animate-fade-in">
