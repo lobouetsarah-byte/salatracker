@@ -5,6 +5,7 @@ import { PrayerCard } from "@/components/PrayerCard";
 import { WeeklyStats } from "@/components/WeeklyStats";
 import { Settings } from "@/components/Settings";
 import { Atkar } from "@/components/Atkar";
+import { WeeklyHadith } from "@/components/WeeklyHadith";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTrackingSync } from "@/hooks/usePrayerTrackingSync";
 import { useDhikrTrackingSync } from "@/hooks/useDhikrTrackingSync";
@@ -225,13 +226,14 @@ const Index = () => {
         {/* Content */}
         <div className="space-y-6">
           {activeTab === "dashboard" && (
-            <div className="space-y-4">
+            <div className="space-y-6 animate-fade-in">
               <WeeklyStats 
                 stats={stats} 
                 period={statsPeriod}
                 onPeriodChange={setStatsPeriod}
                 getCustomStats={getCustomStats}
               />
+              <WeeklyHadith />
             </div>
           )}
 
