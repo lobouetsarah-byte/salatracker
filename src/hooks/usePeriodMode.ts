@@ -23,6 +23,34 @@ export const usePeriodMode = () => {
     }
   }, [user]);
 
+  // Apply/remove global theme class for period mode
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isInPeriod) root.classList.add('period-mode');
+    else root.classList.remove('period-mode');
+  }, [isInPeriod]);
+
+  // Listen to cross-component/tab period-mode changes
+  useEffect(() => {
+    const handler = (e: any) => {
+      const status = e.detail?.isInPeriod;
+      if (typeof status === 'boolean') setIsInPeriod(status);
+    };
+    window.addEventListener('period-mode-changed', handler as EventListener);
+
+    const onStorage = (ev: StorageEvent) => {
+      if (ev.key === 'periodMode' && ev.newValue) {
+        setIsInPeriod(ev.newValue === 'true');
+      }
+    };
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      window.removeEventListener('period-mode-changed', handler as EventListener);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
+
   const loadPeriodStatus = async () => {
     if (!user) return;
 
@@ -51,9 +79,27 @@ export const usePeriodMode = () => {
   };
 
   const togglePeriodMode = async () => {
+    const newStatus = !isInPeriod;
+
+    // Optimistic UI update for instant feedback
+    setIsInPeriod(newStatus);
+    localStorage.setItem("periodMode", newStatus.toString());
+
+    try {
+      // Broadcast to other components/tabs
+      window.dispatchEvent(new CustomEvent("period-mode-changed", { detail: { isInPeriod: newStatus } }));
+    } catch {}
+
+    // Apply global theme class immediately
+    try {
+      const root = document.documentElement;
+      if (newStatus) root.classList.add("period-mode");
+      else root.classList.remove("period-mode");
+    } catch {}
+
     if (user) {
       try {
-        if (isInPeriod && currentPeriodId) {
+        if (!newStatus && currentPeriodId) {
           // End current period
           const { error } = await supabase
             .from("period_tracking")
@@ -65,14 +111,12 @@ export const usePeriodMode = () => {
 
           if (error) throw error;
 
-          setIsInPeriod(false);
           setCurrentPeriodId(null);
-          
           toast({
             title: "Bienvenue de retour ✨",
             description: "Le mode indisposée est désactivé. Tu peux reprendre le suivi de tes prières normalement.",
           });
-        } else {
+        } else if (newStatus) {
           // Start new period
           const { data, error } = await supabase
             .from("period_tracking")
@@ -86,15 +130,26 @@ export const usePeriodMode = () => {
 
           if (error) throw error;
 
-          setIsInPeriod(true);
           setCurrentPeriodId(data.id);
-          
           toast({
             title: "Mode indisposée activé",
             description: "Suivez vos dhikr et invocations pendant cette période.",
           });
+        } else {
+          // Deactivation without currentPeriodId, reload to be safe
+          await loadPeriodStatus();
         }
       } catch (error: any) {
+        // Revert on error
+        const revert = !newStatus;
+        setIsInPeriod(revert);
+        localStorage.setItem("periodMode", revert.toString());
+        try {
+          window.dispatchEvent(new CustomEvent("period-mode-changed", { detail: { isInPeriod: revert } }));
+        } catch {}
+        const root = document.documentElement;
+        if (revert) root.classList.add("period-mode"); else root.classList.remove("period-mode");
+
         toast({
           title: "Erreur",
           description: error.message,
@@ -102,11 +157,7 @@ export const usePeriodMode = () => {
         });
       }
     } else {
-      // Fallback to localStorage
-      const newStatus = !isInPeriod;
-      setIsInPeriod(newStatus);
-      localStorage.setItem("periodMode", newStatus.toString());
-      
+      // Fallback to local only (not authenticated)
       toast({
         title: newStatus ? "Mode indisposée activé" : "Bienvenue de retour ✨",
         description: newStatus 
