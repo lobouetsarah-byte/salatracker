@@ -69,8 +69,8 @@ export const usePeriodMode = () => {
           setCurrentPeriodId(null);
           
           toast({
-            title: "Mode indisposée désactivé",
-            description: "Vous pouvez de nouveau suivre vos prières normalement.",
+            title: "Bienvenue de retour ✨",
+            description: "Le mode indisposée est désactivé. Tu peux reprendre le suivi de tes prières normalement.",
           });
         } else {
           // Start new period
@@ -108,10 +108,10 @@ export const usePeriodMode = () => {
       localStorage.setItem("periodMode", newStatus.toString());
       
       toast({
-        title: newStatus ? "Mode indisposée activé" : "Mode indisposée désactivé",
+        title: newStatus ? "Mode indisposée activé" : "Bienvenue de retour ✨",
         description: newStatus 
           ? "Suivez vos dhikr et invocations pendant cette période."
-          : "Vous pouvez de nouveau suivre vos prières normalement.",
+          : "Le mode indisposée est désactivé. Tu peux reprendre le suivi de tes prières normalement.",
       });
     }
   };
