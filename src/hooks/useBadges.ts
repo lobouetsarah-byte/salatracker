@@ -158,10 +158,10 @@ export const useBadges = () => {
 
     const prayers = [
       { name: "Fajr", badge: "🌕 Gardienne de l'Aube", desc: "7 Fajr à l'heure consécutifs" },
-      { name: "Dhuhr", badge: "☀️ Discipline du Milieu", desc: "7 Dhuhr à l'heure consécutifs" },
-      { name: "Asr", badge: "🌤 Constante de l'Après-midi", desc: "7 Asr à l'heure consécutifs" },
-      { name: "Maghrib", badge: "🌅 Fidèle du Crépuscule", desc: "7 Maghrib à l'heure consécutifs" },
-      { name: "Isha", badge: "✨ Sérénité Nocturne", desc: "7 Isha à l'heure consécutifs" },
+      { name: "Dhuhr", badge: "☀️ Constante du Midi", desc: "7 Dhuhr à l'heure consécutifs" },
+      { name: "Asr", badge: "🌤 Force de l'Après-Midi", desc: "7 Asr à l'heure consécutifs" },
+      { name: "Maghrib", badge: "🌅 Lumière du Couchant", desc: "7 Maghrib à l'heure consécutifs" },
+      { name: "Isha", badge: "✨ Paix de la Nuit", desc: "7 Isha à l'heure consécutifs" },
     ];
 
     for (const prayer of prayers) {
@@ -198,10 +198,136 @@ export const useBadges = () => {
     }
   };
 
+  const checkMonthlyBadges = async (isInPeriod: boolean) => {
+    if (!user) return;
+
+    try {
+      const today = new Date();
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      
+      const dates = [];
+      for (let d = new Date(firstDayOfMonth); d <= lastDayOfMonth && d <= today; d.setDate(d.getDate() + 1)) {
+        dates.push(d.toISOString().split('T')[0]);
+      }
+
+      if (isInPeriod) {
+        // Count spiritual acts in the month
+        const { data } = await supabase
+          .from("dhikr_tracking")
+          .select("*")
+          .eq("user_id", user.id)
+          .in("prayer_date", dates);
+
+        const actCount = data?.length || 0;
+        
+        if (actCount >= 30) {
+          await checkAndAwardBadge(
+            "monthly_30_acts",
+            "🌸 30 Actes Spirituels",
+            "30 actes spirituels accomplis ce mois"
+          );
+        }
+      } else {
+        // Count on-time prayers in the month
+        const { data } = await supabase
+          .from("prayer_tracking")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("status", "on-time")
+          .in("prayer_date", dates);
+
+        const onTimeCount = data?.length || 0;
+        
+        if (onTimeCount >= 30) {
+          await checkAndAwardBadge(
+            "monthly_30_prayers",
+            "📿 30 Prières à l'Heure",
+            "30 prières à l'heure accomplies ce mois"
+          );
+        }
+
+        // Check for disciplined month (20+ days with all 5 prayers on time)
+        let disciplinedDays = 0;
+        for (const date of dates) {
+          const isComplete = await checkDailyCompletion(date, false);
+          if (isComplete) disciplinedDays++;
+        }
+
+        if (disciplinedDays >= 20) {
+          await checkAndAwardBadge(
+            "monthly_disciplined",
+            "💪 Mois Discipliné",
+            "Au moins 20 jours avec toutes les prières à l'heure"
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error checking monthly badges:", error);
+    }
+  };
+
+  const checkPeriodBadges = async () => {
+    if (!user) return;
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Check Douceur & Constante (3 spiritual acts today)
+      const { data: todayActs } = await supabase
+        .from("dhikr_tracking")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("prayer_date", today);
+
+      if ((todayActs?.length || 0) >= 3) {
+        await checkAndAwardBadge(
+          "period_daily_3",
+          "🌸 Douceur & Constante",
+          "3 actes spirituels accomplis aujourd'hui"
+        );
+      }
+
+      // Check Cycle serein (7 days in period with at least 1 act per day)
+      const dates = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        dates.push(d.toISOString().split('T')[0]);
+      }
+
+      let allDaysHaveAct = true;
+      for (const date of dates) {
+        const { data } = await supabase
+          .from("dhikr_tracking")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("prayer_date", date);
+
+        if (!data || data.length === 0) {
+          allDaysHaveAct = false;
+          break;
+        }
+      }
+
+      if (allDaysHaveAct) {
+        await checkAndAwardBadge(
+          "period_cycle_serein",
+          "🌙 Cycle Serein",
+          "7 jours consécutifs avec au moins 1 acte spirituel"
+        );
+      }
+    } catch (error) {
+      console.error("Error checking period badges:", error);
+    }
+  };
+
   return {
     badges,
     checkDailyCompletion,
     checkWeeklyBadges,
+    checkMonthlyBadges,
+    checkPeriodBadges,
     checkAndAwardBadge,
   };
 };

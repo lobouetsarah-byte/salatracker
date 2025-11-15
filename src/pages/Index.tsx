@@ -44,7 +44,7 @@ const Index = () => {
   const { toggleDhikr, getDhikrStatus } = useDhikrTrackingSync();
   const { isInPeriod } = usePeriodMode();
   const { setDhikrForPrayer, getDhikrForPrayer } = usePeriodDhikrTracking();
-  const { checkDailyCompletion, checkWeeklyBadges } = useBadges();
+  const { checkDailyCompletion, checkWeeklyBadges, checkMonthlyBadges, checkPeriodBadges } = useBadges();
   const [showDailySuccess, setShowDailySuccess] = useState(false);
   const { settings, updateSettings } = useSettings();
   const { t } = useLanguage();
@@ -129,15 +129,25 @@ const Index = () => {
     }
   }, [prayerTimes]);
 
-  // Check daily completion and badges at the end of the day
+  // Check daily completion and badges after Isha prayer
   useEffect(() => {
-    const checkEndOfDay = async () => {
-      const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
+    const checkAfterIsha = async () => {
+      if (!prayerTimes?.prayers) return;
       
-      // Check at 23:55 (5 minutes before midnight)
-      if (hours === 23 && minutes === 55) {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      
+      // Get Isha time
+      const ishaPrayer = prayerTimes.prayers.find(p => p.name === "Isha");
+      if (!ishaPrayer) return;
+      
+      const [ishaHours, ishaMinutes] = ishaPrayer.time.split(":").map(Number);
+      const ishaPrayerMinutes = ishaHours * 60 + ishaMinutes;
+      
+      // Check 30 minutes after Isha
+      const checkTime = ishaPrayerMinutes + 30;
+      
+      if (currentMinutes === checkTime) {
         const today = now.toISOString().split('T')[0];
         const isComplete = await checkDailyCompletion(today, isInPeriod);
         
@@ -145,14 +155,19 @@ const Index = () => {
           setShowDailySuccess(true);
         }
         
-        // Check weekly badges
+        // Check all badges
         await checkWeeklyBadges(isInPeriod);
+        await checkMonthlyBadges(isInPeriod);
+        
+        if (isInPeriod) {
+          await checkPeriodBadges();
+        }
       }
     };
 
-    const interval = setInterval(checkEndOfDay, 60000); // Check every minute
+    const interval = setInterval(checkAfterIsha, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, [isInPeriod, checkDailyCompletion, checkWeeklyBadges]);
+  }, [prayerTimes, isInPeriod, checkDailyCompletion, checkWeeklyBadges, checkMonthlyBadges, checkPeriodBadges]);
 
   const isPrayerPast = (prayerTime: string) => {
     const now = new Date();
@@ -250,6 +265,9 @@ const Index = () => {
           )}
         </div>
 
+        {/* Hadith de la semaine */}
+        <WeeklyHadith />
+
         {/* Notifications permission prompt */}
         <NotificationPermissionPrompt />
         
@@ -271,7 +289,6 @@ const Index = () => {
                 getCustomStats={getCustomStats}
               />
               {isInPeriod && <PeriodStats />}
-              <WeeklyHadith />
             </div>
           )}
 
