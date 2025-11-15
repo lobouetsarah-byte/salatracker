@@ -6,6 +6,7 @@ import { WeeklyStats } from "@/components/WeeklyStats";
 import { Settings } from "@/components/Settings";
 import { Atkar } from "@/components/Atkar";
 import { WeeklyHadith } from "@/components/WeeklyHadith";
+import { PeriodStats } from "@/components/PeriodStats";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTrackingSync } from "@/hooks/usePrayerTrackingSync";
 import { useDhikrTrackingSync } from "@/hooks/useDhikrTrackingSync";
@@ -19,7 +20,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
-import { MapPin, Calendar as CalendarIcon, BarChart3, Clock, BookOpen, Settings as SettingsIcon } from "lucide-react";
+import { MapPin, Calendar as CalendarIcon, BarChart3, Clock, BookOpen, Settings as SettingsIcon, Heart } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -174,7 +175,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-white pb-20">
+    <div className={`min-h-screen pb-20 transition-colors duration-300 ${isInPeriod ? "bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
       <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in">
@@ -227,18 +228,38 @@ const Index = () => {
         <div className="space-y-6">
           {activeTab === "dashboard" && (
             <div className="space-y-6 animate-fade-in">
-              <WeeklyStats 
-                stats={stats} 
-                period={statsPeriod}
-                onPeriodChange={setStatsPeriod}
-                getCustomStats={getCustomStats}
-              />
-              <WeeklyHadith />
+              {isInPeriod ? (
+                <>
+                  <PeriodStats />
+                  <WeeklyHadith />
+                </>
+              ) : (
+                <>
+                  <WeeklyStats 
+                    stats={stats} 
+                    period={statsPeriod}
+                    onPeriodChange={setStatsPeriod}
+                    getCustomStats={getCustomStats}
+                  />
+                  <WeeklyHadith />
+                </>
+              )}
             </div>
           )}
 
           {activeTab === "prayers" && (
             <div className="space-y-4 animate-fade-in">
+              {isInPeriod && (
+                <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-[hsl(var(--period-card))] to-[hsl(var(--period-accent))] border-2 border-[hsl(var(--period-border))] shadow-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Heart className="w-5 h-5 text-[hsl(var(--period-button))]" />
+                    <h3 className="font-bold text-[hsl(var(--period-text))]">Mode Période Activé</h3>
+                  </div>
+                  <p className="text-sm text-[hsl(var(--period-text))]/80">
+                    Suivez vos dhikr et invocations. Les prières ne sont pas suivies pendant cette période.
+                  </p>
+                </div>
+              )}
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {t.prayers}
