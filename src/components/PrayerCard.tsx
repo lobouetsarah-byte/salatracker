@@ -92,17 +92,16 @@ export const PrayerCard = ({
   const cardBg = isPeriodMode
     ? "bg-gradient-to-br from-[hsl(var(--period-card))] to-white"
     : hasSuccessBadge ? "bg-gradient-to-br from-success/5 to-success/10" : isPast ? "bg-muted/20" : "";
-  const textOpacity = isPast ? "opacity-50" : "";
 
   return (
     <>
       <Card 
-        className={`p-4 sm:p-5 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast && !isPeriodMode ? "opacity-60 grayscale" : ""} backdrop-blur-sm hover:scale-[1.01] ${isPeriodMode ? "border-[hsl(var(--period-border))]" : ""}`}
+        className={`p-4 sm:p-5 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} backdrop-blur-sm hover:scale-[1.01] ${isPeriodMode ? "border-[hsl(var(--period-border))]" : ""}`}
       >
         <div className="flex items-center justify-between gap-4 sm:gap-5">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-3 flex-wrap">
-              <h3 className={`text-xl sm:text-2xl font-bold text-foreground ${textOpacity}`}>{name}</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground">{name}</h3>
               {isNext && !isPast && (
                 <Badge variant="outline" className="text-xs border-primary/50 text-primary bg-primary/10 animate-pulse">
                   {t.nextPrayer}
@@ -192,12 +191,6 @@ export const PrayerCard = ({
             </div>
           )}
           
-          {/* Period mode indicator */}
-          {isPeriodMode && (
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-pink-100 dark:bg-pink-900/20 transition-all duration-300 flex items-center justify-center shadow-lg flex-shrink-0">
-              <Heart className="w-6 h-6 text-pink-500" />
-            </div>
-          )}
         </div>
       </Card>
 

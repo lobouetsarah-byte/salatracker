@@ -27,22 +27,10 @@ export const WeeklyHadith = () => {
   }
 
   return (
-    <Card className="shadow-lg border-accent/20 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-accent/5 to-accent/10">
-      <CardHeader className="space-y-3">
-        <CardTitle className="flex items-center gap-2 text-xl">
-          <div className="p-2 rounded-lg bg-accent/10">
-            <BookOpen className="w-5 h-5 text-accent" />
-          </div>
-          Hadith de la semaine
-          <Sparkles className="w-4 h-4 text-accent ml-auto" />
-        </CardTitle>
-        <CardDescription className="text-sm font-medium text-accent">
-          {hadith.title}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="p-4 rounded-xl bg-card border border-accent/20">
-          <p className="text-right font-arabic text-xl leading-loose text-foreground mb-3">
+    <div className="text-center py-4 px-6 rounded-2xl bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20 shadow-sm">
+      <div className="space-y-4">
+        <div className="p-4 rounded-xl bg-card/50 backdrop-blur-sm">
+          <p className="text-right font-arabic text-lg sm:text-xl leading-loose text-foreground mb-3">
             {hadith.arabic_text}
           </p>
           <div className="h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent my-3" />
@@ -53,7 +41,7 @@ export const WeeklyHadith = () => {
         <p className="text-xs text-muted-foreground font-medium">
           📚 {hadith.reference}
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
