@@ -7,12 +7,13 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
-import { ArrowRight, ArrowLeft, TrendingUp, Calendar, BookOpen, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowLeft, TrendingUp, Calendar, BookOpen, Sparkles, User, Users } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { z } from "zod";
 
 // Validation schemas
 const firstNameSchema = z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters");
+const genderSchema = z.enum(["male", "female"], { errorMap: () => ({ message: "Please select your gender" }) });
 const emailSchema = z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters");
 const passwordSchema = z.string().min(8, "Password must be at least 8 characters").max(72, "Password must be less than 72 characters");
 const goalsSchema = z.array(z.enum(["track_progress", "consistent_prayer", "dhikr", "start_praying"])).min(1, "Select at least one goal");
@@ -26,6 +27,7 @@ const Onboarding = () => {
   
   // Form data
   const [firstName, setFirstName] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "">("");
   const [goals, setGoals] = useState<string[]>([]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -74,6 +76,17 @@ const Onboarding = () => {
       }
     }
     if (step === 2) {
+      const result = genderSchema.safeParse(gender);
+      if (!result.success) {
+        toast({
+          title: language === "fr" ? "Genre requis" : "Gender required",
+          description: result.error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    if (step === 3) {
       const result = goalsSchema.safeParse(goals);
       if (!result.success) {
         toast({
@@ -84,7 +97,7 @@ const Onboarding = () => {
         return;
       }
     }
-    if (step === 3) {
+    if (step === 4) {
       const result = emailSchema.safeParse(email);
       if (!result.success) {
         toast({
@@ -107,6 +120,7 @@ const Onboarding = () => {
     
     // Validate all inputs
     const firstNameResult = firstNameSchema.safeParse(firstName);
+    const genderResult = genderSchema.safeParse(gender);
     const emailResult = emailSchema.safeParse(email);
     const passwordResult = passwordSchema.safeParse(password);
     const goalsResult = goalsSchema.safeParse(goals);
@@ -115,6 +129,15 @@ const Onboarding = () => {
       toast({
         title: language === "fr" ? "Prénom invalide" : "Invalid first name",
         description: firstNameResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!genderResult.success) {
+      toast({
+        title: language === "fr" ? "Genre requis" : "Gender required",
+        description: genderResult.error.errors[0].message,
         variant: "destructive",
       });
       return;
@@ -164,11 +187,14 @@ const Onboarding = () => {
 
       if (signUpError) throw signUpError;
 
-      // Update profile with validated goals
+      // Update profile with validated goals and gender
       if (data.user) {
         const { error: updateError } = await supabase
           .from('profiles')
-          .update({ goals: goalsResult.data })
+          .update({ 
+            goals: goalsResult.data,
+            gender: genderResult.data
+          })
           .eq('id', data.user.id);
 
         if (updateError) throw updateError;
@@ -203,7 +229,7 @@ const Onboarding = () => {
               {language === "fr" ? "Créer un compte" : "Create Account"}
             </CardTitle>
             <CardDescription>
-              {language === "fr" ? `Étape ${step} sur 4` : `Step ${step} of 4`}
+              {language === "fr" ? `Étape ${step} sur 5` : `Step ${step} of 5`}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -230,6 +256,70 @@ const Onboarding = () => {
             )}
 
             {step === 2 && (
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <Label className="text-lg">
+                    {language === "fr" ? "Vous êtes ?" : "You are?"}
+                  </Label>
+                  <div className="grid gap-3 mt-4">
+                    <div
+                      onClick={() => setGender("male")}
+                      className={`
+                        flex items-center gap-4 p-4 rounded-xl cursor-pointer
+                        transition-all duration-300 border-2
+                        ${gender === "male" 
+                          ? 'bg-primary/10 border-primary shadow-lg scale-[1.02]' 
+                          : 'bg-card border-border hover:border-primary/50 hover:bg-primary/5'
+                        }
+                      `}
+                    >
+                      <div className={`
+                        p-3 rounded-lg transition-colors
+                        ${gender === "male" ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}
+                      `}>
+                        <User className="w-5 h-5" />
+                      </div>
+                      <span className={`flex-1 font-medium ${gender === "male" ? 'text-primary' : ''}`}>
+                        {language === "fr" ? "Homme" : "Male"}
+                      </span>
+                    </div>
+                    <div
+                      onClick={() => setGender("female")}
+                      className={`
+                        flex items-center gap-4 p-4 rounded-xl cursor-pointer
+                        transition-all duration-300 border-2
+                        ${gender === "female" 
+                          ? 'bg-primary/10 border-primary shadow-lg scale-[1.02]' 
+                          : 'bg-card border-border hover:border-primary/50 hover:bg-primary/5'
+                        }
+                      `}
+                    >
+                      <div className={`
+                        p-3 rounded-lg transition-colors
+                        ${gender === "female" ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}
+                      `}>
+                        <Users className="w-5 h-5" />
+                      </div>
+                      <span className={`flex-1 font-medium ${gender === "female" ? 'text-primary' : ''}`}>
+                        {language === "fr" ? "Femme" : "Female"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleBack} variant="outline" className="flex-1 h-12">
+                    <ArrowLeft className="mr-2 w-4 h-4" />
+                    {language === "fr" ? "Retour" : "Back"}
+                  </Button>
+                  <Button onClick={handleNext} className="flex-1 h-12">
+                    {language === "fr" ? "Suivant" : "Next"}
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
               <div className="space-y-4">
                 <div className="space-y-3">
                   <Label className="text-lg">
@@ -282,7 +372,7 @@ const Onboarding = () => {
               </div>
             )}
 
-            {step === 3 && (
+            {step === 4 && (
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">
@@ -310,7 +400,7 @@ const Onboarding = () => {
               </div>
             )}
 
-            {step === 4 && (
+            {step === 5 && (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="password">
