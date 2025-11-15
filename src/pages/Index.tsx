@@ -95,20 +95,20 @@ const Index = () => {
     settings,
   });
   
-  // Regular prayer notifications (only when NOT in period mode)
-  if (isNative && !isInPeriod) {
-    useNativeNotifications(
-      prayerTimes?.prayers || [],
-      getPrayerStatus,
-      settings
-    );
-  } else if (!isNative && !isInPeriod) {
-    usePrayerNotifications(
-      prayerTimes?.prayers || [],
-      getPrayerStatus,
-      settings
-    );
-  }
+  // Regular prayer notifications - hooks must be called unconditionally
+  useNativeNotifications(
+    prayerTimes?.prayers || [],
+    getPrayerStatus,
+    settings,
+    isNative && !isInPeriod // Pass condition as parameter
+  );
+  
+  usePrayerNotifications(
+    prayerTimes?.prayers || [],
+    getPrayerStatus,
+    settings,
+    !isNative && !isInPeriod // Pass condition as parameter
+  );
 
   useEffect(() => {
     if (prayerTimes?.prayers) {

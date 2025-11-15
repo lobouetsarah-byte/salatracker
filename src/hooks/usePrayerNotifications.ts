@@ -6,7 +6,8 @@ import { NotificationSettings } from "./useSettings";
 export const usePrayerNotifications = (
   prayers: Prayer[],
   getPrayerStatus: (date: string, prayerName: string) => PrayerStatus,
-  settings: NotificationSettings
+  settings: NotificationSettings,
+  enabled: boolean = true
 ) => {
   const intervalRef = useRef<number | null>(null);
   const notifiedPrayersRef = useRef<Set<string>>(new Set());
@@ -130,6 +131,8 @@ export const usePrayerNotifications = (
   };
 
   useEffect(() => {
+    if (!enabled) return;
+    
     requestNotificationPermission();
 
     if (prayers.length > 0) {
@@ -146,5 +149,5 @@ export const usePrayerNotifications = (
         adhanAudioRef.current = null;
       }
     };
-  }, [prayers, settings]);
+  }, [prayers, settings, enabled]);
 };

@@ -8,12 +8,13 @@ import { NotificationSettings } from "./useSettings";
 export const useNativeNotifications = (
   prayers: Prayer[],
   getPrayerStatus: (date: string, prayerName: string) => PrayerStatus,
-  settings: NotificationSettings
+  settings: NotificationSettings,
+  enabled: boolean = true
 ) => {
   const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
-    if (!isNative) return;
+    if (!isNative || !enabled) return;
 
     const setupNotifications = async () => {
       // Request permissions
@@ -92,5 +93,5 @@ export const useNativeNotifications = (
         });
       }
     };
-  }, [prayers, settings, isNative, getPrayerStatus]);
+  }, [prayers, settings, isNative, getPrayerStatus, enabled]);
 };
