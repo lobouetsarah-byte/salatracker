@@ -131,4 +131,24 @@ All colors MUST be HSL.
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
+
+  /* Period mode theme override */
+  .period-mode {
+    --background: var(--period-bg);
+    --card: var(--period-card);
+    --primary: var(--period-button);
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--period-accent);
+    --muted: var(--period-accent);
+    --accent: var(--period-button);
+    --border: var(--period-border);
+  }
+
+  .period-mode .hover\:bg-primary\/10:hover {
+    background-color: hsl(var(--period-button) / 0.2);
+  }
+
+  .period-mode .bg-primary\/10 {
+    background-color: hsl(var(--period-button) / 0.2);
+  }
 }

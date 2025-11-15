@@ -11,7 +11,7 @@ import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTrackingSync } from "@/hooks/usePrayerTrackingSync";
 import { useDhikrTrackingSync } from "@/hooks/useDhikrTrackingSync";
 import { usePeriodMode } from "@/hooks/usePeriodMode";
-import { usePeriodDhikrTracking } from "@/hooks/usePeriodDhikrTracking";
+import { usePeriodDhikrTracking, DhikrType } from "@/hooks/usePeriodDhikrTracking";
 import { usePeriodNotifications } from "@/hooks/usePeriodNotifications";
 import { useBadges } from "@/hooks/useBadges";
 import { DailySuccess } from "@/components/DailySuccess";
@@ -32,6 +32,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { PrayerStatus } from "@/hooks/usePrayerTracking";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -129,45 +130,48 @@ const Index = () => {
     }
   }, [prayerTimes]);
 
-  // Check daily completion and badges after Isha prayer
-  useEffect(() => {
-    const checkAfterIsha = async () => {
-      if (!prayerTimes?.prayers) return;
-      
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      
-      // Get Isha time
-      const ishaPrayer = prayerTimes.prayers.find(p => p.name === "Isha");
-      if (!ishaPrayer) return;
-      
-      const [ishaHours, ishaMinutes] = ishaPrayer.time.split(":").map(Number);
-      const ishaPrayerMinutes = ishaHours * 60 + ishaMinutes;
-      
-      // Check 30 minutes after Isha
-      const checkTime = ishaPrayerMinutes + 30;
-      
-      if (currentMinutes === checkTime) {
-        const today = now.toISOString().split('T')[0];
-        const isComplete = await checkDailyCompletion(today, isInPeriod);
-        
-        if (isComplete) {
-          setShowDailySuccess(true);
-        }
-        
-        // Check all badges
-        await checkWeeklyBadges(isInPeriod);
-        await checkMonthlyBadges(isInPeriod);
-        
-        if (isInPeriod) {
-          await checkPeriodBadges();
-        }
-      }
-    };
+  // Check daily completion and badges in real-time after prayer/dhikr updates
+  const checkBadgesRealTime = async () => {
+    if (!user) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Only check for today's date
+    if (selectedDateString !== today) return;
+    
+    // Check if all prayers/acts are completed for today
+    const isComplete = await checkDailyCompletion(today, isInPeriod);
+    
+    if (isComplete) {
+      setShowDailySuccess(true);
+    }
+    
+    // Check all badges
+    await checkWeeklyBadges(isInPeriod);
+    await checkMonthlyBadges(isInPeriod);
+    
+    if (isInPeriod) {
+      await checkPeriodBadges();
+    }
+  };
 
-    const interval = setInterval(checkAfterIsha, 60000); // Check every minute
-    return () => clearInterval(interval);
-  }, [prayerTimes, isInPeriod, checkDailyCompletion, checkWeeklyBadges, checkMonthlyBadges, checkPeriodBadges]);
+  // Enhanced prayer status update with badge checking
+  const handlePrayerStatusUpdate = async (date: string, prayerName: string, status: PrayerStatus) => {
+    await updatePrayerStatus(date, prayerName, status);
+    await checkBadgesRealTime();
+  };
+
+  // Enhanced dhikr toggle with badge checking
+  const handleDhikrToggle = async (date: string, prayerName: string) => {
+    await toggleDhikr(date, prayerName);
+    await checkBadgesRealTime();
+  };
+
+  // Enhanced period dhikr change with badge checking
+  const handlePeriodDhikrChange = async (date: string, prayerName: string, type: any) => {
+    await setDhikrForPrayer(date, prayerName, type);
+    await checkBadgesRealTime();
+  };
 
   const isPrayerPast = (prayerTime: string) => {
     const now = new Date();
@@ -219,7 +223,7 @@ const Index = () => {
   }
 
   return (
-    <div className={`min-h-screen pb-20 transition-colors duration-300 ${isInPeriod ? "bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
+    <div className={`min-h-screen pb-20 transition-colors duration-500 ${isInPeriod ? "period-mode bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
       <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in">
@@ -264,9 +268,6 @@ const Index = () => {
             </div>
           )}
         </div>
-
-        {/* Hadith de la semaine */}
-        <WeeklyHadith />
 
         {/* Notifications permission prompt */}
         <NotificationPermissionPrompt />
@@ -338,12 +339,12 @@ const Index = () => {
                     isPast={isPrayerPast(prayer.time)}
                     status={getPrayerStatus(selectedDateString, prayer.name)}
                     dhikrDone={getDhikrStatus(selectedDateString, prayer.name)}
-                    onStatusChange={(status) => updatePrayerStatus(selectedDateString, prayer.name, status)}
+                    onStatusChange={(status) => handlePrayerStatusUpdate(selectedDateString, prayer.name, status)}
                     onStatusDelete={() => deletePrayerStatus(selectedDateString, prayer.name)}
-                    onDhikrToggle={() => toggleDhikr(selectedDateString, prayer.name)}
+                    onDhikrToggle={() => handleDhikrToggle(selectedDateString, prayer.name)}
                     isPeriodMode={isInPeriod}
                     periodDhikrType={getDhikrForPrayer(selectedDateString, prayer.name)}
-                    onPeriodDhikrChange={(type) => setDhikrForPrayer(selectedDateString, prayer.name, type)}
+                    onPeriodDhikrChange={(type) => handlePeriodDhikrChange(selectedDateString, prayer.name, type)}
                   />
                 </div>
               ))}
