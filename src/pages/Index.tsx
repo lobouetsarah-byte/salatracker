@@ -8,11 +8,15 @@ import { Atkar } from "@/components/Atkar";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTrackingSync } from "@/hooks/usePrayerTrackingSync";
 import { useDhikrTrackingSync } from "@/hooks/useDhikrTrackingSync";
+import { usePeriodMode } from "@/hooks/usePeriodMode";
+import { usePeriodDhikrTracking } from "@/hooks/usePeriodDhikrTracking";
+import { usePeriodNotifications } from "@/hooks/usePeriodNotifications";
 import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
 import { useNativeNotifications } from "@/hooks/useNativeNotifications";
 import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
 import { MapPin, Calendar as CalendarIcon, BarChart3, Clock, BookOpen, Settings as SettingsIcon } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
@@ -30,9 +34,12 @@ const Index = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [userGender, setUserGender] = useState<string | null>(null);
   const { prayerTimes, loading } = usePrayerTimes();
   const { updatePrayerStatus, deletePrayerStatus, getPrayerStatus, getStats, getCustomStats, loading: dataLoading } = usePrayerTrackingSync();
   const { toggleDhikr, getDhikrStatus } = useDhikrTrackingSync();
+  const { isInPeriod } = usePeriodMode();
+  const { setDhikrForPrayer, getDhikrForPrayer } = usePeriodDhikrTracking();
   const { settings, updateSettings } = useSettings();
   const { t } = useLanguage();
   const [nextPrayerIndex, setNextPrayerIndex] = useState<number>(0);
@@ -44,6 +51,25 @@ const Index = () => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   // No automatic redirect - users can use the app without logging in
+
+  // Load user gender for period mode
+  useEffect(() => {
+    const loadGender = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('gender')
+          .eq('id', user.id)
+          .maybeSingle();
+        
+        if (data) {
+          setUserGender(data.gender);
+        }
+      }
+    };
+    
+    loadGender();
+  }, [user]);
 
   // Handle logout splash screen
   useEffect(() => {
@@ -60,13 +86,21 @@ const Index = () => {
   // Use native notifications on mobile, web notifications otherwise
   const isNative = Capacitor.isNativePlatform();
   
-  if (isNative) {
+  // Period notifications (always web-based)
+  usePeriodNotifications({
+    prayers: prayerTimes?.prayers || [],
+    isInPeriod,
+    settings,
+  });
+  
+  // Regular prayer notifications (only when NOT in period mode)
+  if (isNative && !isInPeriod) {
     useNativeNotifications(
       prayerTimes?.prayers || [],
       getPrayerStatus,
       settings
     );
-  } else {
+  } else if (!isNative && !isInPeriod) {
     usePrayerNotifications(
       prayerTimes?.prayers || [],
       getPrayerStatus,
@@ -226,6 +260,9 @@ const Index = () => {
                     onStatusChange={(status) => updatePrayerStatus(selectedDateString, prayer.name, status)}
                     onStatusDelete={() => deletePrayerStatus(selectedDateString, prayer.name)}
                     onDhikrToggle={() => toggleDhikr(selectedDateString, prayer.name)}
+                    isPeriodMode={isInPeriod}
+                    periodDhikrType={getDhikrForPrayer(selectedDateString, prayer.name)}
+                    onPeriodDhikrChange={(type) => setDhikrForPrayer(selectedDateString, prayer.name, type)}
                   />
                 </div>
               ))}
@@ -237,7 +274,12 @@ const Index = () => {
           )}
 
           {activeTab === "settings" && (
-            <Settings settings={settings} onUpdateSettings={updateSettings} onLogout={handleSignOut} />
+            <Settings 
+              settings={settings} 
+              onUpdateSettings={updateSettings} 
+              onLogout={handleSignOut}
+              userGender={userGender}
+            />
           )}
         </div>
 

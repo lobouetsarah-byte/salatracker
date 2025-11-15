@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, XCircle, Trash2, LogIn } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, Trash2, LogIn, Heart, Sparkles, BookHeart } from "lucide-react";
 import { PrayerStatus } from "@/hooks/usePrayerTracking";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { DhikrType } from "@/hooks/usePeriodDhikrTracking";
 
 interface PrayerCardProps {
   name: string;
@@ -19,6 +20,9 @@ interface PrayerCardProps {
   onStatusChange: (status: PrayerStatus) => void;
   onStatusDelete: () => void;
   onDhikrToggle: () => void;
+  isPeriodMode?: boolean;
+  periodDhikrType?: DhikrType | null;
+  onPeriodDhikrChange?: (type: DhikrType | null) => void;
 }
 
 export const PrayerCard = ({
@@ -31,6 +35,9 @@ export const PrayerCard = ({
   onStatusChange,
   onStatusDelete,
   onDhikrToggle,
+  isPeriodMode = false,
+  periodDhikrType = null,
+  onPeriodDhikrChange,
 }: PrayerCardProps) => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
@@ -105,8 +112,44 @@ export const PrayerCard = ({
             </div>
             <p className={`text-2xl sm:text-3xl font-bold mb-3 ${isPast ? "text-muted-foreground" : "bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"}`}>{time}</p>
             
-            {/* Dhikr checkbox */}
-            {status !== "pending" && (
+            {/* Period Mode - Dhikr/Invocation tracking */}
+            {isPeriodMode && isPast && (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground mb-2">Choisissez une action spirituelle :</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant={periodDhikrType === "dhikr" ? "default" : "outline"}
+                    onClick={() => onPeriodDhikrChange?.(periodDhikrType === "dhikr" ? null : "dhikr")}
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Heart className="w-3 h-3 mr-1" />
+                    Dhikr
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={periodDhikrType === "invocation" ? "default" : "outline"}
+                    onClick={() => onPeriodDhikrChange?.(periodDhikrType === "invocation" ? null : "invocation")}
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <BookHeart className="w-3 h-3 mr-1" />
+                    Invocation
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={periodDhikrType === "remembrance" ? "default" : "outline"}
+                    onClick={() => onPeriodDhikrChange?.(periodDhikrType === "remembrance" ? null : "remembrance")}
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Rappel
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {/* Normal Mode - Dhikr checkbox */}
+            {!isPeriodMode && status !== "pending" && (
               <label
                 className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-muted/30 to-muted/50 hover:from-muted/50 hover:to-muted/70 transition-all duration-300 w-full cursor-pointer border border-border/30 hover:border-primary/30"
               >
@@ -123,13 +166,22 @@ export const PrayerCard = ({
             )}
           </div>
 
-          {/* Status color box - clickable */}
-          <div
-            onClick={handleStatusDialogOpen}
-            className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 flex-shrink-0 cursor-pointer`}
-          >
-            {getStatusIcon()}
-          </div>
+          {/* Status color box - clickable (hidden in period mode) */}
+          {!isPeriodMode && (
+            <div
+              onClick={handleStatusDialogOpen}
+              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 flex-shrink-0 cursor-pointer`}
+            >
+              {getStatusIcon()}
+            </div>
+          )}
+          
+          {/* Period mode indicator */}
+          {isPeriodMode && (
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-pink-100 dark:bg-pink-900/20 transition-all duration-300 flex items-center justify-center shadow-lg flex-shrink-0">
+              <Heart className="w-6 h-6 text-pink-500" />
+            </div>
+          )}
         </div>
       </Card>
 
