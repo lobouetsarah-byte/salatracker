@@ -90,7 +90,7 @@ export const PrayerCard = ({
     ? "border-l-[hsl(var(--period-button))]"
     : isNext && !isPast ? "border-l-primary" : isPast ? "border-l-muted-foreground/30" : "border-l-muted";
   const cardBg = isPeriodMode
-    ? "bg-gradient-to-br from-[hsl(var(--period-card))] to-white"
+    ? "bg-gradient-to-br from-[hsl(var(--period-card))]/80 to-[hsl(var(--period-accent))]/50"
     : hasSuccessBadge ? "bg-gradient-to-br from-success/5 to-success/10" : isPast ? "bg-muted/20" : "";
 
   return (
