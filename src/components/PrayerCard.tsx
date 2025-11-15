@@ -86,14 +86,18 @@ export const PrayerCard = ({
   };
 
   const hasSuccessBadge = status === "on-time" && dhikrDone;
-  const borderColor = isNext && !isPast ? "border-l-primary" : isPast ? "border-l-muted-foreground/30" : "border-l-muted";
-  const cardBg = hasSuccessBadge ? "bg-gradient-to-br from-success/5 to-success/10" : isPast ? "bg-muted/20" : "";
+  const borderColor = isPeriodMode 
+    ? "border-l-[hsl(var(--period-button))]"
+    : isNext && !isPast ? "border-l-primary" : isPast ? "border-l-muted-foreground/30" : "border-l-muted";
+  const cardBg = isPeriodMode
+    ? "bg-gradient-to-br from-[hsl(var(--period-card))] to-white"
+    : hasSuccessBadge ? "bg-gradient-to-br from-success/5 to-success/10" : isPast ? "bg-muted/20" : "";
   const textOpacity = isPast ? "opacity-50" : "";
 
   return (
     <>
       <Card 
-        className={`p-4 sm:p-5 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast ? "opacity-60 grayscale" : ""} backdrop-blur-sm hover:scale-[1.01]`}
+        className={`p-4 sm:p-5 hover:shadow-xl transition-all duration-300 border-l-4 ${borderColor} ${cardBg} ${isPast && !isPeriodMode ? "opacity-60 grayscale" : ""} backdrop-blur-sm hover:scale-[1.01] ${isPeriodMode ? "border-[hsl(var(--period-border))]" : ""}`}
       >
         <div className="flex items-center justify-between gap-4 sm:gap-5">
           <div className="flex-1 min-w-0">
@@ -115,13 +119,17 @@ export const PrayerCard = ({
             {/* Period Mode - Dhikr/Invocation tracking */}
             {isPeriodMode && isPast && (
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground mb-2">Choisissez une action spirituelle :</p>
+                <p className="text-xs text-[hsl(var(--period-text))]/70 mb-2">Choisissez une action spirituelle :</p>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
                     variant={periodDhikrType === "dhikr" ? "default" : "outline"}
                     onClick={() => onPeriodDhikrChange?.(periodDhikrType === "dhikr" ? null : "dhikr")}
-                    className="flex-1 min-w-[80px]"
+                    className={`flex-1 min-w-[80px] ${
+                      periodDhikrType === "dhikr" 
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] hover:bg-[hsl(var(--period-accent))]"
+                    }`}
                   >
                     <Heart className="w-3 h-3 mr-1" />
                     Dhikr
@@ -130,7 +138,11 @@ export const PrayerCard = ({
                     size="sm"
                     variant={periodDhikrType === "invocation" ? "default" : "outline"}
                     onClick={() => onPeriodDhikrChange?.(periodDhikrType === "invocation" ? null : "invocation")}
-                    className="flex-1 min-w-[80px]"
+                    className={`flex-1 min-w-[80px] ${
+                      periodDhikrType === "invocation" 
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] hover:bg-[hsl(var(--period-accent))]"
+                    }`}
                   >
                     <BookHeart className="w-3 h-3 mr-1" />
                     Invocation
@@ -139,7 +151,11 @@ export const PrayerCard = ({
                     size="sm"
                     variant={periodDhikrType === "remembrance" ? "default" : "outline"}
                     onClick={() => onPeriodDhikrChange?.(periodDhikrType === "remembrance" ? null : "remembrance")}
-                    className="flex-1 min-w-[80px]"
+                    className={`flex-1 min-w-[80px] ${
+                      periodDhikrType === "remembrance" 
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] hover:bg-[hsl(var(--period-accent))]"
+                    }`}
                   >
                     <Sparkles className="w-3 h-3 mr-1" />
                     Rappel

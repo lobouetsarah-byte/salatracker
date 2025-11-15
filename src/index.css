@@ -105,6 +105,15 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Period mode colors - Rose pâle */
+    --period-bg: 330 100% 98%;
+    --period-card: 330 80% 96%;
+    --period-border: 330 40% 85%;
+    --period-accent: 330 70% 88%;
+    --period-button: 330 80% 70%;
+    --period-button-hover: 330 85% 65%;
+    --period-text: 330 50% 30%;
   }
 }
 
