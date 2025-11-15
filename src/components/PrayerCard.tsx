@@ -123,12 +123,12 @@ export const PrayerCard = ({
                 <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
-                    variant={periodDhikrType === "dhikr" ? "default" : "outline"}
+                    variant="outline"
                     onClick={() => onPeriodDhikrChange?.(periodDhikrType === "dhikr" ? null : "dhikr")}
                     className={`flex-1 min-w-[80px] ${
                       periodDhikrType === "dhikr" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] hover:bg-[hsl(var(--period-accent))]"
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))]" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))]"
                     }`}
                   >
                     <Heart className="w-3 h-3 mr-1" />
@@ -136,12 +136,12 @@ export const PrayerCard = ({
                   </Button>
                   <Button
                     size="sm"
-                    variant={periodDhikrType === "invocation" ? "default" : "outline"}
+                    variant="outline"
                     onClick={() => onPeriodDhikrChange?.(periodDhikrType === "invocation" ? null : "invocation")}
                     className={`flex-1 min-w-[80px] ${
                       periodDhikrType === "invocation" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] hover:bg-[hsl(var(--period-accent))]"
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))]" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))]"
                     }`}
                   >
                     <BookHeart className="w-3 h-3 mr-1" />
@@ -149,12 +149,12 @@ export const PrayerCard = ({
                   </Button>
                   <Button
                     size="sm"
-                    variant={periodDhikrType === "remembrance" ? "default" : "outline"}
+                    variant="outline"
                     onClick={() => onPeriodDhikrChange?.(periodDhikrType === "remembrance" ? null : "remembrance")}
                     className={`flex-1 min-w-[80px] ${
                       periodDhikrType === "remembrance" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] hover:bg-[hsl(var(--period-accent))]"
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))]" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))]"
                     }`}
                   >
                     <Sparkles className="w-3 h-3 mr-1" />
