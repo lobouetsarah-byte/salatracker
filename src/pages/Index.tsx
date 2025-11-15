@@ -13,6 +13,8 @@ import { useDhikrTrackingSync } from "@/hooks/useDhikrTrackingSync";
 import { usePeriodMode } from "@/hooks/usePeriodMode";
 import { usePeriodDhikrTracking } from "@/hooks/usePeriodDhikrTracking";
 import { usePeriodNotifications } from "@/hooks/usePeriodNotifications";
+import { useBadges } from "@/hooks/useBadges";
+import { DailySuccess } from "@/components/DailySuccess";
 import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
 import { useNativeNotifications } from "@/hooks/useNativeNotifications";
 import { useSettings } from "@/hooks/useSettings";
@@ -42,6 +44,8 @@ const Index = () => {
   const { toggleDhikr, getDhikrStatus } = useDhikrTrackingSync();
   const { isInPeriod } = usePeriodMode();
   const { setDhikrForPrayer, getDhikrForPrayer } = usePeriodDhikrTracking();
+  const { checkDailyCompletion, checkWeeklyBadges } = useBadges();
+  const [showDailySuccess, setShowDailySuccess] = useState(false);
   const { settings, updateSettings } = useSettings();
   const { t } = useLanguage();
   const [nextPrayerIndex, setNextPrayerIndex] = useState<number>(0);
@@ -124,6 +128,31 @@ const Index = () => {
       setNextPrayerIndex(nextIndex === -1 ? 0 : nextIndex);
     }
   }, [prayerTimes]);
+
+  // Check daily completion and badges at the end of the day
+  useEffect(() => {
+    const checkEndOfDay = async () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      
+      // Check at 23:55 (5 minutes before midnight)
+      if (hours === 23 && minutes === 55) {
+        const today = now.toISOString().split('T')[0];
+        const isComplete = await checkDailyCompletion(today, isInPeriod);
+        
+        if (isComplete) {
+          setShowDailySuccess(true);
+        }
+        
+        // Check weekly badges
+        await checkWeeklyBadges(isInPeriod);
+      }
+    };
+
+    const interval = setInterval(checkEndOfDay, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [isInPeriod, checkDailyCompletion, checkWeeklyBadges]);
 
   const isPrayerPast = (prayerTime: string) => {
     const now = new Date();
@@ -223,6 +252,13 @@ const Index = () => {
 
         {/* Notifications permission prompt */}
         <NotificationPermissionPrompt />
+        
+        {/* Daily success dialog */}
+        <DailySuccess 
+          open={showDailySuccess} 
+          onClose={() => setShowDailySuccess(false)}
+          isInPeriod={isInPeriod}
+        />
 
         {/* Content */}
         <div className="space-y-6">
