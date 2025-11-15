@@ -85,7 +85,7 @@ export const PrayerCard = ({
     setDialogOpen(true);
   };
 
-  const hasSuccessBadge = status === "on-time" && dhikrDone;
+  const hasSuccessBadge = isPeriodMode ? (periodDhikrType !== null) : (status === "on-time" && dhikrDone);
   const borderColor = isPeriodMode 
     ? "border-l-[hsl(var(--period-button))]"
     : isNext && !isPast ? "border-l-primary" : isPast ? "border-l-muted-foreground/30" : "border-l-muted";
@@ -108,7 +108,11 @@ export const PrayerCard = ({
                 </Badge>
               )}
               {hasSuccessBadge && (
-                <Badge className="text-xs bg-success text-success-foreground shadow-sm animate-fade-in">
+                <Badge className={`text-xs shadow-sm animate-fade-in ${
+                  isPeriodMode 
+                    ? "bg-white text-black border border-[hsl(var(--period-border))]" 
+                    : "bg-success text-success-foreground"
+                }`}>
                   ✓ Succès
                 </Badge>
               )}
