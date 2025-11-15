@@ -228,22 +228,14 @@ const Index = () => {
         <div className="space-y-6">
           {activeTab === "dashboard" && (
             <div className="space-y-6 animate-fade-in">
-              {isInPeriod ? (
-                <>
-                  <PeriodStats />
-                  <WeeklyHadith />
-                </>
-              ) : (
-                <>
-                  <WeeklyStats 
-                    stats={stats} 
-                    period={statsPeriod}
-                    onPeriodChange={setStatsPeriod}
-                    getCustomStats={getCustomStats}
-                  />
-                  <WeeklyHadith />
-                </>
-              )}
+              <WeeklyStats 
+                stats={stats} 
+                period={statsPeriod}
+                onPeriodChange={setStatsPeriod}
+                getCustomStats={getCustomStats}
+              />
+              {isInPeriod && <PeriodStats />}
+              <WeeklyHadith />
             </div>
           )}
 
@@ -252,8 +244,7 @@ const Index = () => {
               {isInPeriod && (
                 <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-[hsl(var(--period-card))] to-[hsl(var(--period-accent))] border-2 border-[hsl(var(--period-border))] shadow-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <Heart className="w-5 h-5 text-[hsl(var(--period-button))]" />
-                    <h3 className="font-bold text-[hsl(var(--period-text))]">Mode Période Activé</h3>
+                    <h3 className="font-bold text-[hsl(var(--period-text))]">Mode Indisposée Activé</h3>
                   </div>
                   <p className="text-sm text-[hsl(var(--period-text))]/80">
                     Suivez vos dhikr et invocations. Les prières ne sont pas suivies pendant cette période.
@@ -264,11 +255,25 @@ const Index = () => {
                 <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {t.prayers}
                 </h2>
-                <div className="bg-primary/10 px-3 py-1 rounded-full">
-                  <span className="text-sm font-medium text-primary">
-                    {stats.onTime + stats.late}/{stats.total}
-                  </span>
-                </div>
+                {isInPeriod ? (
+                  <div className="bg-[hsl(var(--period-button))]/20 px-3 py-1 rounded-full">
+                    <span className="text-sm font-medium text-[hsl(var(--period-text))]">
+                      {(() => {
+                        const count = prayerTimes?.prayers.filter(prayer => {
+                          const dhikrType = getDhikrForPrayer(selectedDateString, prayer.name);
+                          return dhikrType !== null;
+                        }).length || 0;
+                        return `${count}/${prayerTimes?.prayers.length || 5}`;
+                      })()}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="bg-primary/10 px-3 py-1 rounded-full">
+                    <span className="text-sm font-medium text-primary">
+                      {stats.onTime + stats.late}/{stats.total}
+                    </span>
+                  </div>
+                )}
               </div>
               
               {prayerTimes?.prayers.map((prayer, index) => (

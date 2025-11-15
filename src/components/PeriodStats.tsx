@@ -71,7 +71,7 @@ export const PeriodStats = () => {
           <Heart className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-[hsl(var(--period-text))]">Statistiques de Période</h2>
+          <h2 className="text-2xl font-bold text-[hsl(var(--period-text))]">Statistiques Indisposée</h2>
           <p className="text-sm text-[hsl(var(--period-text))]/70">Votre parcours spirituel</p>
         </div>
       </div>

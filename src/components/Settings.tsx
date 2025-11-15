@@ -38,9 +38,9 @@ export const Settings = ({ settings, onUpdateSettings, onLogout, userGender }: S
           <CardHeader className="space-y-3">
             <CardTitle className="flex items-center gap-2 text-xl">
               <div className="p-2 rounded-lg bg-pink-100 dark:bg-pink-900/20">
-                <Heart className="w-5 h-5 text-pink-500" />
+              <Heart className="w-5 h-5 text-pink-500" />
               </div>
-              Mode Période
+              Mode Indisposée
             </CardTitle>
             <CardDescription className="text-sm">
               Pour suivre vos actions spirituelles pendant vos règles

@@ -69,7 +69,7 @@ export const usePeriodMode = () => {
           setCurrentPeriodId(null);
           
           toast({
-            title: "Mode période désactivé",
+            title: "Mode indisposée désactivé",
             description: "Vous pouvez de nouveau suivre vos prières normalement.",
           });
         } else {
@@ -90,7 +90,7 @@ export const usePeriodMode = () => {
           setCurrentPeriodId(data.id);
           
           toast({
-            title: "Mode période activé",
+            title: "Mode indisposée activé",
             description: "Suivez vos dhikr et invocations pendant cette période.",
           });
         }
@@ -108,7 +108,7 @@ export const usePeriodMode = () => {
       localStorage.setItem("periodMode", newStatus.toString());
       
       toast({
-        title: newStatus ? "Mode période activé" : "Mode période désactivé",
+        title: newStatus ? "Mode indisposée activé" : "Mode indisposée désactivé",
         description: newStatus 
           ? "Suivez vos dhikr et invocations pendant cette période."
           : "Vous pouvez de nouveau suivre vos prières normalement.",
