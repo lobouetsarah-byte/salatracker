@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          badge_description: string | null
+          badge_name: string
+          badge_type: string
+          created_at: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_description?: string | null
+          badge_name: string
+          badge_type: string
+          created_at?: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_description?: string | null
+          badge_name?: string
+          badge_type?: string
+          created_at?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       dhikr_tracking: {
         Row: {
           completed: boolean
@@ -39,6 +69,120 @@ export type Database = {
           id?: string
           prayer_date?: string
           prayer_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          created_at: string
+          current_count: number
+          description: string | null
+          end_date: string | null
+          frequency: string
+          goal_type: string
+          id: string
+          is_completed: boolean
+          start_date: string
+          target_count: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_count?: number
+          description?: string | null
+          end_date?: string | null
+          frequency: string
+          goal_type: string
+          id?: string
+          is_completed?: boolean
+          start_date?: string
+          target_count?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_count?: number
+          description?: string | null
+          end_date?: string | null
+          frequency?: string
+          goal_type?: string
+          id?: string
+          is_completed?: boolean
+          start_date?: string
+          target_count?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hadiths: {
+        Row: {
+          arabic_text: string
+          created_at: string
+          french_translation: string
+          id: string
+          is_published: boolean
+          reference: string
+          title: string
+          updated_at: string
+          week_number: number | null
+        }
+        Insert: {
+          arabic_text: string
+          created_at?: string
+          french_translation: string
+          id?: string
+          is_published?: boolean
+          reference: string
+          title: string
+          updated_at?: string
+          week_number?: number | null
+        }
+        Update: {
+          arabic_text?: string
+          created_at?: string
+          french_translation?: string
+          id?: string
+          is_published?: boolean
+          reference?: string
+          title?: string
+          updated_at?: string
+          week_number?: number | null
+        }
+        Relationships: []
+      }
+      period_tracking: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          is_active: boolean
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          start_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          start_date?: string
           updated_at?: string
           user_id?: string
         }
@@ -79,6 +223,7 @@ export type Database = {
           created_at: string
           email: string | null
           first_name: string | null
+          gender: string | null
           goals: string[] | null
           id: string
           updated_at: string
@@ -87,6 +232,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
+          gender?: string | null
           goals?: string[] | null
           id: string
           updated_at?: string
@@ -95,6 +241,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
+          gender?: string | null
           goals?: string[] | null
           id?: string
           updated_at?: string
