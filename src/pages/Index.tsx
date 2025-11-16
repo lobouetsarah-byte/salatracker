@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
 import { MapPin, Calendar as CalendarIcon, BarChart3, Clock, BookOpen, Settings as SettingsIcon, Heart } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
+import salatrackLogoPink from "@/assets/salatrack-logo-pink.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { NotificationPermissionPrompt } from "@/components/NotificationPermissionPrompt";
@@ -230,14 +231,14 @@ const Index = () => {
           <div className="flex items-center justify-center gap-4 mb-2">
             <div className={`p-3 rounded-2xl backdrop-blur-sm ${isInPeriod ? "bg-white/20" : "bg-primary/10"}`}>
               <img 
-                src={salatrackLogo} 
+                src={isInPeriod ? salatrackLogoPink : salatrackLogo} 
                 alt="Salatracker" 
                 className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg" 
               />
             </div>
             <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold ${
               isInPeriod 
-                ? "text-white drop-shadow-lg" 
+                ? "text-[hsl(var(--period-text))] drop-shadow-lg" 
                 : "bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent"
             }`}>
               {t.appTitle}
