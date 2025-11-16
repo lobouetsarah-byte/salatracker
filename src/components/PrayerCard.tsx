@@ -119,69 +119,134 @@ export const PrayerCard = ({
             </div>
             <p className={`text-2xl sm:text-3xl font-bold mb-3 ${isPast ? "text-muted-foreground" : "bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"}`}>{time}</p>
             
-            {/* Period Mode - Dhikr/Invocation tracking */}
+            {/* Period Mode - Enhanced Dhikr/Invocation tracking */}
             {isPeriodMode && isPast && (
-              <div className="space-y-2">
-                <p className="text-xs text-[hsl(var(--period-text))]/70 mb-2">Choisissez une action spirituelle :</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="space-y-3 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium text-[hsl(var(--period-text))]/80">Action spirituelle :</p>
+                  {periodDhikrType && (
+                    <Badge className="text-xs bg-white text-[hsl(var(--period-text))] border-[hsl(var(--period-border))]">
+                      ✓ Complété
+                    </Badge>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => onPeriodDhikrChange?.(periodDhikrType === "dhikr" ? null : "dhikr")}
-                    className={`flex-1 min-w-[80px] ${
+                    onClick={() => {
+                      if (!user) {
+                        setLoginPromptOpen(true);
+                        return;
+                      }
+                      onPeriodDhikrChange?.(periodDhikrType === "dhikr" ? null : "dhikr");
+                    }}
+                    className={`relative overflow-hidden transition-all duration-300 ${
                       periodDhikrType === "dhikr" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))]" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))]"
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
                     }`}
                   >
-                    <Heart className="w-3 h-3 mr-1" />
+                    <Heart className={`w-4 h-4 mr-1 ${periodDhikrType === "dhikr" ? "animate-pulse" : ""}`} />
                     Dhikr
+                    {periodDhikrType === "dhikr" && (
+                      <CheckCircle2 className="w-3 h-3 ml-1 animate-scale-in" />
+                    )}
                   </Button>
+                  
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => onPeriodDhikrChange?.(periodDhikrType === "invocation" ? null : "invocation")}
-                    className={`flex-1 min-w-[80px] ${
+                    onClick={() => {
+                      if (!user) {
+                        setLoginPromptOpen(true);
+                        return;
+                      }
+                      onPeriodDhikrChange?.(periodDhikrType === "invocation" ? null : "invocation");
+                    }}
+                    className={`relative overflow-hidden transition-all duration-300 ${
                       periodDhikrType === "invocation" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))]" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))]"
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
                     }`}
                   >
-                    <BookHeart className="w-3 h-3 mr-1" />
+                    <BookHeart className={`w-4 h-4 mr-1 ${periodDhikrType === "invocation" ? "animate-pulse" : ""}`} />
                     Invocation
+                    {periodDhikrType === "invocation" && (
+                      <CheckCircle2 className="w-3 h-3 ml-1 animate-scale-in" />
+                    )}
                   </Button>
+                  
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => onPeriodDhikrChange?.(periodDhikrType === "remembrance" ? null : "remembrance")}
-                    className={`flex-1 min-w-[80px] ${
+                    onClick={() => {
+                      if (!user) {
+                        setLoginPromptOpen(true);
+                        return;
+                      }
+                      onPeriodDhikrChange?.(periodDhikrType === "remembrance" ? null : "remembrance");
+                    }}
+                    className={`relative overflow-hidden transition-all duration-300 ${
                       periodDhikrType === "remembrance" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))]" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))]"
+                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
+                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
                     }`}
                   >
-                    <Sparkles className="w-3 h-3 mr-1" />
+                    <Sparkles className={`w-4 h-4 mr-1 ${periodDhikrType === "remembrance" ? "animate-pulse" : ""}`} />
                     Rappel
+                    {periodDhikrType === "remembrance" && (
+                      <CheckCircle2 className="w-3 h-3 ml-1 animate-scale-in" />
+                    )}
                   </Button>
                 </div>
               </div>
             )}
             
-            {/* Normal Mode - Dhikr checkbox */}
+            {/* Normal Mode - Enhanced Dhikr Toggle */}
             {!isPeriodMode && status !== "pending" && (
-              <label
-                className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-muted/30 to-muted/50 hover:from-muted/50 hover:to-muted/70 transition-all duration-300 w-full cursor-pointer border border-border/30 hover:border-primary/30"
+              <div 
+                onClick={handleDhikrToggle}
+                className={`group relative p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 ${
+                  dhikrDone 
+                    ? "bg-gradient-to-br from-success/10 to-success/20 border-success/40 hover:border-success/60 shadow-md" 
+                    : "bg-gradient-to-br from-muted/20 to-muted/30 border-border/40 hover:border-primary/40 hover:shadow-md"
+                }`}
               >
-                <input
-                  type="checkbox"
-                  checked={dhikrDone}
-                  onChange={handleDhikrToggle}
-                  className="w-5 h-5 rounded-md border-2 border-muted-foreground/50 text-primary focus:ring-2 focus:ring-primary cursor-pointer transition-all"
-                />
-                <span className="text-sm sm:text-base font-medium">
-                  {dhikrDone ? t.dhikrDone : t.dhikrPending}
-                </span>
-              </label>
+                <div className="flex items-center gap-4">
+                  {/* Custom Checkbox */}
+                  <div className={`relative flex items-center justify-center w-7 h-7 rounded-lg transition-all duration-300 ${
+                    dhikrDone 
+                      ? "bg-success scale-100" 
+                      : "bg-muted border-2 border-muted-foreground/40 group-hover:border-primary/60"
+                  }`}>
+                    {dhikrDone && (
+                      <CheckCircle2 className="w-5 h-5 text-white animate-scale-in" />
+                    )}
+                  </div>
+                  
+                  {/* Label */}
+                  <div className="flex-1">
+                    <p className={`text-sm sm:text-base font-semibold transition-colors duration-300 ${
+                      dhikrDone ? "text-success" : "text-foreground group-hover:text-primary"
+                    }`}>
+                      {dhikrDone ? "✓ " + t.dhikrDone : t.dhikrPending}
+                    </p>
+                    {!dhikrDone && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Cliquez pour marquer comme fait
+                      </p>
+                    )}
+                  </div>
+                  
+                  {/* Icon indicator */}
+                  {dhikrDone ? (
+                    <Sparkles className="w-5 h-5 text-success animate-pulse" />
+                  ) : (
+                    <Heart className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  )}
+                </div>
+              </div>
             )}
           </div>
 
