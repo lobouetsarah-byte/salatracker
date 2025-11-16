@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
+import salatrackLogoPink from "@/assets/salatrack-logo-pink.png";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -39,13 +40,13 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
     >
       <div className="relative">
         <img 
-          src={salatrackLogo} 
+          src={isInPeriod ? salatrackLogoPink : salatrackLogo} 
           alt="Salatracker" 
           className="w-40 h-40 animate-scale-in" 
         />
       </div>
       <h1 className={`mt-6 text-4xl font-bold drop-shadow-lg animate-fade-in ${
-        isInPeriod ? "text-white" : "text-primary"
+        isInPeriod ? "text-[hsl(var(--period-text))]" : "text-primary"
       }`}>
         Salatracker
       </h1>

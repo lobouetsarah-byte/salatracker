@@ -101,7 +101,7 @@ export const PrayerCard = ({
         <div className="flex items-center justify-between gap-4 sm:gap-5">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-3 flex-wrap">
-              <h3 className="text-xl sm:text-2xl font-bold text-foreground">{name}</h3>
+              <h3 className={`text-xl sm:text-2xl font-bold ${isPeriodMode ? "text-[hsl(var(--period-text))]" : "text-foreground"}`}>{name}</h3>
               {isNext && !isPast && (
                 <Badge variant="outline" className="text-xs border-primary/50 text-primary bg-primary/10 animate-pulse">
                   {t.nextPrayer}
