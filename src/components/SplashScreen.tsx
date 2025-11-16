@@ -37,6 +37,10 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0"
       } ${isInPeriod ? "bg-white" : "bg-white dark:bg-white"}`}
+      style={{
+        paddingTop: 'max(2rem, env(safe-area-inset-top))',
+        paddingBottom: 'max(2rem, env(safe-area-inset-bottom))'
+      }}
     >
       <div className="relative">
         <img 

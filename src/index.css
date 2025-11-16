@@ -151,4 +151,12 @@ All colors MUST be HSL.
   .period-mode .bg-primary\/10 {
     background-color: hsl(var(--period-button) / 0.2);
   }
+
+  /* Safe area insets for mobile devices */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
