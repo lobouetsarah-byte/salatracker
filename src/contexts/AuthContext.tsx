@@ -115,13 +115,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
     
     try {
-      // Delete user data from profiles table first
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', user.id);
+      // Call the edge function to delete the user account
+      const { error } = await supabase.functions.invoke('delete-user', {
+        method: 'POST',
+      });
       
-      if (profileError) throw profileError;
+      if (error) throw error;
 
       // Sign out the user
       await supabase.auth.signOut();
@@ -131,6 +130,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: "Votre compte a été supprimé avec succès",
       });
     } catch (error: any) {
+      console.error('Error deleting account:', error);
       toast({
         title: "Erreur",
         description: "Impossible de supprimer le compte",
