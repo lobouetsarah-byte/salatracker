@@ -12,6 +12,7 @@ const corsHeaders = {
 
 interface ResetPasswordRequest {
   email: string;
+  redirectTo?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -20,7 +21,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email }: ResetPasswordRequest = await req.json();
+    const { email, redirectTo }: ResetPasswordRequest = await req.json();
 
     if (!email) {
       return new Response(
@@ -34,10 +35,13 @@ const handler = async (req: Request): Promise<Response> => {
     // Create Supabase client with service role key
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Generate password reset link
+    // Generate password reset link with redirect
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: email,
+      options: {
+        redirectTo: redirectTo || `${req.headers.get('origin')}/auth`,
+      },
     });
 
     // For security reasons, always return success even if user doesn't exist
