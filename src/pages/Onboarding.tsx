@@ -204,7 +204,7 @@ const Onboarding = () => {
         title: language === "fr" ? "Compte créé avec succès !" : "Account created successfully!",
       });
 
-      navigate("/");
+      navigate("/how-it-works");
     } catch (error: any) {
       toast({
         title: language === "fr" ? "Erreur" : "Error",

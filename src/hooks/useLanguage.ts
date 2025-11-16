@@ -9,7 +9,7 @@ interface Translations {
   // Tabs
   dashboard: string;
   prayers: string;
-  atkar: string;
+  adhkar: string;
   settings: string;
   
   // Prayer names
@@ -41,9 +41,9 @@ interface Translations {
   totalPrayers: string;
   completionRate: string;
   
-  // Atkar
-  morningAtkar: string;
-  eveningAtkar: string;
+  // Adhkar
+  morningAdhkar: string;
+  eveningAdhkar: string;
   
   // Settings
   notificationSettings: string;
@@ -94,7 +94,7 @@ const translations: Record<Language, Translations> = {
     appTitle: "Salatracker",
     dashboard: "Progrès",
     prayers: "Prières",
-    atkar: "Atkar",
+    adhkar: "Adhkar",
     settings: "Paramètres",
     fajr: "Fajr",
     dhuhr: "Dhuhr",
@@ -117,8 +117,8 @@ const translations: Record<Language, Translations> = {
     monthlyProgress: "Progrès du mois",
     totalPrayers: "Total de prières",
     completionRate: "Taux de complétion",
-    morningAtkar: "Atkar du matin",
-    eveningAtkar: "Atkar du soir",
+    morningAdhkar: "Adhkar du matin",
+    eveningAdhkar: "Adhkar du soir",
     notificationSettings: "Paramètres de notification",
     languageSettings: "Paramètres de langue",
     prayerTimeNotifications: "Notifications de l'heure de prière",
@@ -159,7 +159,7 @@ const translations: Record<Language, Translations> = {
     appTitle: "Salatracker",
     dashboard: "Progress",
     prayers: "Prayers",
-    atkar: "Atkar",
+    adhkar: "Adhkar",
     settings: "Settings",
     fajr: "Fajr",
     dhuhr: "Dhuhr",
@@ -182,8 +182,8 @@ const translations: Record<Language, Translations> = {
     monthlyProgress: "This Month's Progress",
     totalPrayers: "Total Prayers",
     completionRate: "Completion Rate",
-    morningAtkar: "Morning Atkar",
-    eveningAtkar: "Evening Atkar",
+    morningAdhkar: "Morning Adhkar",
+    eveningAdhkar: "Evening Adhkar",
     notificationSettings: "Notification Settings",
     languageSettings: "Language Settings",
     prayerTimeNotifications: "Prayer Time Notifications",
