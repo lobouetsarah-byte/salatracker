@@ -1,125 +1,185 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle2, Bell, Award, Wifi, Smartphone, BookOpen, Heart, Clock } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle2, Bell, Award, Wifi, Smartphone, BookOpen, Heart, Clock, ArrowRight, ArrowLeft } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 
 const HowItWorks = () => {
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(0);
 
-  const features = [
+  const pages = [
     {
       icon: CheckCircle2,
-      title: "Marquer vos prières",
-      description: "Cochez vos prières comme accomplies à l'heure, en retard, ou manquées. Suivez votre dhikr après chaque prière."
+      title: "Suivre vos prières",
+      description: "Marquez chaque prière comme accomplie à l'heure, en retard, ou manquée. Un simple clic pour rester organisé.",
+      color: "text-primary",
+      bgColor: "bg-primary/10"
     },
     {
       icon: Clock,
-      title: "Horaires de prières",
-      description: "Les horaires sont calculés automatiquement selon votre localisation. L'heure de la prochaine prière est toujours visible."
+      title: "Horaires automatiques",
+      description: "Les horaires sont calculés selon votre localisation. L'heure de la prochaine prière est toujours visible en un coup d'œil.",
+      color: "text-accent",
+      bgColor: "bg-accent/10"
     },
     {
       icon: BookOpen,
       title: "Adhkar matin & soir",
-      description: "Récitez vos invocations du matin et du soir avec l'arabe, la phonétique et la traduction. Suivez votre progression quotidienne."
+      description: "Récitez vos invocations quotidiennes avec l'arabe, la phonétique et la traduction. Suivez votre progression.",
+      color: "text-success",
+      bgColor: "bg-success/10"
     },
     {
       icon: Heart,
       title: "Mode indisposée",
-      description: "Activez le mode spécial pendant vos périodes. Suivez vos actes spirituels (dhikr, invocations, rappels) à chaque moment de prière."
+      description: "Un mode spécial pendant vos périodes pour suivre vos actes spirituels : dhikr, invocations et rappels à chaque moment de prière.",
+      color: "text-[#E91E63]",
+      bgColor: "bg-[#E91E63]/10"
     },
     {
       icon: Award,
       title: "Badges & récompenses",
-      description: "Gagnez des badges pour votre assiduité : 7 jours consécutifs, journée parfaite, mois discipliné, et bien plus encore."
-    },
-    {
-      icon: Wifi,
-      title: "Mode hors-ligne",
-      description: "L'application fonctionne sans connexion internet. Vos données se synchronisent automatiquement quand vous êtes en ligne."
+      description: "Gagnez des badges pour votre assiduité : 7 jours consécutifs, journée parfaite, mois discipliné et plus encore.",
+      color: "text-warning",
+      bgColor: "bg-warning/10"
     },
     {
       icon: Bell,
       title: "Notifications intelligentes",
-      description: "Recevez l'adhan à l'heure exacte de chaque prière, un rappel 30 min avant la suivante, et des rappels pour vos adhkar."
+      description: "Recevez l'adhan à l'heure exacte, un rappel 30 min avant la prochaine prière, et des rappels pour vos adhkar.",
+      color: "text-primary",
+      bgColor: "bg-primary/10"
     },
     {
-      icon: Smartphone,
-      title: "Widget iPhone",
-      description: "Accès rapide depuis votre écran d'accueil : visualisez la prochaine prière et marquez-la comme accomplie en un clic."
+      icon: Wifi,
+      title: "Mode hors-ligne & Widget",
+      description: "L'app fonctionne sans connexion. Vos données se synchronisent automatiquement. Widget iPhone pour un accès rapide.",
+      color: "text-accent",
+      bgColor: "bg-accent/10"
     }
   ];
 
+  const totalPages = pages.length;
+  const currentPageData = pages[currentPage];
+
+  const handleNext = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    } else {
+      navigate("/");
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleSkip = () => {
+    navigate("/");
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <div className="container max-w-4xl mx-auto px-4 py-8 sm:py-12">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex flex-col">
+      <div className="container max-w-2xl mx-auto px-4 py-8 flex-1 flex flex-col">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
+        <div className="text-center mb-8">
           <img 
             src={salatrackLogo} 
             alt="Salatrack Logo" 
-            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 drop-shadow-lg"
+            className="w-16 h-16 mx-auto mb-4 drop-shadow-lg animate-fade-in"
           />
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Comment ça marche ?
           </h1>
-          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
-            Découvrez toutes les fonctionnalités de Salatrack pour vous accompagner dans votre cheminement spirituel
+          <p className="text-sm text-muted-foreground">
+            Découvrez Salatrack en quelques étapes
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
-          {features.map((feature, index) => (
-            <Card 
+        {/* Progress Indicators */}
+        <div className="flex justify-center gap-2 mb-8">
+          {pages.map((_, index) => (
+            <button
               key={index}
-              className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur"
-            >
-              <CardHeader>
-                <div className="flex items-start gap-4">
-                  <div className="p-2 sm:p-3 rounded-lg bg-primary/10 text-primary">
-                    <feature.icon className="w-5 h-5 sm:w-6 sm:h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-base sm:text-lg mb-2">{feature.title}</CardTitle>
-                    <CardDescription className="text-sm leading-relaxed">
-                      {feature.description}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
+              onClick={() => setCurrentPage(index)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                index === currentPage 
+                  ? "w-8 bg-primary" 
+                  : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+              }`}
+              aria-label={`Aller à la page ${index + 1}`}
+            />
           ))}
         </div>
 
-        {/* Additional Info Card */}
-        <Card className="mb-8 border-primary/20 bg-primary/5">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3 sm:gap-4">
-              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary mt-1 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-2 text-base sm:text-lg">Hadith de la semaine</h3>
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  Chaque semaine, découvrez un nouveau hadith avec sa traduction française pour enrichir votre connaissance et votre foi.
-                </p>
-              </div>
+        {/* Main Content Card */}
+        <Card className="flex-1 border-border/50 bg-card/50 backdrop-blur shadow-lg animate-fade-in">
+          <CardContent className="p-8 sm:p-12 flex flex-col items-center justify-center text-center h-full min-h-[400px]">
+            <div className={`p-6 rounded-2xl ${currentPageData.bgColor} mb-6 animate-scale-in`}>
+              <currentPageData.icon className={`w-16 h-16 ${currentPageData.color}`} />
             </div>
+            
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 animate-fade-in">
+              {currentPageData.title}
+            </h2>
+            
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-md animate-fade-in">
+              {currentPageData.description}
+            </p>
           </CardContent>
         </Card>
 
-        {/* CTA Button */}
-        <div className="text-center">
-          <Button 
+        {/* Navigation Buttons */}
+        <div className="flex items-center justify-between gap-4 mt-8">
+          <Button
+            variant="ghost"
             size="lg"
-            onClick={() => navigate("/")}
-            className="w-full sm:w-auto px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+            onClick={handlePrevious}
+            disabled={currentPage === 0}
+            className="flex-shrink-0"
           >
-            Commencer maintenant
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Retour
           </Button>
-          <p className="text-sm text-muted-foreground mt-4">
-            Prêt à transformer votre pratique spirituelle ? 🌟
-          </p>
+
+          {currentPage < totalPages - 1 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSkip}
+              className="text-muted-foreground"
+            >
+              Passer
+            </Button>
+          )}
+
+          <Button
+            size="lg"
+            onClick={handleNext}
+            className="flex-shrink-0 shadow-lg"
+          >
+            {currentPage === totalPages - 1 ? (
+              <>
+                Commencer
+                <CheckCircle2 className="w-5 h-5 ml-2" />
+              </>
+            ) : (
+              <>
+                Suivant
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </>
+            )}
+          </Button>
         </div>
+
+        {/* Page Counter */}
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          {currentPage + 1} / {totalPages}
+        </p>
       </div>
     </div>
   );

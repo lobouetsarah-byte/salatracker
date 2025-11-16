@@ -7,6 +7,20 @@ interface SplashScreenProps {
 
 export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [isInPeriod, setIsInPeriod] = useState(false);
+
+  // Check period mode status
+  useEffect(() => {
+    const checkPeriodMode = () => {
+      const periodMode = localStorage.getItem("period-mode") === "true";
+      setIsInPeriod(periodMode);
+    };
+    
+    checkPeriodMode();
+    window.addEventListener("period-mode-changed", checkPeriodMode);
+    
+    return () => window.removeEventListener("period-mode-changed", checkPeriodMode);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,9 +33,9 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-white transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0"
-      }`}
+      } ${isInPeriod ? "bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}
     >
       <div className="relative">
         <img 
@@ -30,10 +44,16 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           className="w-40 h-40 animate-scale-in" 
         />
       </div>
-      <h1 className="mt-6 text-4xl font-bold text-primary drop-shadow-lg animate-fade-in">
+      <h1 className={`mt-6 text-4xl font-bold drop-shadow-lg animate-fade-in ${
+        isInPeriod ? "text-white" : "text-primary"
+      }`}>
         Salatracker
       </h1>
-      <p className="mt-2 text-muted-foreground text-sm animate-fade-in">Suivez vos prières au quotidien</p>
+      <p className={`mt-2 text-sm animate-fade-in ${
+        isInPeriod ? "text-white/90" : "text-muted-foreground"
+      }`}>
+        Suivez vos prières au quotidien
+      </p>
     </div>
   );
 };

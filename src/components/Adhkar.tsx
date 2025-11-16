@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2, Pause } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2, Pause, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 interface Dhikr {
   id: string;
@@ -201,6 +202,8 @@ export const Adhkar = () => {
   const [completedEvening, setCompletedEvening] = useState<Set<string>>(new Set());
   const [isPlaying, setIsPlaying] = useState(false);
   const voicesLoaded = useRef(false);
+  const [hasShownMorningCongrats, setHasShownMorningCongrats] = useState(false);
+  const [hasShownEveningCongrats, setHasShownEveningCongrats] = useState(false);
 
   // Load voices when available
   useEffect(() => {
@@ -326,6 +329,34 @@ export const Adhkar = () => {
   const allMorningCompleted = morningAdhkar.every(d => completedMorning.has(d.id));
   const allEveningCompleted = eveningAdhkar.every(d => completedEvening.has(d.id));
 
+  // Check for completion and show congratulation animation
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    const congratsKey = `adhkar-congrats-${today}`;
+    const stored = localStorage.getItem(congratsKey);
+    const data = stored ? JSON.parse(stored) : { morning: false, evening: false };
+    
+    if (allMorningCompleted && morningAdhkar.length > 0 && !data.morning) {
+      toast.success("🎉 Masha'Allah ! Vous avez complété tous les adhkar du matin !", {
+        duration: 5000,
+        icon: <Sparkles className="w-5 h-5 text-yellow-500" />,
+        className: "animate-scale-in",
+      });
+      data.morning = true;
+      localStorage.setItem(congratsKey, JSON.stringify(data));
+    }
+
+    if (allEveningCompleted && eveningAdhkar.length > 0 && !data.evening) {
+      toast.success("🎉 Masha'Allah ! Vous avez complété tous les adhkar du soir !", {
+        duration: 5000,
+        icon: <Sparkles className="w-5 h-5 text-yellow-500" />,
+        className: "animate-scale-in",
+      });
+      data.evening = true;
+      localStorage.setItem(congratsKey, JSON.stringify(data));
+    }
+  }, [allMorningCompleted, allEveningCompleted]);
+
   const renderDhikrList = (dhikrList: Dhikr[], type: "morning" | "evening") => {
     const completed = type === "morning" ? completedMorning : completedEvening;
 
@@ -371,37 +402,29 @@ export const Adhkar = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "morning" | "evening")} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6">
-          <TabsTrigger value="morning" className="gap-2">
-            <span className="text-xl">☀️</span>
-            <div className="flex flex-col items-start">
-              <span className="text-sm font-medium">{t.morningAdhkar}</span>
-              {activeTab === "morning" && (
-                <span className="text-xs text-muted-foreground">
-                  ~{getTotalTime(morningAdhkar)} min
-                </span>
-              )}
+        <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-auto p-1">
+          <TabsTrigger value="morning" className="flex items-center justify-start gap-2 py-3 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <span className="text-lg sm:text-xl shrink-0">☀️</span>
+            <div className="flex flex-col items-start flex-1 min-w-0">
+              <span className="text-xs sm:text-sm font-medium truncate w-full">{t.morningAdhkar}</span>
+              <span className="text-[10px] sm:text-xs opacity-70">
+                ~{getTotalTime(morningAdhkar)} min
+              </span>
             </div>
             {allMorningCompleted && (
-              <Badge variant="outline" className="ml-auto bg-success/10 border-success text-success">
-                <CheckCircle className="w-3 h-3" />
-              </Badge>
+              <CheckCircle className="w-4 h-4 shrink-0 text-success" />
             )}
           </TabsTrigger>
-          <TabsTrigger value="evening" className="gap-2">
-            <span className="text-xl">🌙</span>
-            <div className="flex flex-col items-start">
-              <span className="text-sm font-medium">{t.eveningAdhkar}</span>
-              {activeTab === "evening" && (
-                <span className="text-xs text-muted-foreground">
-                  ~{getTotalTime(eveningAdhkar)} min
-                </span>
-              )}
+          <TabsTrigger value="evening" className="flex items-center justify-start gap-2 py-3 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <span className="text-lg sm:text-xl shrink-0">🌙</span>
+            <div className="flex flex-col items-start flex-1 min-w-0">
+              <span className="text-xs sm:text-sm font-medium truncate w-full">{t.eveningAdhkar}</span>
+              <span className="text-[10px] sm:text-xs opacity-70">
+                ~{getTotalTime(eveningAdhkar)} min
+              </span>
             </div>
             {allEveningCompleted && (
-              <Badge variant="outline" className="ml-auto bg-success/10 border-success text-success">
-                <CheckCircle className="w-3 h-3" />
-              </Badge>
+              <CheckCircle className="w-4 h-4 shrink-0 text-success" />
             )}
           </TabsTrigger>
         </TabsList>
