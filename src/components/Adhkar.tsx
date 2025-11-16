@@ -192,7 +192,11 @@ const eveningAdhkar: Dhikr[] = [
   }
 ];
 
-export const Adhkar = () => {
+interface AdhkarProps {
+  onCompletion?: () => void;
+}
+
+export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   const { t, language } = useLanguage();
   const [selectedDhikr, setSelectedDhikr] = useState<Dhikr | null>(null);
   const [currentSentence, setCurrentSentence] = useState(0);
@@ -257,7 +261,31 @@ export const Adhkar = () => {
     data[activeTab] = Array.from(newCompleted);
     localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
 
-    toast.success(language === "fr" ? "Adhkar complété!" : "Adhkar completed!");
+    // Check if all adhkar in this category are complete
+    const adhkarList = activeTab === "morning" ? morningAdhkar : eveningAdhkar;
+    const allComplete = adhkarList.every(dhikr => newCompleted.has(dhikr.id));
+    
+    if (allComplete) {
+      // Check if we haven't shown congrats yet today
+      const congratsKey = `adhkar-congrats-${activeTab}-${today}`;
+      if (!localStorage.getItem(congratsKey)) {
+        toast.success(
+          language === "fr" 
+            ? `🎉 Bravo ! Tous les adhkar du ${activeTab === "morning" ? "matin" : "soir"} sont complétés !` 
+            : `🎉 Congratulations! All ${activeTab} adhkar completed!`,
+          { duration: 6000 }
+        );
+        localStorage.setItem(congratsKey, "true");
+        
+        // Trigger badge check
+        if (onCompletion) {
+          onCompletion();
+        }
+      }
+    } else {
+      toast.success(language === "fr" ? "Adhkar complété!" : "Adhkar completed!");
+    }
+    
     setDialogOpen(false);
   };
 
@@ -279,6 +307,10 @@ export const Adhkar = () => {
     const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
     data[activeTab] = Array.from(newCompleted);
     localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
+
+    // Clear congrats flag since not all are complete anymore
+    const congratsKey = `adhkar-congrats-${activeTab}-${today}`;
+    localStorage.removeItem(congratsKey);
 
     toast.info(language === "fr" ? "Adhkar marqué comme non complété" : "Adhkar marked as incomplete");
   };
