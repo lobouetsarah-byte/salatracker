@@ -73,7 +73,7 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Salatracker <onboarding@resend.dev>",
         to: [email],
-        subject: "Réinitialisation de votre mot de passe",
+        subject: "Réinitialisez votre mot de passe",
         html: `
           <!DOCTYPE html>
           <html lang="fr">
@@ -81,182 +81,137 @@ const handler = async (req: Request): Promise<Response> => {
               <meta charset="utf-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <style>
-                body { 
-                  margin: 0; 
-                  padding: 0; 
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                * {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
                 }
-                .email-wrapper {
-                  width: 100%;
-                  padding: 40px 20px;
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                }
-                .email-container { 
-                  max-width: 600px; 
-                  margin: 0 auto; 
+                body {
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
                   background-color: #ffffff;
-                  border-radius: 16px;
-                  overflow: hidden;
-                  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                  line-height: 1.6;
+                  -webkit-font-smoothing: antialiased;
+                  -moz-osx-font-smoothing: grayscale;
                 }
-                .header { 
-                  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
-                  padding: 40px 30px;
-                  text-align: center;
+                .email-container {
+                  max-width: 560px;
+                  margin: 0 auto;
+                  padding: 60px 20px;
                 }
                 .logo {
-                  font-size: 48px;
-                  margin-bottom: 10px;
+                  text-align: center;
+                  margin-bottom: 48px;
                 }
-                .header h1 { 
-                  color: #ffffff; 
-                  margin: 0;
-                  font-size: 32px;
-                  font-weight: 700;
+                .logo-emoji {
+                  font-size: 64px;
+                  line-height: 1;
+                  display: block;
+                  margin-bottom: 8px;
+                }
+                .content {
+                  text-align: center;
+                  padding: 0 20px;
+                }
+                h1 {
+                  color: #1a1a1a;
+                  font-size: 28px;
+                  font-weight: 600;
+                  margin-bottom: 16px;
                   letter-spacing: -0.5px;
                 }
-                .header p {
-                  color: rgba(255, 255, 255, 0.9);
-                  margin: 8px 0 0 0;
+                p {
+                  color: #525252;
                   font-size: 16px;
-                }
-                .content { 
-                  padding: 40px 30px;
-                  color: #1f2937;
-                }
-                .content h2 {
-                  color: #1f2937;
-                  font-size: 24px;
-                  font-weight: 600;
-                  margin: 0 0 16px 0;
-                }
-                .content p {
-                  color: #4b5563;
-                  font-size: 16px;
-                  line-height: 1.6;
-                  margin: 0 0 16px 0;
+                  margin-bottom: 16px;
+                  line-height: 1.7;
                 }
                 .button-container {
-                  text-align: center;
-                  margin: 32px 0;
+                  margin: 40px 0;
                 }
-                .button { 
+                .button {
                   display: inline-block;
-                  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+                  background-color: #8B5CF6;
                   color: #ffffff;
                   text-decoration: none;
-                  padding: 16px 40px;
-                  border-radius: 12px;
+                  padding: 16px 48px;
+                  border-radius: 8px;
                   font-weight: 600;
                   font-size: 16px;
-                  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-                  transition: all 0.3s ease;
+                  transition: background-color 0.2s ease;
                 }
-                .button:hover { 
-                  background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
-                  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
-                  transform: translateY(-2px);
+                .button:hover {
+                  background-color: #7C3AED;
                 }
-                .security-note {
-                  background-color: #fef3c7;
-                  border-left: 4px solid #f59e0b;
-                  padding: 16px;
-                  margin: 24px 0;
-                  border-radius: 8px;
-                }
-                .security-note p {
-                  color: #92400e;
+                .note {
+                  color: #737373;
                   font-size: 14px;
-                  margin: 0;
+                  margin-top: 32px;
+                  line-height: 1.6;
                 }
-                .footer { 
-                  background-color: #f9fafb;
-                  padding: 30px;
+                .footer {
                   text-align: center;
-                  border-top: 1px solid #e5e7eb;
+                  margin-top: 48px;
+                  padding-top: 32px;
+                  border-top: 1px solid #e5e5e5;
                 }
                 .footer p {
-                  color: #6b7280;
-                  font-size: 14px;
-                  margin: 4px 0;
+                  color: #a3a3a3;
+                  font-size: 13px;
+                  margin-bottom: 8px;
                 }
-                .footer-links {
-                  margin-top: 16px;
-                }
-                .footer-links a {
-                  color: #8B5CF6;
-                  text-decoration: none;
-                  margin: 0 12px;
-                  font-size: 14px;
-                }
+                
+                /* Mobile optimization */
                 @media only screen and (max-width: 600px) {
-                  .email-wrapper {
-                    padding: 20px 10px;
+                  .email-container {
+                    padding: 40px 16px;
                   }
-                  .content {
-                    padding: 30px 20px;
-                  }
-                  .header {
-                    padding: 30px 20px;
+                  h1 {
+                    font-size: 24px;
                   }
                   .button {
                     display: block;
-                    padding: 14px 24px;
+                    width: 100%;
+                    padding: 18px 32px;
+                    font-size: 17px;
+                  }
+                  .logo-emoji {
+                    font-size: 56px;
                   }
                 }
               </style>
             </head>
             <body>
-              <div class="email-wrapper">
-                <div class="email-container">
-                  <div class="header">
-                    <div class="logo">🕌</div>
-                    <h1>Salatracker</h1>
-                    <p>Réinitialisation de mot de passe</p>
+              <div class="email-container">
+                <!-- Logo -->
+                <div class="logo">
+                  <span class="logo-emoji">🕌</span>
+                </div>
+                
+                <!-- Content -->
+                <div class="content">
+                  <h1>Réinitialisez votre mot de passe</h1>
+                  
+                  <p>
+                    Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe pour votre compte Salatracker.
+                  </p>
+                  
+                  <!-- CTA Button -->
+                  <div class="button-container">
+                    <a href="${data.properties.action_link}" class="button">
+                      Réinitialiser le mot de passe
+                    </a>
                   </div>
                   
-                  <div class="content">
-                    <h2>Bonjour,</h2>
-                    <p>
-                      Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte Salatracker.
-                    </p>
-                    <p>
-                      Pour créer un nouveau mot de passe, cliquez simplement sur le bouton ci-dessous :
-                    </p>
-                    
-                    <div class="button-container">
-                      <a href="${data.properties.action_link}" class="button">
-                        🔒 Réinitialiser mon mot de passe
-                      </a>
-                    </div>
-                    
-                    <div class="security-note">
-                      <p>
-                        ⏱️ <strong>Ce lien expirera dans 1 heure</strong> pour des raisons de sécurité.
-                      </p>
-                    </div>
-                    
-                    <p>
-                      Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email en toute sécurité. 
-                      Votre mot de passe actuel restera inchangé.
-                    </p>
-                    
-                    <p style="margin-top: 24px; color: #9ca3af; font-size: 14px;">
-                      Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
-                      <a href="${data.properties.action_link}" style="color: #8B5CF6; word-break: break-all;">${data.properties.action_link}</a>
-                    </p>
-                  </div>
-                  
-                  <div class="footer">
-                    <p><strong>Salatracker</strong></p>
-                    <p>Votre compagnon fidèle pour suivre vos prières quotidiennes 🤲</p>
-                    <div class="footer-links">
-                      <p style="color: #9ca3af; font-size: 12px; margin-top: 12px;">
-                        © ${new Date().getFullYear()} Salatracker. Tous droits réservés.
-                      </p>
-                    </div>
-                  </div>
+                  <p class="note">
+                    Ce lien expirera dans 1 heure.<br>
+                    Si vous n'avez pas demandé cette réinitialisation, ignorez simplement cet email.
+                  </p>
+                </div>
+                
+                <!-- Footer -->
+                <div class="footer">
+                  <p>Salatracker</p>
+                  <p>Votre compagnon pour les prières quotidiennes</p>
                 </div>
               </div>
             </body>
