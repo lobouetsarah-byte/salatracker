@@ -23,7 +23,7 @@ interface Dhikr {
   repetitions: number;
 }
 
-const morningAtkar: Dhikr[] = [
+const morningAdhkar: Dhikr[] = [
   {
     id: "morning-invocation",
     name: "Invocation du matin",
@@ -70,83 +70,44 @@ const morningAtkar: Dhikr[] = [
       {
         arabic: "وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ",
         phonetic: "Wasi'a kursiyyuhu as-samāwāti wa al-arḍ, wa lā ya'ūduhu ḥifẓuhumā, wa huwa al-'aliyyu al-'aẓīm",
-        translation: "His Throne extends over the heavens and the earth, and their preservation does not tire Him. And He is the Most High, the Most Great.",
+        translation: "His Throne extends over the heavens and the earth, and it does not tire Him to preserve them. And He is the Most High, the Most Great.",
         translationFr: "Son Trône déborde les cieux et la terre, dont la garde ne Lui coûte aucune peine. Et Il est le Très Haut, le Très Grand."
       }
     ],
     repetitions: 1
   },
   {
-    id: "surah-ikhlas",
-    name: "Sourate Al-Ikhlas",
-    nameEn: "Surah Al-Ikhlas",
-    preview: "قُلْ هُوَ اللَّهُ أَحَدٌ...",
-    previewEn: "Say: He is Allah, the One...",
-    estimatedTime: "30 sec",
-    sentences: [
-      {
-        arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ، اللَّهُ الصَّمَدُ، لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
-        phonetic: "Qul huwa Allāhu aḥad, Allāhu aṣ-ṣamad, lam yalid wa lam yūlad, wa lam yakun lahu kufuwan aḥad",
-        translation: "Say: He is Allah, the One. Allah, the Eternal Refuge. He neither begets nor is born, nor is there to Him any equivalent.",
-        translationFr: "Dis : Il est Allah, Unique. Allah, Le Seul à être imploré. Il n'a jamais engendré, n'a pas été engendré, et nul n'est égal à Lui."
-      }
-    ],
-    repetitions: 3
-  },
-  {
-    id: "surah-falaq",
-    name: "Sourate Al-Falaq",
-    nameEn: "Surah Al-Falaq",
-    preview: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ...",
-    previewEn: "Say: I seek refuge in the Lord of daybreak...",
-    estimatedTime: "30 sec",
-    sentences: [
-      {
-        arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، مِن شَرِّ مَا خَلَقَ، وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ، وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ، وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
-        phonetic: "Qul a'ūdhu bi-rabbi al-falaq, min sharri mā khalaq, wa min sharri ghāsiqin idhā waqab...",
-        translation: "Say: I seek refuge in the Lord of daybreak, from the evil of that which He created, and from the evil of darkness when it settles...",
-        translationFr: "Dis : Je cherche protection auprès du Seigneur de l'aube, contre le mal des êtres qu'Il a créés, contre le mal de l'obscurité quand elle s'approfondit..."
-      }
-    ],
-    repetitions: 3
-  },
-  {
-    id: "surah-nas",
-    name: "Sourate An-Nas",
-    nameEn: "Surah An-Nas",
-    preview: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ...",
-    previewEn: "Say: I seek refuge in the Lord of mankind...",
-    estimatedTime: "30 sec",
-    sentences: [
-      {
-        arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ، مَلِكِ النَّاسِ، إِلَٰهِ النَّاسِ، مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
-        phonetic: "Qul a'ūdhu bi-rabbi an-nās, maliki an-nās, ilāhi an-nās, min sharri al-waswāsi al-khannās",
-        translation: "Say: I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer.",
-        translationFr: "Dis : Je cherche protection auprès du Seigneur des hommes, Le Roi des hommes, Dieu des hommes, contre le mal du mauvais conseiller, furtif."
-      }
-    ],
-    repetitions: 3
-  },
-  {
-    id: "morning-tasbih",
-    name: "Tasbih du matin",
-    nameEn: "Morning Tasbih",
-    preview: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ...",
-    previewEn: "Glory be to Allah and praise be to Him...",
+    id: "subhan-allah",
+    name: "Tasbih, Tahmid, Takbir",
+    nameEn: "Tasbih, Tahmid, Takbir",
+    preview: "سُبْحَانَ اللَّهِ، الْحَمْدُ لِلَّهِ، اللَّهُ أَكْبَرُ",
+    previewEn: "Glory be to Allah, Praise be to Allah, Allah is the Greatest",
     estimatedTime: "2 min",
     sentences: [
       {
-        arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)",
-        phonetic: "Subḥāna Allāhi wa biḥamdih (100 fois)",
-        translation: "Glory be to Allah and praise be to Him (100 times)",
-        translationFr: "Gloire et pureté à Allah et par Sa louange (100 fois)"
+        arabic: "سُبْحَانَ اللَّهِ",
+        phonetic: "Subḥāna Allāh",
+        translation: "Glory be to Allah",
+        translationFr: "Gloire à Allah"
+      },
+      {
+        arabic: "الْحَمْدُ لِلَّهِ",
+        phonetic: "Al-ḥamdu lillāh",
+        translation: "Praise be to Allah",
+        translationFr: "Louange à Allah"
+      },
+      {
+        arabic: "اللَّهُ أَكْبَرُ",
+        phonetic: "Allāhu akbar",
+        translation: "Allah is the Greatest",
+        translationFr: "Allah est le Plus Grand"
       }
     ],
-    repetitions: 100
+    repetitions: 33
   }
 ];
 
-const eveningAtkar: Dhikr[] = [
+const eveningAdhkar: Dhikr[] = [
   {
     id: "evening-invocation",
     name: "Invocation du soir",
@@ -193,83 +154,44 @@ const eveningAtkar: Dhikr[] = [
       {
         arabic: "وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ",
         phonetic: "Wasi'a kursiyyuhu as-samāwāti wa al-arḍ, wa lā ya'ūduhu ḥifẓuhumā, wa huwa al-'aliyyu al-'aẓīm",
-        translation: "His Throne extends over the heavens and the earth, and their preservation does not tire Him. And He is the Most High, the Most Great.",
+        translation: "His Throne extends over the heavens and the earth, and it does not tire Him to preserve them. And He is the Most High, the Most Great.",
         translationFr: "Son Trône déborde les cieux et la terre, dont la garde ne Lui coûte aucune peine. Et Il est le Très Haut, le Très Grand."
       }
     ],
     repetitions: 1
   },
   {
-    id: "surah-ikhlas-evening",
-    name: "Sourate Al-Ikhlas",
-    nameEn: "Surah Al-Ikhlas",
-    preview: "قُلْ هُوَ اللَّهُ أَحَدٌ...",
-    previewEn: "Say: He is Allah, the One...",
-    estimatedTime: "30 sec",
-    sentences: [
-      {
-        arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ، اللَّهُ الصَّمَدُ، لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
-        phonetic: "Qul huwa Allāhu aḥad, Allāhu aṣ-ṣamad, lam yalid wa lam yūlad, wa lam yakun lahu kufuwan aḥad",
-        translation: "Say: He is Allah, the One. Allah, the Eternal Refuge. He neither begets nor is born, nor is there to Him any equivalent.",
-        translationFr: "Dis : Il est Allah, Unique. Allah, Le Seul à être imploré. Il n'a jamais engendré, n'a pas été engendré, et nul n'est égal à Lui."
-      }
-    ],
-    repetitions: 3
-  },
-  {
-    id: "surah-falaq-evening",
-    name: "Sourate Al-Falaq",
-    nameEn: "Surah Al-Falaq",
-    preview: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ...",
-    previewEn: "Say: I seek refuge in the Lord of daybreak...",
-    estimatedTime: "30 sec",
-    sentences: [
-      {
-        arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، مِن شَرِّ مَا خَلَقَ، وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ، وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ، وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
-        phonetic: "Qul a'ūdhu bi-rabbi al-falaq, min sharri mā khalaq, wa min sharri ghāsiqin idhā waqab...",
-        translation: "Say: I seek refuge in the Lord of daybreak, from the evil of that which He created, and from the evil of darkness when it settles...",
-        translationFr: "Dis : Je cherche protection auprès du Seigneur de l'aube, contre le mal des êtres qu'Il a créés, contre le mal de l'obscurité quand elle s'approfondit..."
-      }
-    ],
-    repetitions: 3
-  },
-  {
-    id: "surah-nas-evening",
-    name: "Sourate An-Nas",
-    nameEn: "Surah An-Nas",
-    preview: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ...",
-    previewEn: "Say: I seek refuge in the Lord of mankind...",
-    estimatedTime: "30 sec",
-    sentences: [
-      {
-        arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ، مَلِكِ النَّاسِ، إِلَٰهِ النَّاسِ، مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
-        phonetic: "Qul a'ūdhu bi-rabbi an-nās, maliki an-nās, ilāhi an-nās, min sharri al-waswāsi al-khannās",
-        translation: "Say: I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer.",
-        translationFr: "Dis : Je cherche protection auprès du Seigneur des hommes, Le Roi des hommes, Dieu des hommes, contre le mal du mauvais conseiller, furtif."
-      }
-    ],
-    repetitions: 3
-  },
-  {
-    id: "evening-tasbih",
-    name: "Tasbih du soir",
-    nameEn: "Evening Tasbih",
-    preview: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ...",
-    previewEn: "Glory be to Allah and praise be to Him...",
+    id: "subhan-allah-evening",
+    name: "Tasbih, Tahmid, Takbir",
+    nameEn: "Tasbih, Tahmid, Takbir",
+    preview: "سُبْحَانَ اللَّهِ، الْحَمْدُ لِلَّهِ، اللَّهُ أَكْبَرُ",
+    previewEn: "Glory be to Allah, Praise be to Allah, Allah is the Greatest",
     estimatedTime: "2 min",
     sentences: [
       {
-        arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)",
-        phonetic: "Subḥāna Allāhi wa biḥamdih (100 fois)",
-        translation: "Glory be to Allah and praise be to Him (100 times)",
-        translationFr: "Gloire et pureté à Allah et par Sa louange (100 fois)"
+        arabic: "سُبْحَانَ اللَّهِ",
+        phonetic: "Subḥāna Allāh",
+        translation: "Glory be to Allah",
+        translationFr: "Gloire à Allah"
+      },
+      {
+        arabic: "الْحَمْدُ لِلَّهِ",
+        phonetic: "Al-ḥamdu lillāh",
+        translation: "Praise be to Allah",
+        translationFr: "Louange à Allah"
+      },
+      {
+        arabic: "اللَّهُ أَكْبَرُ",
+        phonetic: "Allāhu akbar",
+        translation: "Allah is the Greatest",
+        translationFr: "Allah est le Plus Grand"
       }
     ],
-    repetitions: 100
+    repetitions: 33
   }
 ];
 
-export const Atkar = () => {
+export const Adhkar = () => {
   const { t, language } = useLanguage();
   const [selectedDhikr, setSelectedDhikr] = useState<Dhikr | null>(null);
   const [currentSentence, setCurrentSentence] = useState(0);
@@ -278,27 +200,31 @@ export const Atkar = () => {
   const [completedMorning, setCompletedMorning] = useState<Set<string>>(new Set());
   const [completedEvening, setCompletedEvening] = useState<Set<string>>(new Set());
   const [isPlaying, setIsPlaying] = useState(false);
+  const voicesLoaded = useRef(false);
 
-  // Load voices on component mount
+  // Load voices when available
   useEffect(() => {
-    if ('speechSynthesis' in window) {
+    if ('speechSynthesis' in window && !voicesLoaded.current) {
       const loadVoices = () => {
         window.speechSynthesis.getVoices();
+        voicesLoaded.current = true;
       };
+
       loadVoices();
-      if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = loadVoices;
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
       }
     }
   }, []);
 
+  // Load completion status from localStorage
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
-    const stored = localStorage.getItem(`atkar-${today}`);
+    const stored = localStorage.getItem(`adhkar-${today}`);
     if (stored) {
       const data = JSON.parse(stored);
-      setCompletedMorning(new Set(data.morning || []));
-      setCompletedEvening(new Set(data.evening || []));
+      if (data.morning) setCompletedMorning(new Set(data.morning));
+      if (data.evening) setCompletedEvening(new Set(data.evening));
     }
   }, []);
 
@@ -309,24 +235,24 @@ export const Atkar = () => {
     setDialogOpen(true);
   };
 
-  const handleMarkComplete = () => {
+  const markAsComplete = () => {
     if (!selectedDhikr) return;
-    
+
     const today = new Date().toISOString().split("T")[0];
     const newCompleted = activeTab === "morning" 
       ? new Set([...completedMorning, selectedDhikr.id])
       : new Set([...completedEvening, selectedDhikr.id]);
-    
+
     if (activeTab === "morning") {
       setCompletedMorning(newCompleted);
     } else {
       setCompletedEvening(newCompleted);
     }
 
-    const stored = localStorage.getItem(`atkar-${today}`);
+    const stored = localStorage.getItem(`adhkar-${today}`);
     const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
     data[activeTab] = Array.from(newCompleted);
-    localStorage.setItem(`atkar-${today}`, JSON.stringify(data));
+    localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
 
     setDialogOpen(false);
   };
@@ -397,8 +323,8 @@ export const Atkar = () => {
     }
   };
 
-  const allMorningCompleted = morningAtkar.every(d => completedMorning.has(d.id));
-  const allEveningCompleted = eveningAtkar.every(d => completedEvening.has(d.id));
+  const allMorningCompleted = morningAdhkar.every(d => completedMorning.has(d.id));
+  const allEveningCompleted = eveningAdhkar.every(d => completedEvening.has(d.id));
 
   const renderDhikrList = (dhikrList: Dhikr[], type: "morning" | "evening") => {
     const completed = type === "morning" ? completedMorning : completedEvening;
@@ -443,176 +369,151 @@ export const Atkar = () => {
   };
 
   return (
-    <div className="space-y-6 pb-6">
-      <h2 className="text-xl sm:text-2xl font-bold text-foreground text-center">
-        {language === "fr" ? "Adhkar quotidiens" : "Daily Adhkar"}
-      </h2>
-
+    <div className="space-y-4 sm:space-y-6">
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "morning" | "evening")} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="morning" className="flex flex-col gap-1">
-            <span>{language === "fr" ? "Matin" : "Morning"}</span>
-            <div className="flex items-center gap-2">
-              {allMorningCompleted && (
-                <Badge className="bg-success text-success-foreground text-xs px-1 py-0">
-                  <Check className="w-3 h-3" />
-                </Badge>
-              )}
+        <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6">
+          <TabsTrigger value="morning" className="gap-2">
+            <span className="text-xl">☀️</span>
+            <div className="flex flex-col items-start">
+              <span className="text-sm font-medium">{t.morningAdhkar}</span>
               {activeTab === "morning" && (
                 <span className="text-xs text-muted-foreground">
-                  ~{getTotalTime(morningAtkar)} min
+                  ~{getTotalTime(morningAdhkar)} min
                 </span>
               )}
             </div>
+            {allMorningCompleted && (
+              <Badge variant="outline" className="ml-auto bg-success/10 border-success text-success">
+                <CheckCircle className="w-3 h-3" />
+              </Badge>
+            )}
           </TabsTrigger>
-          <TabsTrigger value="evening" className="flex flex-col gap-1">
-            <span>{language === "fr" ? "Soir" : "Evening"}</span>
-            <div className="flex items-center gap-2">
-              {allEveningCompleted && (
-                <Badge className="bg-success text-success-foreground text-xs px-1 py-0">
-                  <Check className="w-3 h-3" />
-                </Badge>
-              )}
+          <TabsTrigger value="evening" className="gap-2">
+            <span className="text-xl">🌙</span>
+            <div className="flex flex-col items-start">
+              <span className="text-sm font-medium">{t.eveningAdhkar}</span>
               {activeTab === "evening" && (
                 <span className="text-xs text-muted-foreground">
-                  ~{getTotalTime(eveningAtkar)} min
+                  ~{getTotalTime(eveningAdhkar)} min
                 </span>
               )}
             </div>
+            {allEveningCompleted && (
+              <Badge variant="outline" className="ml-auto bg-success/10 border-success text-success">
+                <CheckCircle className="w-3 h-3" />
+              </Badge>
+            )}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="morning">
-          {renderDhikrList(morningAtkar, "morning")}
+          {renderDhikrList(morningAdhkar, "morning")}
         </TabsContent>
 
         <TabsContent value="evening">
-          {renderDhikrList(eveningAtkar, "evening")}
+          {renderDhikrList(eveningAdhkar, "evening")}
         </TabsContent>
       </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl text-center">
+            <DialogTitle className="text-lg sm:text-xl">
               {selectedDhikr && (language === "fr" ? selectedDhikr.name : selectedDhikr.nameEn)}
             </DialogTitle>
           </DialogHeader>
 
           {selectedDhikr && (
-            <div className="space-y-6 p-2">
-              <div className="text-center space-y-4">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-arabic leading-loose" dir="rtl">
-                  {selectedDhikr.sentences[currentSentence].arabic}
-                </p>
-                
-                <p className="text-base sm:text-lg text-primary italic">
-                  {selectedDhikr.sentences[currentSentence].phonetic}
-                </p>
-                
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  {language === "fr" 
-                    ? selectedDhikr.sentences[currentSentence].translationFr 
-                    : selectedDhikr.sentences[currentSentence].translation}
-                </p>
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span>{selectedDhikr.estimatedTime}</span>
+                </div>
+                <span>
+                  {currentSentence + 1} / {selectedDhikr.sentences.length}
+                </span>
               </div>
 
-              {/* Audio button */}
-              <div className="flex justify-center gap-2">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="gap-2"
-                  onClick={() => {
-                    if (isPlaying) {
-                      stopAudio();
-                    } else {
-                      playAudio(selectedDhikr.sentences[currentSentence].arabic);
-                    }
-                  }}
-                >
-                  {isPlaying ? (
-                    <>
-                      <Pause className="w-5 h-5" />
-                      {language === "fr" ? "Arrêter" : "Stop"}
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-5 h-5" />
-                      {language === "fr" ? "Écouter" : "Listen"}
-                    </>
-                  )}
-                </Button>
-              </div>
+              <div className="space-y-4 p-4 sm:p-6 bg-muted/30 rounded-lg">
+                <div className="text-center">
+                  <p className="text-2xl sm:text-3xl font-arabic leading-loose text-foreground mb-4">
+                    {selectedDhikr.sentences[currentSentence].arabic}
+                  </p>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (isPlaying) {
+                        stopAudio();
+                      } else {
+                        playAudio(selectedDhikr.sentences[currentSentence].arabic);
+                      }
+                    }}
+                    className="mb-4"
+                  >
+                    {isPlaying ? (
+                      <>
+                        <Pause className="w-4 h-4 mr-2" />
+                        Pause
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 className="w-4 h-4 mr-2" />
+                        Écouter
+                      </>
+                    )}
+                  </Button>
 
-              {/* Page Navigation */}
-              <div className="flex items-center justify-between pt-6 border-t">
-                <Button
-                  onClick={prevSentence}
-                  disabled={currentSentence === 0}
-                  variant="outline"
-                  size="lg"
-                  className="flex-1 mr-2"
-                >
-                  <ChevronLeft className="w-5 h-5 mr-1" />
-                  {language === "fr" ? "Précédent" : "Previous"}
-                </Button>
-
-                <div className="flex flex-col items-center justify-center min-w-[100px]">
-                  <span className="text-xs text-muted-foreground mb-1">
-                    {language === "fr" ? "Page" : "Page"}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: selectedDhikr.sentences.length }).map((_, index) => (
-                      <div
-                        key={index}
-                        className={`h-2 rounded-full transition-all ${
-                          index === currentSentence
-                            ? "w-6 bg-primary"
-                            : "w-2 bg-muted"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm font-semibold text-foreground mt-1">
-                    {currentSentence + 1} / {selectedDhikr.sentences.length}
-                  </span>
+                  <p className="text-sm sm:text-base text-muted-foreground italic mb-3">
+                    {selectedDhikr.sentences[currentSentence].phonetic}
+                  </p>
+                  <p className="text-sm sm:text-base text-foreground">
+                    {language === "fr" 
+                      ? selectedDhikr.sentences[currentSentence].translationFr
+                      : selectedDhikr.sentences[currentSentence].translation}
+                  </p>
                 </div>
 
+                {selectedDhikr.repetitions > 1 && (
+                  <div className="text-center text-sm text-muted-foreground">
+                    {language === "fr" ? "À répéter" : "Repeat"} {selectedDhikr.repetitions}x
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between gap-2">
                 <Button
+                  variant="outline"
+                  onClick={prevSentence}
+                  disabled={currentSentence === 0}
+                  className="flex-1"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  {language === "fr" ? "Précédent" : "Previous"}
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={nextSentence}
                   disabled={currentSentence === selectedDhikr.sentences.length - 1}
-                  variant="outline"
-                  size="lg"
-                  className="flex-1 ml-2"
+                  className="flex-1"
                 >
                   {language === "fr" ? "Suivant" : "Next"}
-                  <ChevronRight className="w-5 h-5 ml-1" />
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
 
-              {/* Mark as complete button */}
-              <div className="pt-4">
-                <Button
-                  onClick={handleMarkComplete}
-                  className="w-full bg-success hover:bg-success/90 text-success-foreground"
+              {currentSentence === selectedDhikr.sentences.length - 1 && (
+                <Button 
+                  onClick={markAsComplete} 
+                  className="w-full"
                   size="lg"
-                  disabled={
-                    activeTab === "morning"
-                      ? completedMorning.has(selectedDhikr.id)
-                      : completedEvening.has(selectedDhikr.id)
-                  }
                 >
-                  <Check className="w-5 h-5 mr-2" />
-                  {activeTab === "morning"
-                    ? completedMorning.has(selectedDhikr.id)
-                      ? (language === "fr" ? "✓ Déjà fait" : "✓ Already done")
-                      : (language === "fr" ? "Marquer comme fait (Matin)" : "Mark as done (Morning)")
-                    : completedEvening.has(selectedDhikr.id)
-                      ? (language === "fr" ? "✓ Déjà fait" : "✓ Already done")
-                      : (language === "fr" ? "Marquer comme fait (Soir)" : "Mark as done (Evening)")}
+                  <Check className="w-4 h-4 mr-2" />
+                  {language === "fr" ? "Marquer comme terminé" : "Mark as completed"}
                 </Button>
-              </div>
+              )}
             </div>
           )}
         </DialogContent>

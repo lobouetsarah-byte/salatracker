@@ -4,7 +4,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { PrayerCard } from "@/components/PrayerCard";
 import { WeeklyStats } from "@/components/WeeklyStats";
 import { Settings } from "@/components/Settings";
-import { Atkar } from "@/components/Atkar";
+import { Adhkar } from "@/components/Adhkar";
 import { WeeklyHadith } from "@/components/WeeklyHadith";
 import { PeriodStats } from "@/components/PeriodStats";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
@@ -354,8 +354,8 @@ const Index = () => {
             </div>
           )}
 
-          {activeTab === "atkar" && (
-            <Atkar />
+          {activeTab === "adhkar" && (
+            <Adhkar />
           )}
 
           {activeTab === "settings" && (
@@ -408,18 +408,18 @@ const Index = () => {
               <span className="text-xs font-medium">{t.prayers}</span>
             </button>
             <button
-              onClick={() => setActiveTab("atkar")}
+              onClick={() => setActiveTab("adhkar")}
               className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 relative ${
-                activeTab === "atkar" 
+                activeTab === "adhkar" 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {activeTab === "atkar" && (
+              {activeTab === "adhkar" && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full" />
               )}
               <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-xs font-medium">{t.atkar}</span>
+              <span className="text-xs font-medium">{t.adhkar}</span>
             </button>
             <button
               onClick={() => setActiveTab("settings")}
