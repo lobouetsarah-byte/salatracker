@@ -232,7 +232,7 @@ const Index = () => {
               <img 
                 src={salatrackLogo} 
                 alt="Salatracker" 
-                className={`w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg ${isInPeriod ? "brightness-0 invert" : ""}`} 
+                className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg" 
               />
             </div>
             <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold ${
