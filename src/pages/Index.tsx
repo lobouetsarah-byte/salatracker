@@ -24,7 +24,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
-import { MapPin, Calendar as CalendarIcon, BarChart3, Clock, BookOpen, Settings as SettingsIcon, Heart } from "lucide-react";
+import { MapPin, Calendar as CalendarIcon, BarChart3, Clock, BookOpen, Settings as SettingsIcon, Heart, Edit3 } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import salatrackLogoPink from "@/assets/salatrack-logo-pink.png";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,6 +36,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { PrayerStatus } from "@/hooks/usePrayerTracking";
+import { LocationDialog } from "@/components/LocationDialog";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -61,6 +62,7 @@ const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const selectedDateString = selectedDate.toISOString().split("T")[0];
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
 
   // No automatic redirect - users can use the app without logging in
 
@@ -327,7 +329,10 @@ const Index = () => {
                   />
                 </PopoverContent>
               </Popover>
-              <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
+              <button 
+                className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50 hover:bg-card/70 hover:border-primary/30 transition-all cursor-pointer group"
+                onClick={() => setLocationDialogOpen(true)}
+              >
                 <MapPin className="w-4 h-4 text-primary" />
                 <span className="font-medium">
                   {locationName}
@@ -335,7 +340,8 @@ const Index = () => {
                     <span className="ml-2 text-xs text-primary">(manuel)</span>
                   )}
                 </span>
-              </div>
+                <Edit3 className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
             </div>
           )}
         </div>
@@ -348,6 +354,12 @@ const Index = () => {
           open={showDailySuccess} 
           onClose={() => setShowDailySuccess(false)}
           isInPeriod={isInPeriod}
+        />
+
+        {/* Location dialog */}
+        <LocationDialog 
+          open={locationDialogOpen}
+          onOpenChange={setLocationDialogOpen}
         />
 
         {/* Content */}
