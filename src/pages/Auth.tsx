@@ -147,7 +147,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-white p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-white p-4" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
       <div className="w-full max-w-md space-y-4">
         <div className="text-center mb-6">
           <img src={salatrackLogo} alt="Salatracker" className="w-20 h-20 mx-auto mb-4" />

@@ -267,7 +267,7 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen pb-20 transition-colors duration-500 ${isInPeriod ? "period-mode bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in">
           <div className="flex items-center justify-center gap-4 mb-2">
@@ -433,7 +433,10 @@ const Index = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-border/50 shadow-2xl z-50">
+      <div 
+        className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-border/50 shadow-2xl z-50"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-4 h-16 sm:h-18">
             <button

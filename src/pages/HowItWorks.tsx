@@ -83,7 +83,7 @@ const HowItWorks = () => {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-b from-background to-muted/20 flex flex-col">
+    <div className="h-screen overflow-hidden bg-gradient-to-b from-background to-muted/20 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="container max-w-2xl mx-auto px-4 h-full flex flex-col justify-between py-6 sm:py-8">
         {/* Header - Compact */}
         <div className="text-center flex-shrink-0">
