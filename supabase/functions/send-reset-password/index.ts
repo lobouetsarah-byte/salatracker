@@ -29,7 +29,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log("Generating password reset link for:", email);
+    console.log("Processing password reset request for:", email);
 
     // Create Supabase client with service role key
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -40,7 +40,19 @@ const handler = async (req: Request): Promise<Response> => {
       email: email,
     });
 
+    // For security reasons, always return success even if user doesn't exist
+    // This prevents email enumeration attacks
     if (error) {
+      if (error.message.includes("User with this email not found") || error.status === 404) {
+        console.log("User not found, but returning success for security");
+        return new Response(
+          JSON.stringify({ success: true, message: "Si cet email existe, un lien de réinitialisation a été envoyé" }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
       console.error("Error generating reset link:", error);
       throw error;
     }
