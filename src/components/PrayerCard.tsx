@@ -160,14 +160,6 @@ export const PrayerCard = ({
                   )}
                 </div>
                 
-                {!canMarkCompleted && (
-                  <div className="p-3 rounded-lg bg-muted/30 border border-muted">
-                    <p className="text-xs text-muted-foreground flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      Disponible après l'Adhan à {time}
-                    </p>
-                  </div>
-                )}
                 
                 <div className="grid grid-cols-3 gap-2">
                   <Button
@@ -283,11 +275,6 @@ export const PrayerCard = ({
                       }`}>
                         {dhikrDone ? "✓ " + t.dhikrDone : t.dhikrPending}
                       </p>
-                      {!dhikrDone && !canMarkCompleted && (
-                        <p className="text-xs text-destructive/70 mt-0.5">
-                          🕐 Disponible après l'Adhan ({time})
-                        </p>
-                      )}
                       {!dhikrDone && canMarkCompleted && (
                         <p className="text-xs text-muted-foreground mt-0.5">
                           Cliquez pour marquer comme fait
@@ -327,13 +314,6 @@ export const PrayerCard = ({
                   <Clock className="w-5 h-5 text-muted-foreground" />
                 )}
               </div>
-              {!canMarkCompleted && status === "pending" && (
-                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                  <p className="text-xs text-destructive/70 font-medium">
-                    Après {time}
-                  </p>
-                </div>
-              )}
             </div>
           )}
           
@@ -349,14 +329,6 @@ export const PrayerCard = ({
             </DialogTitle>
           </DialogHeader>
           
-          {!canMarkCompleted && (
-            <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 mb-4">
-              <p className="text-sm text-destructive flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Cette prière ne peut être marquée qu'après l'Adhan à {time}
-              </p>
-            </div>
-          )}
           
           <div className="space-y-3 mt-4">
             <Button
