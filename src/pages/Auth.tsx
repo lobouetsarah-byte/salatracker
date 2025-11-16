@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserX, ArrowLeft } from "lucide-react";
+import { UserX, ArrowLeft, KeyRound } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -29,7 +29,21 @@ const Auth = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [cooldownUntil, setCooldownUntil] = useState<Date | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const activeTab = searchParams.get("tab") || "login";
+
+  // Check if user arrived from password reset email
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    const type = hashParams.get('type');
+    
+    if (type === 'recovery' && accessToken) {
+      setIsResettingPassword(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -146,6 +160,58 @@ const Auth = () => {
     }
   };
 
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate passwords
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Erreur",
+        description: "Les mots de passe ne correspondent pas",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const passwordResult = passwordSchema.safeParse(newPassword);
+    if (!passwordResult.success) {
+      toast({
+        title: "Mot de passe invalide",
+        description: passwordResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: passwordResult.data
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Succès",
+        description: "Votre mot de passe a été mis à jour",
+      });
+      
+      // Clear the hash and redirect to login
+      window.history.replaceState(null, '', '/auth');
+      setIsResettingPassword(false);
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      toast({
+        title: t.errorOccurred,
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-white p-4" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
       <div className="w-full max-w-md space-y-4">
@@ -159,7 +225,44 @@ const Auth = () => {
             <CardDescription>{t.trackProgress}</CardDescription>
           </CardHeader>
           <CardContent>
-            {showForgotPassword ? (
+            {isResettingPassword ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-center mb-4">
+                  <KeyRound className="w-12 h-12 text-primary" />
+                </div>
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-semibold mb-2">Nouveau mot de passe</h3>
+                  <p className="text-sm text-muted-foreground">Entrez votre nouveau mot de passe</p>
+                </div>
+                <form onSubmit={handleUpdatePassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "..." : "Mettre à jour le mot de passe"}
+                  </Button>
+                </form>
+              </div>
+            ) : showForgotPassword ? (
               <div className="space-y-4">
                 <Button
                   variant="ghost"
