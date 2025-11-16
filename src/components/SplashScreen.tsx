@@ -36,7 +36,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
     <div
       className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0"
-      } ${isInPeriod ? "bg-gradient-to-br from-[#E91E63] to-[#FF6B9D]" : "bg-white dark:bg-white"}`}
+      } ${isInPeriod ? "bg-white" : "bg-white dark:bg-white"}`}
     >
       <div className="relative">
         <img 
