@@ -267,18 +267,25 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen pb-20 transition-colors duration-500 ${isInPeriod ? "period-mode bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
-        {/* Header */}
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="flex items-center justify-center gap-4 mb-2">
-            <div className={`p-3 rounded-2xl backdrop-blur-sm ${isInPeriod ? "bg-white/20" : "bg-primary/10"}`}>
+      {/* Fixed Header with Logo */}
+      <div 
+        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-md bg-opacity-95 border-b transition-colors duration-500 ${
+          isInPeriod 
+            ? "bg-[hsl(var(--period-bg))] border-[hsl(var(--period-border))]" 
+            : "bg-white dark:bg-white border-border"
+        }`}
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-center gap-4">
+            <div className={`p-2.5 rounded-xl backdrop-blur-sm ${isInPeriod ? "bg-white/20" : "bg-primary/10"}`}>
               <img 
                 src={isInPeriod ? salatrackLogoPink : salatrackLogo} 
                 alt="Salatracker" 
-                className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg" 
+                className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-lg" 
               />
             </div>
-            <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold ${
+            <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${
               isInPeriod 
                 ? "text-[hsl(var(--period-text))] drop-shadow-lg" 
                 : "bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent"
@@ -286,7 +293,13 @@ const Index = () => {
               {t.appTitle}
             </h1>
           </div>
-          
+        </div>
+      </div>
+
+      {/* Scrollable Content Area */}
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8" style={{ paddingTop: 'calc(80px + env(safe-area-inset-top))' }}>
+        {/* Date Picker and Location (Prayers Tab Only) */}
+        <div className="animate-fade-in">
           {activeTab === "prayers" && (
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base">
               <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
