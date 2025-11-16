@@ -269,16 +269,16 @@ const Index = () => {
     <div className={`min-h-screen pb-20 transition-colors duration-500 ${isInPeriod ? "period-mode bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
       {/* Fixed Header with Logo */}
       <div 
-        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-md bg-opacity-95 border-b transition-colors duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-500 ${
           isInPeriod 
-            ? "bg-[hsl(var(--period-bg))] border-[hsl(var(--period-border))]" 
-            : "bg-white dark:bg-white border-border"
+            ? "bg-[hsl(var(--period-bg))]" 
+            : "bg-background"
         }`}
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-center gap-4">
-            <div className={`p-2.5 rounded-xl backdrop-blur-sm ${isInPeriod ? "bg-white/20" : "bg-primary/10"}`}>
+            <div className={`p-2.5 rounded-xl ${isInPeriod ? "bg-white/20" : "bg-primary/10"}`}>
               <img 
                 src={isInPeriod ? salatrackLogoPink : salatrackLogo} 
                 alt="Salatracker" 
@@ -297,7 +297,7 @@ const Index = () => {
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8" style={{ paddingTop: 'calc(80px + env(safe-area-inset-top))' }}>
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8" style={{ paddingTop: 'calc(96px + env(safe-area-inset-top))' }}>
         {/* Date Picker and Location (Prayers Tab Only) */}
         <div className="animate-fade-in">
           {activeTab === "prayers" && (
