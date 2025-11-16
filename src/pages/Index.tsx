@@ -292,8 +292,13 @@ const Index = () => {
         <div className="space-y-6">
           {activeTab === "dashboard" && (
             <div className="space-y-6 animate-fade-in">
-              {/* Hadith de la semaine */}
-              <WeeklyHadith />
+              {/* Hadith du jour */}
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
+                  Hadith du jour
+                </h2>
+                <WeeklyHadith />
+              </div>
               
               <WeeklyStats 
                 stats={stats} 

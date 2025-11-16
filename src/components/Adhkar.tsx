@@ -257,7 +257,36 @@ export const Adhkar = () => {
     data[activeTab] = Array.from(newCompleted);
     localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
 
+    toast.success(language === "fr" ? "Adhkar complété!" : "Adhkar completed!");
     setDialogOpen(false);
+  };
+
+  const undoComplete = () => {
+    if (!selectedDhikr) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    const newCompleted = activeTab === "morning" 
+      ? new Set([...completedMorning].filter(id => id !== selectedDhikr.id))
+      : new Set([...completedEvening].filter(id => id !== selectedDhikr.id));
+
+    if (activeTab === "morning") {
+      setCompletedMorning(newCompleted);
+    } else {
+      setCompletedEvening(newCompleted);
+    }
+
+    const stored = localStorage.getItem(`adhkar-${today}`);
+    const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
+    data[activeTab] = Array.from(newCompleted);
+    localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
+
+    toast.info(language === "fr" ? "Adhkar marqué comme non complété" : "Adhkar marked as incomplete");
+  };
+
+  const isCompleted = (dhikrId: string) => {
+    return activeTab === "morning" 
+      ? completedMorning.has(dhikrId)
+      : completedEvening.has(dhikrId);
   };
 
   const nextSentence = () => {
@@ -529,12 +558,16 @@ export const Adhkar = () => {
 
               {currentSentence === selectedDhikr.sentences.length - 1 && (
                 <Button 
-                  onClick={markAsComplete} 
+                  onClick={isCompleted(selectedDhikr.id) ? undoComplete : markAsComplete}
+                  variant={isCompleted(selectedDhikr.id) ? "outline" : "default"}
                   className="w-full"
                   size="lg"
                 >
                   <Check className="w-4 h-4 mr-2" />
-                  {language === "fr" ? "Marquer comme terminé" : "Mark as completed"}
+                  {isCompleted(selectedDhikr.id)
+                    ? (language === "fr" ? "Annuler la complétion" : "Undo completion")
+                    : (language === "fr" ? "Marquer comme terminé" : "Mark as completed")
+                  }
                 </Button>
               )}
             </div>
