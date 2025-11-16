@@ -137,8 +137,8 @@ const Auth = () => {
     
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(emailResult.data, {
-        redirectTo: `${window.location.origin}/auth`,
+      const { error } = await supabase.functions.invoke("send-reset-password", {
+        body: { email: emailResult.data },
       });
       
       if (error) throw error;
