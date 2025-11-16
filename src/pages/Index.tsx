@@ -19,6 +19,7 @@ import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
 import { useNativeNotifications } from "@/hooks/useNativeNotifications";
 import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useLocationSettings } from "@/hooks/useLocationSettings";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,7 +44,8 @@ const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [userGender, setUserGender] = useState<string | null>(null);
-  const { prayerTimes, loading } = usePrayerTimes();
+  const { settings: locationSettings } = useLocationSettings();
+  const { prayerTimes, loading, locationName, isManualMode } = usePrayerTimes({ locationSettings });
   const { updatePrayerStatus, deletePrayerStatus, getPrayerStatus, getStats, getCustomStats, loading: dataLoading } = usePrayerTrackingSync();
   const { toggleDhikr, getDhikrStatus } = useDhikrTrackingSync();
   const { isInPeriod } = usePeriodMode();
@@ -327,7 +329,12 @@ const Index = () => {
               </Popover>
               <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
                 <MapPin className="w-4 h-4 text-primary" />
-                <span className="font-medium">{prayerTimes?.location}</span>
+                <span className="font-medium">
+                  {locationName}
+                  {isManualMode && (
+                    <span className="ml-2 text-xs text-primary">(manuel)</span>
+                  )}
+                </span>
               </div>
             </div>
           )}

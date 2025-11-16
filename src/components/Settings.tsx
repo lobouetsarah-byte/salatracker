@@ -7,6 +7,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { SettingsAccount } from "./SettingsAccount";
 import { Link } from "react-router-dom";
 import { usePeriodMode } from "@/hooks/usePeriodMode";
+import { LocationSettings } from "./LocationSettings";
 
 interface SettingsProps {
   settings: NotificationSettings;
@@ -70,6 +71,9 @@ export const Settings = ({ settings, onUpdateSettings, onLogout, userGender }: S
           </CardContent>
         </Card>
       )}
+
+      {/* Location Settings */}
+      <LocationSettings />
 
       {/* Notification Settings */}
       <Card className="shadow-lg border-primary/10 hover:shadow-xl transition-shadow duration-300">
