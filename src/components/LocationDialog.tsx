@@ -22,11 +22,11 @@ interface LocationDialogProps {
 export const LocationDialog = ({ open, onOpenChange }: LocationDialogProps) => {
   const { settings, setAutoMode, setManualMode, isManualMode } = useLocationSettings();
   const [city, setCity] = useState(settings.manualLocation?.city || "");
-  const [country, setCountry] = useState(settings.manualLocation?.country || "");
   const [latitude, setLatitude] = useState(settings.manualLocation?.latitude?.toString() || "");
   const [longitude, setLongitude] = useState(settings.manualLocation?.longitude?.toString() || "");
   const [useCoordinates, setUseCoordinates] = useState(false);
   const [localManualMode, setLocalManualMode] = useState(isManualMode);
+  const DEFAULT_COUNTRY = "France";
 
   const handleToggleMode = (checked: boolean) => {
     setLocalManualMode(checked);
@@ -55,13 +55,13 @@ export const LocationDialog = ({ open, onOpenChange }: LocationDialogProps) => {
       setManualMode({ latitude: lat, longitude: lon });
       toast.success("Localisation manuelle enregistrée");
     } else {
-      if (!city.trim() || !country.trim()) {
-        toast.error("Veuillez entrer la ville et le pays");
+      if (!city.trim()) {
+        toast.error("Veuillez entrer une ville");
         return;
       }
 
-      setManualMode({ city: city.trim(), country: country.trim() });
-      toast.success(`Localisation enregistrée: ${city}, ${country}`);
+      setManualMode({ city: city.trim(), country: DEFAULT_COUNTRY });
+      toast.success(`Localisation enregistrée: ${city}, ${DEFAULT_COUNTRY}`);
     }
     
     onOpenChange(false);
@@ -135,26 +135,15 @@ export const LocationDialog = ({ open, onOpenChange }: LocationDialogProps) => {
                   </div>
                 </>
               ) : (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="city">Ville</Label>
-                    <Input
-                      id="city"
-                      placeholder="ex: Paris"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="country">Pays</Label>
-                    <Input
-                      id="country"
-                      placeholder="ex: France"
-                      value={country}
-                      onChange={(e) => setCountry(e.target.value)}
-                    />
-                  </div>
-                </>
+                <div className="space-y-2">
+                  <Label htmlFor="city">Ville en France</Label>
+                  <Input
+                    id="city"
+                    placeholder="ex: Paris, Lyon, Marseille..."
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                </div>
               )}
 
               <Button onClick={handleSaveManualLocation} className="w-full">
