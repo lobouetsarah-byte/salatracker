@@ -46,10 +46,10 @@ const Auth = () => {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (user && !isResettingPassword) {
       navigate("/");
     }
-  }, [user, navigate]);
+  }, [user, navigate, isResettingPassword]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
