@@ -102,25 +102,24 @@ const handler = async (req: Request): Promise<Response> => {
                   text-align: center;
                   margin-bottom: 48px;
                 }
-                .logo-emoji {
-                  font-size: 64px;
-                  line-height: 1;
-                  display: block;
-                  margin-bottom: 8px;
+                .logo img {
+                  width: 80px;
+                  height: 80px;
+                  display: inline-block;
                 }
                 .content {
                   text-align: center;
                   padding: 0 20px;
                 }
                 h1 {
-                  color: #1a1a1a;
+                  color: #000000;
                   font-size: 28px;
                   font-weight: 600;
                   margin-bottom: 16px;
                   letter-spacing: -0.5px;
                 }
                 p {
-                  color: #525252;
+                  color: #000000;
                   font-size: 16px;
                   margin-bottom: 16px;
                   line-height: 1.7;
@@ -130,20 +129,21 @@ const handler = async (req: Request): Promise<Response> => {
                 }
                 .button {
                   display: inline-block;
-                  background-color: #8B5CF6;
-                  color: #ffffff;
+                  background-color: #ffffff;
+                  color: #000000;
                   text-decoration: none;
                   padding: 16px 48px;
                   border-radius: 8px;
                   font-weight: 600;
                   font-size: 16px;
-                  transition: background-color 0.2s ease;
+                  border: 2px solid #000000;
+                  transition: all 0.2s ease;
                 }
                 .button:hover {
-                  background-color: #7C3AED;
+                  background-color: #f5f5f5;
                 }
                 .note {
-                  color: #737373;
+                  color: #000000;
                   font-size: 14px;
                   margin-top: 32px;
                   line-height: 1.6;
@@ -155,7 +155,7 @@ const handler = async (req: Request): Promise<Response> => {
                   border-top: 1px solid #e5e5e5;
                 }
                 .footer p {
-                  color: #a3a3a3;
+                  color: #000000;
                   font-size: 13px;
                   margin-bottom: 8px;
                 }
@@ -174,8 +174,9 @@ const handler = async (req: Request): Promise<Response> => {
                     padding: 18px 32px;
                     font-size: 17px;
                   }
-                  .logo-emoji {
-                    font-size: 56px;
+                  .logo img {
+                    width: 70px;
+                    height: 70px;
                   }
                 }
               </style>
@@ -184,7 +185,7 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="email-container">
                 <!-- Logo -->
                 <div class="logo">
-                  <span class="logo-emoji">🕌</span>
+                  <img src="https://salatracker.lovable.app/salatrack-logo.png" alt="Salatracker Logo" />
                 </div>
                 
                 <!-- Content -->
