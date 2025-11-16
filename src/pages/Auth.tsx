@@ -13,8 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
 import { z } from "zod";
 
-const emailSchema = z.string().trim().email("Email invalide").max(255, "Email trop long");
-const passwordSchema = z.string().min(8, "Minimum 8 caractères").max(72, "Maximum 72 caractères");
+const emailSchema = z.string().trim().email("Adresse email invalide").max(255, "L'email est trop long");
+const passwordSchema = z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères").max(72, "Le mot de passe est trop long (maximum 72 caractères)");
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ const Auth = () => {
       const remainingSeconds = Math.ceil((cooldownUntil.getTime() - Date.now()) / 1000);
       toast({
         title: "Trop de tentatives",
-        description: `Veuillez patienter ${remainingSeconds} secondes`,
+        description: `Veuillez patienter ${remainingSeconds} secondes avant de réessayer`,
         variant: "destructive",
       });
       return;
@@ -57,7 +57,7 @@ const Auth = () => {
     
     if (!emailResult.success) {
       toast({
-        title: "Email invalide",
+        title: "Adresse email invalide",
         description: emailResult.error.errors[0].message,
         variant: "destructive",
       });
@@ -91,7 +91,7 @@ const Auth = () => {
       } else {
         toast({
           title: "Erreur de connexion",
-          description: "Email ou mot de passe incorrect",
+          description: "Adresse email ou mot de passe incorrect. Veuillez réessayer.",
           variant: "destructive",
         });
       }
@@ -114,7 +114,7 @@ const Auth = () => {
     const emailResult = emailSchema.safeParse(resetEmail);
     if (!emailResult.success) {
       toast({
-        title: "Email invalide",
+        title: "Adresse email invalide",
         description: emailResult.error.errors[0].message,
         variant: "destructive",
       });

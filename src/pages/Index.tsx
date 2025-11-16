@@ -228,10 +228,18 @@ const Index = () => {
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in">
           <div className="flex items-center justify-center gap-4 mb-2">
-            <div className="bg-primary/10 p-3 rounded-2xl backdrop-blur-sm">
-              <img src={salatrackLogo} alt="Salatracker" className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg" />
+            <div className={`p-3 rounded-2xl backdrop-blur-sm ${isInPeriod ? "bg-white/20" : "bg-primary/10"}`}>
+              <img 
+                src={salatrackLogo} 
+                alt="Salatracker" 
+                className={`w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg ${isInPeriod ? "brightness-0 invert" : ""}`} 
+              />
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent">
+            <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold ${
+              isInPeriod 
+                ? "text-white drop-shadow-lg" 
+                : "bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent"
+            }`}>
               {t.appTitle}
             </h1>
           </div>
