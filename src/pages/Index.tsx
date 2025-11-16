@@ -20,6 +20,7 @@ import { useNativeNotifications } from "@/hooks/useNativeNotifications";
 import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
 import { MapPin, Calendar as CalendarIcon, BarChart3, Clock, BookOpen, Settings as SettingsIcon, Heart } from "lucide-react";
@@ -38,6 +39,7 @@ import { PrayerStatus } from "@/hooks/usePrayerTracking";
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
+  const { toast } = useToast();
   const [showSplash, setShowSplash] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [userGender, setUserGender] = useState<string | null>(null);
@@ -159,18 +161,58 @@ const Index = () => {
   // Enhanced prayer status update with badge checking
   const handlePrayerStatusUpdate = async (date: string, prayerName: string, status: PrayerStatus) => {
     await updatePrayerStatus(date, prayerName, status);
+    
+    // Show immediate success message for on-time prayers
+    if (status === "on-time" && date === today) {
+      toast({
+        title: "🕌 Prière à l'heure !",
+        description: `${prayerName} accomplie à l'heure. Continuez ainsi !`,
+        duration: 4000,
+      });
+    }
+    
     await checkBadgesRealTime();
   };
 
   // Enhanced dhikr toggle with badge checking
   const handleDhikrToggle = async (date: string, prayerName: string) => {
+    const wasDone = getDhikrStatus(date, prayerName);
     await toggleDhikr(date, prayerName);
+    
+    // Show success message when completing dhikr (not when unchecking)
+    if (!wasDone && date === today) {
+      toast({
+        title: "✨ Dhikr accompli !",
+        description: `Dhikr après ${prayerName} complété`,
+        duration: 3000,
+      });
+    }
+    
     await checkBadgesRealTime();
   };
 
   // Enhanced period dhikr change with badge checking
   const handlePeriodDhikrChange = async (date: string, prayerName: string, type: any) => {
+    const previousType = getDhikrForPrayer(date, prayerName);
     await setDhikrForPrayer(date, prayerName, type);
+    
+    // Show success message when adding a dhikr type (not when changing or removing)
+    if (!previousType && type && date === today) {
+      const dhikrNames: { [key: string]: string } = {
+        "quran": "📖 Lecture du Coran",
+        "dhikr": "🤲 Dhikr",
+        "dua": "🤲 Dou'a",
+        "charity": "💝 Aumône",
+        "islamic-learning": "📚 Apprentissage islamique"
+      };
+      
+      toast({
+        title: "🌸 Acte spirituel accompli !",
+        description: `${dhikrNames[type] || "Acte spirituel"} pour ${prayerName}`,
+        duration: 3000,
+      });
+    }
+    
     await checkBadgesRealTime();
   };
 
@@ -369,7 +411,7 @@ const Index = () => {
           )}
 
           {activeTab === "adhkar" && (
-            <Adhkar />
+            <Adhkar onCompletion={checkBadgesRealTime} />
           )}
 
           {activeTab === "settings" && (
