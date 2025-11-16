@@ -23,6 +23,7 @@ interface PrayerCardProps {
   isPeriodMode?: boolean;
   periodDhikrType?: DhikrType | null;
   onPeriodDhikrChange?: (type: DhikrType | null) => void;
+  selectedDate?: string; // Add to check if it's today
 }
 
 export const PrayerCard = ({
@@ -38,12 +39,34 @@ export const PrayerCard = ({
   isPeriodMode = false,
   periodDhikrType = null,
   onPeriodDhikrChange,
+  selectedDate,
 }: PrayerCardProps) => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loginPromptOpen, setLoginPromptOpen] = useState(false);
+
+  // Check if prayer time has arrived (Adhan notification time)
+  const isPrayerTimeArrived = () => {
+    const today = new Date().toISOString().split("T")[0];
+    
+    // If selected date is in the past, prayer time has arrived
+    if (selectedDate && selectedDate < today) return true;
+    
+    // If selected date is in the future, prayer time hasn't arrived yet
+    if (selectedDate && selectedDate > today) return false;
+    
+    // If it's today, check the actual time
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const [hours, minutes] = time.split(":").map(Number);
+    const prayerMinutes = hours * 60 + minutes;
+    
+    return currentMinutes >= prayerMinutes;
+  };
+
+  const canMarkCompleted = isPrayerTimeArrived();
 
   const getStatusColor = () => {
     if (status === "pending") return "bg-muted hover:bg-muted/80";
@@ -80,6 +103,10 @@ export const PrayerCard = ({
   const handleStatusDialogOpen = () => {
     if (!user) {
       setLoginPromptOpen(true);
+      return;
+    }
+    if (!canMarkCompleted) {
+      // Don't open dialog if prayer time hasn't arrived
       return;
     }
     setDialogOpen(true);
@@ -123,17 +150,30 @@ export const PrayerCard = ({
             {isPeriodMode && isPast && (
               <div className="space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-medium text-[hsl(var(--period-text))]/80">Action spirituelle :</p>
+                  <p className="text-xs font-medium text-[hsl(var(--period-text))]/80">
+                    Action spirituelle :
+                  </p>
                   {periodDhikrType && (
                     <Badge className="text-xs bg-white text-[hsl(var(--period-text))] border-[hsl(var(--period-border))]">
                       ✓ Complété
                     </Badge>
                   )}
                 </div>
+                
+                {!canMarkCompleted && (
+                  <div className="p-3 rounded-lg bg-muted/30 border border-muted">
+                    <p className="text-xs text-muted-foreground flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Disponible après l'Adhan à {time}
+                    </p>
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-3 gap-2">
                   <Button
                     size="sm"
                     variant="outline"
+                    disabled={!canMarkCompleted}
                     onClick={() => {
                       if (!user) {
                         setLoginPromptOpen(true);
@@ -142,9 +182,11 @@ export const PrayerCard = ({
                       onPeriodDhikrChange?.(periodDhikrType === "dhikr" ? null : "dhikr");
                     }}
                     className={`relative overflow-hidden transition-all duration-300 ${
-                      periodDhikrType === "dhikr" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
+                      !canMarkCompleted
+                        ? "opacity-50 cursor-not-allowed"
+                        : periodDhikrType === "dhikr" 
+                          ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
+                          : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
                     }`}
                   >
                     <Heart className={`w-4 h-4 mr-1 ${periodDhikrType === "dhikr" ? "animate-pulse" : ""}`} />
@@ -157,6 +199,7 @@ export const PrayerCard = ({
                   <Button
                     size="sm"
                     variant="outline"
+                    disabled={!canMarkCompleted}
                     onClick={() => {
                       if (!user) {
                         setLoginPromptOpen(true);
@@ -165,9 +208,11 @@ export const PrayerCard = ({
                       onPeriodDhikrChange?.(periodDhikrType === "invocation" ? null : "invocation");
                     }}
                     className={`relative overflow-hidden transition-all duration-300 ${
-                      periodDhikrType === "invocation" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
+                      !canMarkCompleted
+                        ? "opacity-50 cursor-not-allowed"
+                        : periodDhikrType === "invocation" 
+                          ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
+                          : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
                     }`}
                   >
                     <BookHeart className={`w-4 h-4 mr-1 ${periodDhikrType === "invocation" ? "animate-pulse" : ""}`} />
@@ -180,6 +225,7 @@ export const PrayerCard = ({
                   <Button
                     size="sm"
                     variant="outline"
+                    disabled={!canMarkCompleted}
                     onClick={() => {
                       if (!user) {
                         setLoginPromptOpen(true);
@@ -188,9 +234,11 @@ export const PrayerCard = ({
                       onPeriodDhikrChange?.(periodDhikrType === "remembrance" ? null : "remembrance");
                     }}
                     className={`relative overflow-hidden transition-all duration-300 ${
-                      periodDhikrType === "remembrance" 
-                        ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
-                        : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
+                      !canMarkCompleted
+                        ? "opacity-50 cursor-not-allowed"
+                        : periodDhikrType === "remembrance" 
+                          ? "bg-[hsl(var(--period-button))] hover:bg-[hsl(var(--period-button-hover))] text-white border-[hsl(var(--period-button))] shadow-md scale-105" 
+                          : "border-[hsl(var(--period-border))] text-[hsl(var(--period-text))] bg-white hover:bg-[hsl(var(--period-accent))] hover:border-[hsl(var(--period-button))]"
                     }`}
                   >
                     <Sparkles className={`w-4 h-4 mr-1 ${periodDhikrType === "remembrance" ? "animate-pulse" : ""}`} />
@@ -205,46 +253,59 @@ export const PrayerCard = ({
             
             {/* Normal Mode - Enhanced Dhikr Toggle */}
             {!isPeriodMode && status !== "pending" && (
-              <div 
-                onClick={handleDhikrToggle}
-                className={`group relative p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 ${
-                  dhikrDone 
-                    ? "bg-gradient-to-br from-success/10 to-success/20 border-success/40 hover:border-success/60 shadow-md" 
-                    : "bg-gradient-to-br from-muted/20 to-muted/30 border-border/40 hover:border-primary/40 hover:shadow-md"
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  {/* Custom Checkbox */}
-                  <div className={`relative flex items-center justify-center w-7 h-7 rounded-lg transition-all duration-300 ${
-                    dhikrDone 
-                      ? "bg-success scale-100" 
-                      : "bg-muted border-2 border-muted-foreground/40 group-hover:border-primary/60"
-                  }`}>
-                    {dhikrDone && (
-                      <CheckCircle2 className="w-5 h-5 text-white animate-scale-in" />
-                    )}
-                  </div>
-                  
-                  {/* Label */}
-                  <div className="flex-1">
-                    <p className={`text-sm sm:text-base font-semibold transition-colors duration-300 ${
-                      dhikrDone ? "text-success" : "text-foreground group-hover:text-primary"
+              <div className="relative">
+                <div 
+                  onClick={canMarkCompleted ? handleDhikrToggle : undefined}
+                  className={`group relative p-4 rounded-xl transition-all duration-300 border-2 ${
+                    !canMarkCompleted 
+                      ? "opacity-50 cursor-not-allowed bg-muted/10 border-muted/30" 
+                      : dhikrDone 
+                        ? "cursor-pointer bg-gradient-to-br from-success/10 to-success/20 border-success/40 hover:border-success/60 shadow-md" 
+                        : "cursor-pointer bg-gradient-to-br from-muted/20 to-muted/30 border-border/40 hover:border-primary/40 hover:shadow-md"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Custom Checkbox */}
+                    <div className={`relative flex items-center justify-center w-7 h-7 rounded-lg transition-all duration-300 ${
+                      dhikrDone 
+                        ? "bg-success scale-100" 
+                        : "bg-muted border-2 border-muted-foreground/40 group-hover:border-primary/60"
                     }`}>
-                      {dhikrDone ? "✓ " + t.dhikrDone : t.dhikrPending}
-                    </p>
-                    {!dhikrDone && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Cliquez pour marquer comme fait
+                      {dhikrDone && (
+                        <CheckCircle2 className="w-5 h-5 text-white animate-scale-in" />
+                      )}
+                    </div>
+                    
+                    {/* Label */}
+                    <div className="flex-1">
+                      <p className={`text-sm sm:text-base font-semibold transition-colors duration-300 ${
+                        dhikrDone ? "text-success" : "text-foreground group-hover:text-primary"
+                      }`}>
+                        {dhikrDone ? "✓ " + t.dhikrDone : t.dhikrPending}
                       </p>
+                      {!dhikrDone && !canMarkCompleted && (
+                        <p className="text-xs text-destructive/70 mt-0.5">
+                          🕐 Disponible après l'Adhan ({time})
+                        </p>
+                      )}
+                      {!dhikrDone && canMarkCompleted && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Cliquez pour marquer comme fait
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Icon indicator */}
+                    {dhikrDone ? (
+                      <Sparkles className="w-5 h-5 text-success animate-pulse" />
+                    ) : (
+                      <Heart className={`w-5 h-5 transition-colors ${
+                        canMarkCompleted 
+                          ? "text-muted-foreground group-hover:text-primary" 
+                          : "text-muted-foreground/40"
+                      }`} />
                     )}
                   </div>
-                  
-                  {/* Icon indicator */}
-                  {dhikrDone ? (
-                    <Sparkles className="w-5 h-5 text-success animate-pulse" />
-                  ) : (
-                    <Heart className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  )}
                 </div>
               </div>
             )}
@@ -252,11 +313,27 @@ export const PrayerCard = ({
 
           {/* Status color box - clickable (hidden in period mode) */}
           {!isPeriodMode && (
-            <div
-              onClick={handleStatusDialogOpen}
-              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 flex-shrink-0 cursor-pointer`}
-            >
-              {getStatusIcon()}
+            <div className="relative">
+              <div
+                onClick={handleStatusDialogOpen}
+                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${getStatusColor()} transition-all duration-300 flex items-center justify-center shadow-lg flex-shrink-0 ${
+                  canMarkCompleted 
+                    ? "cursor-pointer hover:shadow-xl hover:scale-110 active:scale-95" 
+                    : "opacity-50 cursor-not-allowed"
+                }`}
+              >
+                {getStatusIcon()}
+                {!canMarkCompleted && status === "pending" && (
+                  <Clock className="w-5 h-5 text-muted-foreground" />
+                )}
+              </div>
+              {!canMarkCompleted && status === "pending" && (
+                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                  <p className="text-xs text-destructive/70 font-medium">
+                    Après {time}
+                  </p>
+                </div>
+              )}
             </div>
           )}
           
@@ -271,10 +348,21 @@ export const PrayerCard = ({
               {name} - {time}
             </DialogTitle>
           </DialogHeader>
+          
+          {!canMarkCompleted && (
+            <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 mb-4">
+              <p className="text-sm text-destructive flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Cette prière ne peut être marquée qu'après l'Adhan à {time}
+              </p>
+            </div>
+          )}
+          
           <div className="space-y-3 mt-4">
             <Button
               onClick={() => handleStatusClick("on-time")}
-              className="w-full bg-success hover:bg-success/90 text-success-foreground"
+              disabled={!canMarkCompleted}
+              className="w-full bg-success hover:bg-success/90 text-success-foreground disabled:opacity-50 disabled:cursor-not-allowed"
               size="lg"
             >
               <CheckCircle2 className="w-5 h-5 mr-2" />
@@ -282,7 +370,8 @@ export const PrayerCard = ({
             </Button>
             <Button
               onClick={() => handleStatusClick("late")}
-              className="w-full bg-warning hover:bg-warning/90 text-warning-foreground"
+              disabled={!canMarkCompleted}
+              className="w-full bg-warning hover:bg-warning/90 text-warning-foreground disabled:opacity-50 disabled:cursor-not-allowed"
               size="lg"
             >
               <Clock className="w-5 h-5 mr-2" />
@@ -290,7 +379,8 @@ export const PrayerCard = ({
             </Button>
             <Button
               onClick={() => handleStatusClick("missed")}
-              className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+              disabled={!canMarkCompleted}
+              className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground disabled:opacity-50 disabled:cursor-not-allowed"
               size="lg"
             >
               <XCircle className="w-5 h-5 mr-2" />

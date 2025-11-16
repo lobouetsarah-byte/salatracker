@@ -404,6 +404,7 @@ const Index = () => {
                     isPeriodMode={isInPeriod}
                     periodDhikrType={getDhikrForPrayer(selectedDateString, prayer.name)}
                     onPeriodDhikrChange={(type) => handlePeriodDhikrChange(selectedDateString, prayer.name, type)}
+                    selectedDate={selectedDateString}
                   />
                 </div>
               ))}
