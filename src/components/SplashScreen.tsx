@@ -13,7 +13,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   // Check period mode status
   useEffect(() => {
     const checkPeriodMode = () => {
-      const periodMode = localStorage.getItem("period-mode") === "true";
+      const periodMode = localStorage.getItem("periodMode") === "true";
       setIsInPeriod(periodMode);
     };
     
