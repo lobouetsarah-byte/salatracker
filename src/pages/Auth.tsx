@@ -147,8 +147,8 @@ const Auth = () => {
       if (error) throw error;
       
       toast({
-        title: t.checkEmail,
-        description: t.resetEmailSent,
+        title: "📧 Email envoyé",
+        description: "Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques instants.",
       });
       setShowForgotPassword(false);
       setResetEmail("");
@@ -195,15 +195,20 @@ const Auth = () => {
       if (error) throw error;
       
       toast({
-        title: "Succès",
-        description: "Votre mot de passe a été mis à jour",
+        title: "✅ Succès",
+        description: "Votre mot de passe a été mis à jour avec succès. Redirection...",
       });
       
-      // Clear the hash and redirect to login
-      window.history.replaceState(null, '', '/auth');
-      setIsResettingPassword(false);
+      // Clear form and hash
       setNewPassword("");
       setConfirmPassword("");
+      window.history.replaceState(null, '', '/auth');
+      setIsResettingPassword(false);
+      
+      // Auto-redirect to home after 2 seconds
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (error: any) {
       toast({
         title: t.errorOccurred,
@@ -234,8 +239,10 @@ const Auth = () => {
                   <KeyRound className="w-12 h-12 text-primary" />
                 </div>
                 <div className="text-center mb-6">
-                  <h3 className="text-lg font-semibold mb-2">Nouveau mot de passe</h3>
-                  <p className="text-sm text-muted-foreground">Entrez votre nouveau mot de passe</p>
+                  <h3 className="text-lg font-semibold mb-2">Créer un nouveau mot de passe</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Choisissez un mot de passe fort avec au moins 8 caractères
+                  </p>
                 </div>
                 <form onSubmit={handleUpdatePassword} className="space-y-4">
                   <div className="space-y-2">
@@ -243,25 +250,41 @@ const Auth = () => {
                     <Input
                       id="new-password"
                       type="password"
-                      placeholder="••••••••"
+                      placeholder="Minimum 8 caractères"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
+                      disabled={loading}
                     />
+                    {newPassword && newPassword.length < 8 && (
+                      <p className="text-xs text-destructive">
+                        Le mot de passe doit contenir au moins 8 caractères
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
                     <Input
                       id="confirm-password"
                       type="password"
-                      placeholder="••••••••"
+                      placeholder="Retapez votre mot de passe"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
+                      disabled={loading}
                     />
+                    {confirmPassword && newPassword !== confirmPassword && (
+                      <p className="text-xs text-destructive">
+                        Les mots de passe ne correspondent pas
+                      </p>
+                    )}
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "..." : "Mettre à jour le mot de passe"}
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={loading || newPassword.length < 8 || newPassword !== confirmPassword}
+                  >
+                    {loading ? "⏳ Mise à jour en cours..." : "✓ Confirmer le nouveau mot de passe"}
                   </Button>
                 </form>
               </div>
@@ -276,20 +299,26 @@ const Auth = () => {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   {t.backToLogin}
                 </Button>
+                <div className="text-center mb-4">
+                  <p className="text-sm text-muted-foreground">
+                    Entrez votre adresse email pour recevoir un lien de réinitialisation
+                  </p>
+                </div>
                 <form onSubmit={handleForgotPassword} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="reset-email">{t.email}</Label>
                     <Input
                       id="reset-email"
                       type="email"
-                      placeholder={t.email}
+                      placeholder="votre@email.com"
                       value={resetEmail}
                       onChange={(e) => setResetEmail(e.target.value)}
                       required
+                      disabled={loading}
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "..." : t.sendResetLink}
+                  <Button type="submit" className="w-full" disabled={loading || !resetEmail}>
+                    {loading ? "📧 Envoi en cours..." : "📧 Envoyer le lien de réinitialisation"}
                   </Button>
                 </form>
               </div>
