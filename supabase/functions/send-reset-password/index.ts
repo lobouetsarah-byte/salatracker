@@ -80,141 +80,91 @@ const handler = async (req: Request): Promise<Response> => {
             <head>
               <meta charset="utf-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                * {
-                  margin: 0;
-                  padding: 0;
-                  box-sizing: border-box;
-                }
-                body {
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-                  background-color: #ffffff;
-                  line-height: 1.6;
-                  -webkit-font-smoothing: antialiased;
-                  -moz-osx-font-smoothing: grayscale;
-                }
-                .email-container {
-                  max-width: 560px;
-                  margin: 0 auto;
-                  padding: 60px 20px;
-                }
-                .logo {
-                  text-align: center;
-                  margin-bottom: 48px;
-                }
-                .logo img {
-                  width: 80px;
-                  height: 80px;
-                  display: inline-block;
-                }
-                .content {
-                  text-align: center;
-                  padding: 0 20px;
-                }
-                h1 {
-                  color: #000000;
-                  font-size: 28px;
-                  font-weight: 600;
-                  margin-bottom: 16px;
-                  letter-spacing: -0.5px;
-                }
-                p {
-                  color: #000000;
-                  font-size: 16px;
-                  margin-bottom: 16px;
-                  line-height: 1.7;
-                }
-                .button-container {
-                  margin: 40px 0;
-                }
-                .button {
-                  display: inline-block;
-                  background-color: #ffffff;
-                  color: #000000;
-                  text-decoration: none;
-                  padding: 16px 48px;
-                  border-radius: 8px;
-                  font-weight: 600;
-                  font-size: 16px;
-                  border: 2px solid #000000;
-                  transition: all 0.2s ease;
-                }
-                .button:hover {
-                  background-color: #f5f5f5;
-                }
-                .note {
-                  color: #000000;
-                  font-size: 14px;
-                  margin-top: 32px;
-                  line-height: 1.6;
-                }
-                .footer {
-                  text-align: center;
-                  margin-top: 48px;
-                  padding-top: 32px;
-                  border-top: 1px solid #e5e5e5;
-                }
-                .footer p {
-                  color: #000000;
-                  font-size: 13px;
-                  margin-bottom: 8px;
-                }
-                
-                /* Mobile optimization */
-                @media only screen and (max-width: 600px) {
-                  .email-container {
-                    padding: 40px 16px;
-                  }
-                  h1 {
-                    font-size: 24px;
-                  }
-                  .button {
-                    display: block;
-                    width: 100%;
-                    padding: 18px 32px;
-                    font-size: 17px;
-                  }
-                  .logo img {
-                    width: 70px;
-                    height: 70px;
-                  }
-                }
+              <meta http-equiv="X-UA-Compatible" content="IE=edge">
+              <title>Réinitialisation de mot de passe</title>
+              <!--[if mso]>
+              <style type="text/css">
+                body, table, td {font-family: Arial, Helvetica, sans-serif !important;}
               </style>
+              <![endif]-->
             </head>
-            <body>
-              <div class="email-container">
-                <!-- Logo -->
-                <div class="logo">
-                  <img src="https://salatracker.lovable.app/salatrack-logo.png" alt="Salatracker Logo" />
-                </div>
-                
-                <!-- Content -->
-                <div class="content">
-                  <h1>Réinitialisez votre mot de passe</h1>
-                  
-                  <p>
-                    Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe pour votre compte Salatracker.
-                  </p>
-                  
-                  <!-- CTA Button -->
-                  <div class="button-container">
-                    <a href="${data.properties.action_link}" class="button">
-                      Réinitialiser le mot de passe
-                    </a>
-                  </div>
-                  
-                  <p class="note">
-                    Ce lien expirera dans 1 heure.<br>
-                    Si vous n'avez pas demandé cette réinitialisation, ignorez simplement cet email.
-                  </p>
-                </div>
-                
-                <!-- Footer -->
-                <div class="footer">
-                  <p>Salatracker</p>
-                  <p>Votre compagnon pour les prières quotidiennes</p>
-                </div>
-              </div>
+            <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #ffffff;">
+                <tr>
+                  <td align="center" style="padding: 60px 20px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 560px;">
+                      
+                      <!-- Logo -->
+                      <tr>
+                        <td align="center" style="padding-bottom: 48px;">
+                          <img src="${req.headers.get('origin') || 'https://salatracker.lovable.app'}/salatrack-logo.png" alt="Salatracker" width="80" height="80" style="display: block; width: 80px; height: 80px; border: 0;" />
+                        </td>
+                      </tr>
+                      
+                      <!-- Content -->
+                      <tr>
+                        <td style="padding: 0 20px;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                            
+                            <!-- Heading -->
+                            <tr>
+                              <td align="center" style="padding-bottom: 16px;">
+                                <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 600; line-height: 1.3; letter-spacing: -0.5px;">Réinitialisez votre mot de passe</h1>
+                              </td>
+                            </tr>
+                            
+                            <!-- Body Text -->
+                            <tr>
+                              <td align="center" style="padding-bottom: 16px;">
+                                <p style="margin: 0; color: #000000; font-size: 16px; line-height: 1.7;">Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe pour votre compte Salatracker.</p>
+                              </td>
+                            </tr>
+                            
+                            <!-- Button -->
+                            <tr>
+                              <td align="center" style="padding: 40px 0;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                  <tr>
+                                    <td align="center" style="border-radius: 8px; background-color: #ffffff; border: 2px solid #000000;">
+                                      <a href="${data.properties.action_link}" target="_blank" style="display: inline-block; padding: 16px 48px; color: #000000; text-decoration: none; font-weight: 600; font-size: 16px;">Réinitialiser le mot de passe</a>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            
+                            <!-- Note -->
+                            <tr>
+                              <td align="center" style="padding-top: 32px;">
+                                <p style="margin: 0; color: #000000; font-size: 14px; line-height: 1.6;">
+                                  Ce lien expirera dans 1 heure.<br/>
+                                  Si vous n'avez pas demandé cette réinitialisation, ignorez simplement cet email.
+                                </p>
+                              </td>
+                            </tr>
+                            
+                          </table>
+                        </td>
+                      </tr>
+                      
+                      <!-- Footer -->
+                      <tr>
+                        <td style="padding-top: 48px; border-top: 1px solid #e5e5e5;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tr>
+                              <td align="center" style="padding: 32px 20px 0;">
+                                <p style="margin: 0 0 8px 0; color: #000000; font-size: 13px;">Salatracker</p>
+                                <p style="margin: 0; color: #000000; font-size: 13px;">Votre compagnon pour les prières quotidiennes</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      
+                    </table>
+                  </td>
+                </tr>
+              </table>
             </body>
           </html>
         `,
