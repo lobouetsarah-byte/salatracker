@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { SplashScreen } from "@/components/SplashScreen";
 import { PrayerCard } from "@/components/PrayerCard";
 import { WeeklyStats } from "@/components/WeeklyStats";
 import { Settings } from "@/components/Settings";
@@ -42,7 +41,6 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
   const { toast } = useToast();
-  const [showSplash, setShowSplash] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [userGender, setUserGender] = useState<string | null>(null);
   const { settings: locationSettings } = useLocationSettings();
@@ -84,18 +82,6 @@ const Index = () => {
     
     loadGender();
   }, [user]);
-
-  // Handle logout splash screen
-  useEffect(() => {
-    if (isLoggingOut && showSplash) {
-      const timer = setTimeout(() => {
-        setShowSplash(false);
-        setIsLoggingOut(false);
-        navigate("/auth");
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoggingOut, showSplash, navigate]);
 
   // Use native notifications on mobile, web notifications otherwise
   const isNative = Capacitor.isNativePlatform();
@@ -242,16 +228,7 @@ const Index = () => {
   const handleSignOut = async () => {
     setIsLoggingOut(true);
     await signOut();
-    setShowSplash(true);
   };
-
-  if (showSplash) {
-    return <SplashScreen onComplete={() => {
-      if (!isLoggingOut) {
-        setShowSplash(false);
-      }
-    }} />;
-  }
 
   if (loading || dataLoading) {
     return (
