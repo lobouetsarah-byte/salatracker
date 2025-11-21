@@ -20,22 +20,30 @@ const queryClient = new QueryClient();
 const AppContent = () => {
   const { loading } = useAuth();
   const location = useLocation();
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
   const [appReady, setAppReady] = useState(false);
+  const [hasShownSplash, setHasShownSplash] = useState(false);
 
   useEffect(() => {
-    if (!loading && location.pathname === "/") {
-      const timer = setTimeout(() => {
+    // Only show splash screen once on initial homepage load
+    if (!loading && location.pathname === "/" && !hasShownSplash) {
+      setShowSplash(true);
+      setHasShownSplash(true);
+
+      const readyTimer = setTimeout(() => {
         setAppReady(true);
-        setTimeout(() => setShowSplash(false), 500);
       }, 1000);
 
-      return () => clearTimeout(timer);
-    } else if (location.pathname !== "/") {
-      setShowSplash(false);
-      setAppReady(true);
+      const hideTimer = setTimeout(() => {
+        setShowSplash(false);
+      }, 1500);
+
+      return () => {
+        clearTimeout(readyTimer);
+        clearTimeout(hideTimer);
+      };
     }
-  }, [loading, location.pathname]);
+  }, [loading, location.pathname, hasShownSplash]);
 
   return (
     <>
