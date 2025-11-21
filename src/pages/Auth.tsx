@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserX, ArrowLeft, KeyRound } from "lucide-react";
+import { ArrowLeft, KeyRound } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { notify } from "@/lib/notifications";
 import { useLanguage } from "@/hooks/useLanguage";
 import { z } from "zod";
 
@@ -21,7 +20,6 @@ const Auth = () => {
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading, signIn } = useAuth();
   const { t } = useLanguage();
-  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,7 +30,6 @@ const Auth = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isResettingPassword, setIsResettingPassword] = useState(false);
-  const activeTab = searchParams.get("tab") || "login";
 
   // Check if user arrived from password reset email
   useEffect(() => {
@@ -53,61 +50,37 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Check cooldown
+
     if (cooldownUntil && new Date() < cooldownUntil) {
       const remainingSeconds = Math.ceil((cooldownUntil.getTime() - Date.now()) / 1000);
-      toast({
-        title: "Trop de tentatives",
-        description: `Veuillez patienter ${remainingSeconds} secondes avant de réessayer`,
-        variant: "destructive",
-      });
+      notify.auth.rateLimitExceeded(remainingSeconds);
       return;
     }
 
-    // Validate input
     const emailResult = emailSchema.safeParse(email);
     const passwordResult = passwordSchema.safeParse(password);
-    
+
     if (!emailResult.success) {
-      toast({
-        title: "Adresse email invalide",
-        description: emailResult.error.errors[0].message,
-        variant: "destructive",
-      });
+      notify.error("Adresse email invalide", emailResult.error.errors[0].message);
       return;
     }
     if (!passwordResult.success) {
-      toast({
-        title: "Mot de passe invalide",
-        description: passwordResult.error.errors[0].message,
-        variant: "destructive",
-      });
+      notify.error("Mot de passe invalide", passwordResult.error.errors[0].message);
       return;
     }
-    
+
     setLoading(true);
     const { error } = await signIn(emailResult.data, passwordResult.data);
     setLoading(false);
-    
+
     if (error) {
       const newAttempts = loginAttempts + 1;
       setLoginAttempts(newAttempts);
-      
+
       if (newAttempts >= 5) {
-        const cooldown = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+        const cooldown = new Date(Date.now() + 5 * 60 * 1000);
         setCooldownUntil(cooldown);
-        toast({
-          title: "Trop de tentatives échouées",
-          description: "Veuillez patienter 5 minutes avant de réessayer",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Erreur de connexion",
-          description: "Adresse email ou mot de passe incorrect. Veuillez réessayer.",
-          variant: "destructive",
-        });
+        notify.error("Trop de tentatives échouées", "Veuillez patienter 5 minutes avant de réessayer");
       }
     } else {
       setLoginAttempts(0);
@@ -123,41 +96,29 @@ const Auth = () => {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resetEmail) return;
-    
-    // Validate email
+
     const emailResult = emailSchema.safeParse(resetEmail);
     if (!emailResult.success) {
-      toast({
-        title: "Adresse email invalide",
-        description: emailResult.error.errors[0].message,
-        variant: "destructive",
-      });
+      notify.error("Adresse email invalide", emailResult.error.errors[0].message);
       return;
     }
-    
+
     setLoading(true);
     try {
       const { error } = await supabase.functions.invoke("send-reset-password", {
-        body: { 
+        body: {
           email: emailResult.data,
           redirectTo: `${window.location.origin}/auth`,
         },
       });
-      
+
       if (error) throw error;
-      
-      toast({
-        title: "📧 Email envoyé",
-        description: "Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques instants.",
-      });
+
+      notify.auth.resetPasswordEmailSent();
       setShowForgotPassword(false);
       setResetEmail("");
     } catch (error: any) {
-      toast({
-        title: t.errorOccurred,
-        description: error.message,
-        variant: "destructive",
-      });
+      notify.auth.resetPasswordEmailError(error.message);
     } finally {
       setLoading(false);
     }
@@ -165,56 +126,38 @@ const Auth = () => {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate passwords
+
     if (newPassword !== confirmPassword) {
-      toast({
-        title: "Erreur",
-        description: "Les mots de passe ne correspondent pas",
-        variant: "destructive",
-      });
+      notify.error("Erreur", "Les mots de passe ne correspondent pas");
       return;
     }
 
     const passwordResult = passwordSchema.safeParse(newPassword);
     if (!passwordResult.success) {
-      toast({
-        title: "Mot de passe invalide",
-        description: passwordResult.error.errors[0].message,
-        variant: "destructive",
-      });
+      notify.error("Mot de passe invalide", passwordResult.error.errors[0].message);
       return;
     }
-    
+
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({
         password: passwordResult.data
       });
-      
+
       if (error) throw error;
-      
-      toast({
-        title: "✅ Succès",
-        description: "Votre mot de passe a été mis à jour avec succès. Redirection...",
-      });
-      
-      // Clear form and hash
+
+      notify.auth.passwordUpdateSuccess();
+
       setNewPassword("");
       setConfirmPassword("");
       window.history.replaceState(null, '', '/auth');
       setIsResettingPassword(false);
-      
-      // Auto-redirect to home after 2 seconds
+
       setTimeout(() => {
         navigate("/");
       }, 2000);
     } catch (error: any) {
-      toast({
-        title: t.errorOccurred,
-        description: error.message,
-        variant: "destructive",
-      });
+      notify.auth.passwordUpdateError(error.message);
     } finally {
       setLoading(false);
     }

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
-import { useToast } from "@/hooks/use-toast";
+import { notify } from "@/lib/notifications";
 
 interface AuthContextType {
   user: User | null;
@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -47,22 +46,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
       });
-      
+
       if (error) {
-        toast({
-          title: "Erreur de connexion",
-          description: error.message,
-          variant: "destructive",
-        });
+        notify.auth.loginError(error.message);
+      } else {
+        notify.auth.loginSuccess();
       }
-      
+
       return { error };
     } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la connexion",
-        variant: "destructive",
-      });
+      notify.auth.loginError();
       return { error };
     }
   };
@@ -70,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
-      
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -78,64 +71,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           emailRedirectTo: redirectUrl,
         },
       });
-      
+
       if (error) {
-        toast({
-          title: "Erreur d'inscription",
-          description: error.message,
-          variant: "destructive",
-        });
+        notify.auth.signupError(error.message);
       } else {
-        toast({
-          title: "Compte créé !",
-          description: "Vous pouvez maintenant vous connecter",
-        });
+        notify.auth.signupSuccess();
       }
-      
+
       return { error };
     } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'inscription",
-        variant: "destructive",
-      });
+      notify.auth.signupError();
       return { error };
     }
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    toast({
-      title: "Déconnexion",
-      description: "Vous êtes maintenant déconnecté",
-    });
+    notify.auth.logoutSuccess();
   };
 
   const deleteAccount = async () => {
     if (!user) return;
-    
+
     try {
-      // Call the edge function to delete the user account
       const { error } = await supabase.functions.invoke('delete-user', {
         method: 'POST',
       });
-      
+
       if (error) throw error;
 
-      // Sign out the user
       await supabase.auth.signOut();
-      
-      toast({
-        title: "Compte supprimé",
-        description: "Votre compte a été supprimé avec succès",
-      });
+
+      notify.success("Compte supprimé", "Votre compte a été supprimé avec succès");
     } catch (error: any) {
       console.error('Error deleting account:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer le compte",
-        variant: "destructive",
-      });
+      notify.error("Erreur", "Impossible de supprimer le compte");
     }
   };
 

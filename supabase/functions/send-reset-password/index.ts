@@ -1,5 +1,4 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const resendApiKey = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -7,7 +6,8 @@ const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
 interface ResetPasswordRequest {
@@ -15,55 +15,81 @@ interface ResetPasswordRequest {
   redirectTo?: string;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+Deno.serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders, status: 200 });
+  }
+
+  if (req.method !== "POST") {
+    return new Response(
+      JSON.stringify({ error: "Method not allowed" }),
+      { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
 
   try {
     const { email, redirectTo }: ResetPasswordRequest = await req.json();
 
-    if (!email) {
+    if (!email || typeof email !== 'string') {
       return new Response(
-        JSON.stringify({ error: "Email is required" }),
+        JSON.stringify({ error: "Valid email is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Processing password reset request for:", email);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return new Response(
+        JSON.stringify({ success: true, message: "Si cet email existe, un lien de réinitialisation a été envoyé" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    // Create Supabase client with service role key
+    console.log("Processing password reset request for:", email.substring(0, 3) + "***");
+
+    const { createClient } = await import("jsr:@supabase/supabase-js@2");
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Generate password reset link with redirect
+    const origin = req.headers.get('origin') || req.headers.get('referer') || 'https://salatracker.lovable.app';
+    const sanitizedRedirectTo = redirectTo || `${origin}/auth`;
+
+    if (!sanitizedRedirectTo.startsWith('http://') && !sanitizedRedirectTo.startsWith('https://')) {
+      return new Response(
+        JSON.stringify({ success: true, message: "Si cet email existe, un lien de réinitialisation a été envoyé" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
-      email: email,
+      email: email.toLowerCase().trim(),
       options: {
-        redirectTo: redirectTo || `${req.headers.get('origin')}/auth`,
+        redirectTo: sanitizedRedirectTo,
       },
     });
 
-    // For security reasons, always return success even if user doesn't exist
-    // This prevents email enumeration attacks
     if (error) {
-      if (error.message.includes("User with this email not found") || error.status === 404) {
-        console.log("User not found, but returning success for security");
+      if (error.message?.includes("User") || error.status === 404 || error.status === 400) {
+        console.log("User not found or invalid, but returning success for security");
         return new Response(
           JSON.stringify({ success: true, message: "Si cet email existe, un lien de réinitialisation a été envoyé" }),
-          {
-            status: 200,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      console.error("Error generating reset link:", error);
+      console.error("Error generating reset link:", error.message);
       throw error;
+    }
+
+    if (!data?.properties?.action_link) {
+      console.error("No action link generated");
+      return new Response(
+        JSON.stringify({ success: true, message: "Si cet email existe, un lien de réinitialisation a été envoyé" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     console.log("Reset link generated successfully");
 
-    // Send email with Resend API
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -72,7 +98,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: "Salatracker <onboarding@resend.dev>",
-        to: [email],
+        to: [email.toLowerCase().trim()],
         subject: "Réinitialisez votre mot de passe",
         html: `
           <!DOCTYPE html>
@@ -172,32 +198,26 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (!emailResponse.ok) {
-      const errorData = await emailResponse.json();
+      const errorData = await emailResponse.json().catch(() => ({}));
       console.error("Resend API error:", errorData);
-      throw new Error(`Failed to send email: ${JSON.stringify(errorData)}`);
+      return new Response(
+        JSON.stringify({ success: true, message: "Si cet email existe, un lien de réinitialisation a été envoyé" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const emailData = await emailResponse.json();
-
-    console.log("Email sent successfully:", emailData);
+    console.log("Email sent successfully");
 
     return new Response(
       JSON.stringify({ success: true, message: "Email envoyé avec succès" }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("Error in send-reset-password function:", error);
+    console.error("Error in send-reset-password function:", error.message);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ success: true, message: "Si cet email existe, un lien de réinitialisation a été envoyé" }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
-};
-
-serve(handler);
+});
