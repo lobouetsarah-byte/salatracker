@@ -5,9 +5,14 @@ const config: CapacitorConfig = {
   appName: 'Salatrack',
   webDir: 'dist',
   backgroundColor: '#0c3b2e',
-  server: {
-    url: 'https://salatrack.app',
-    cleartext: false
+  ios: {
+    contentInset: 'always',
+    scheme: 'Salatrack',
+  },
+  android: {
+    allowMixedContent: false,
+    captureInput: true,
+    webContentsDebuggingEnabled: false,
   },
   plugins: {
     LocalNotifications: {
