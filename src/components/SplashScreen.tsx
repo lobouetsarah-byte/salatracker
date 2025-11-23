@@ -13,10 +13,11 @@ interface SplashScreenProps {
 export const SplashScreen = ({
   isReady,
   onTimeout,
-  timeoutDuration = 10000
+  timeoutDuration = 30000
 }: SplashScreenProps) => {
   const [showError, setShowError] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+  const [timeoutTriggered, setTimeoutTriggered] = useState(false);
 
   useEffect(() => {
     if (isReady) {
@@ -25,15 +26,18 @@ export const SplashScreen = ({
   }, [isReady]);
 
   useEffect(() => {
+    if (isReady || timeoutTriggered) return;
+
     const timer = setTimeout(() => {
       if (!isReady) {
+        setTimeoutTriggered(true);
         setShowError(true);
         onTimeout?.();
       }
     }, timeoutDuration);
 
     return () => clearTimeout(timer);
-  }, [isReady, timeoutDuration, onTimeout]);
+  }, [isReady, timeoutDuration, onTimeout, timeoutTriggered]);
 
   const handleReload = () => {
     window.location.reload();

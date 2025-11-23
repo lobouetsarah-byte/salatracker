@@ -53,6 +53,24 @@ export const isSupabaseConfigured = () => {
     SUPABASE_URL &&
     SUPABASE_ANON_KEY &&
     SUPABASE_URL !== 'https://placeholder.supabase.co' &&
-    SUPABASE_ANON_KEY !== 'placeholder-key'
+    SUPABASE_ANON_KEY !== 'placeholder-key' &&
+    SUPABASE_URL.includes('supabase.co')
   );
+};
+
+// Test Supabase connection
+export const testSupabaseConnection = async (): Promise<{ success: boolean; error?: string }> => {
+  if (!isSupabaseConfigured()) {
+    return { success: false, error: 'Supabase is not configured' };
+  }
+
+  try {
+    const { error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
+    if (error && error.code !== 'PGRST116') {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Connection failed' };
+  }
 };

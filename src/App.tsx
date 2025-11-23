@@ -20,39 +20,27 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { loading } = useAuth();
+  const { initialized } = useAuth();
   const location = useLocation();
-  const [showSplash, setShowSplash] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
   const [appReady, setAppReady] = useState(false);
-  const [hasShownSplash, setHasShownSplash] = useState(false);
 
   useEffect(() => {
-    // Only show splash screen once on initial homepage load
-    if (!loading && location.pathname === "/" && !hasShownSplash) {
-      setShowSplash(true);
-      setHasShownSplash(true);
-
-      const readyTimer = setTimeout(() => {
-        setAppReady(true);
-      }, 1000);
-
-      const hideTimer = setTimeout(() => {
+    if (initialized) {
+      setAppReady(true);
+      const timer = setTimeout(() => {
         setShowSplash(false);
-      }, 1500);
-
-      return () => {
-        clearTimeout(readyTimer);
-        clearTimeout(hideTimer);
-      };
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [loading, location.pathname, hasShownSplash]);
+  }, [initialized]);
 
   return (
     <>
       {showSplash && location.pathname === "/" && (
         <SplashScreen
           isReady={appReady}
-          timeoutDuration={8000}
+          timeoutDuration={30000}
         />
       )}
       <Routes>
