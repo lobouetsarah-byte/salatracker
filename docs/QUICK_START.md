@@ -1,4 +1,43 @@
-# Quick Start Guide - Supabase Environment Setup
+# Quick Start Guide
+
+## 🎬 App Startup & Loading Behavior
+
+### What You'll See on App Launch
+
+**✅ Normal Startup (1-3 seconds)**:
+1. Splash screen appears with Salatracker logo and loading animation
+2. App initializes Supabase authentication in background
+3. Splash smoothly fades out
+4. Main app interface appears
+
+**❌ Configuration Error**:
+- Red error card with "Supabase configuration error" message
+- Instructions to check `.env` file
+- **Never** shows a blank or green screen
+
+**⚠️ Network/Timeout Error**:
+- Splash screen stays visible with loading indicator
+- After 30 seconds: "Loading too long" error message appears
+- "Reload application" button to retry
+- Clear explanation of the issue
+
+### Mobile-Specific Behavior
+
+**Safe Areas & Layout**:
+- Content respects iOS notch, status bar, and home indicator
+- Full-screen layout without overlapping system UI
+- Bottom navigation positioned above home indicator
+- Works on all iPhone/Android screen sizes
+
+**Error Recovery**:
+- JavaScript errors show user-friendly error screen (not blank)
+- Technical details available in collapsible section
+- "Reload application" button always available
+- Error boundary catches and displays all runtime errors
+
+---
+
+## 🔧 Supabase Environment Setup
 
 This is a **quick reference** for setting up your Supabase environment variables. For detailed information, see [supabase-env-setup.md](./supabase-env-setup.md).
 
@@ -103,14 +142,25 @@ See the [Supabase Environment Setup Guide](./supabase-env-setup.md) for detailed
 ## ✅ What You Should See
 
 ### When Configured Correctly
-- ✅ App loads without blank screens
-- ✅ No error messages
+- ✅ Splash screen appears immediately on launch
+- ✅ Brief loading (1-3 seconds)
+- ✅ App loads smoothly without blank screens
+- ✅ No error messages in console
 - ✅ Can sign up / log in
+- ✅ Prayer times and location load correctly
 
 ### When Configured Incorrectly
-- ❌ Shows "Configuration Error" screen (not blank)
-- ❌ Clear error message in console
-- ❌ Cannot use the app
+- ❌ Shows "Configuration Error" screen (red card, clear message)
+- ❌ **Never** a blank or green screen
+- ❌ Error message clearly states what's wrong
+- ❌ Provides instructions on how to fix
+- ❌ Cannot use the app until fixed
+
+### If Network Issue
+- ⚠️ Splash screen shows for longer
+- ⚠️ After 30s: "Loading too long" error appears
+- ⚠️ Reload button available
+- ⚠️ Check your internet connection
 
 ---
 

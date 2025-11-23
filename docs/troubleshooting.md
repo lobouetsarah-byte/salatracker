@@ -2,19 +2,56 @@
 
 ## Common Issues and Solutions
 
-### 1. White/Green Screen on App Launch
+### 1. Blank Screen / App Not Rendering
 
-**Problem**: App shows a white or green splash screen indefinitely and nothing displays.
+**Problem**: App shows a blank screen, green background, or doesn't render on mobile.
 
-**Cause**: Splash screen logic blocking the app from rendering.
+**Cause**: Multiple possible causes:
+- CSS layout issues
+- App initialization blocking render
+- JavaScript errors preventing UI from mounting
+- Missing error boundaries
 
-**Solution**: ✅ **FIXED** - Splash screen now:
-- Starts hidden by default
-- Only shows once on first load
-- Automatically hides after 1.5 seconds
-- Won't block app content from rendering
+**Solution**: ✅ **FIXED** - Complete startup flow overhaul:
 
-**Code Location**: `src/App.tsx` - AppContent component
+**What Was Changed**:
+1. **Splash Screen**: Now shows on startup and waits for actual auth initialization (not arbitrary timers)
+2. **CSS Fixed**: Removed constraining styles from `#root` and `body` that prevented full-screen rendering
+3. **Safe Areas**: Added proper iOS/Android safe area handling for notch/status bar
+4. **Error Boundary**: Added comprehensive error handling to show error UI instead of blank screen
+5. **Always Render**: App now always renders SOMETHING - splash, error, or main app
+6. **Initialization Logic**: Changed from time-based to state-based (waits for Supabase auth to initialize)
+
+**Startup Flow (Current)**:
+1. **Initial Load**: Splash screen appears immediately
+2. **Auth Init**: App waits for Supabase authentication to initialize (1-3 seconds typically)
+3. **Success**: Splash fades out, main app appears
+4. **Error**: After 30 seconds without init, shows error message with reload button
+5. **Config Error**: If Supabase env vars missing, shows specific config error screen
+
+**On Normal Startup You Should See**:
+- Splash screen with logo and loading animation
+- Brief loading (1-3 seconds)
+- Splash fades out
+- Main app appears
+
+**On Config Error You Should See**:
+- Red error card stating "Supabase configuration error"
+- Instructions to check environment variables
+- Never a blank screen
+
+**On Network Error You Should See**:
+- Splash screen with loading indicator
+- After 30 seconds: "Loading too long" error message
+- "Reload application" button to retry
+
+**Code Locations**:
+- `src/App.tsx` - Main app wrapper and startup logic
+- `src/contexts/AuthContext.tsx` - Auth initialization
+- `src/components/SplashScreen.tsx` - Splash screen component
+- `src/components/ErrorBoundary.tsx` - Error handling
+- `src/index.css` - CSS fixes for full-screen layout
+- `src/App.css` - Root element styling
 
 ---
 

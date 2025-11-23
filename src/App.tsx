@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SplashScreen } from "@/components/SplashScreen";
 import { SupabaseConfigError } from "@/components/SupabaseConfigError";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -20,10 +21,11 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { initialized } = useAuth();
+  const { initialized, loading } = useAuth();
   const location = useLocation();
   const [showSplash, setShowSplash] = useState(true);
   const [appReady, setAppReady] = useState(false);
+  const [initError, setInitError] = useState(false);
 
   useEffect(() => {
     if (initialized) {
@@ -35,46 +37,58 @@ const AppContent = () => {
     }
   }, [initialized]);
 
+  useEffect(() => {
+    const errorTimer = setTimeout(() => {
+      if (!initialized && !loading) {
+        setInitError(true);
+      }
+    }, 30000);
+
+    return () => clearTimeout(errorTimer);
+  }, [initialized, loading]);
+
+  if (!initialized || showSplash) {
+    return (
+      <SplashScreen
+        isReady={appReady}
+        timeoutDuration={30000}
+      />
+    );
+  }
+
   return (
-    <>
-      {showSplash && location.pathname === "/" && (
-        <SplashScreen
-          isReady={appReady}
-          timeoutDuration={30000}
-        />
-      )}
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/how-it-works" element={<HowItWorks />} />
-        <Route path="/terms" element={<TermsOfService />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/generate-splash" element={<GenerateSplash />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/how-it-works" element={<HowItWorks />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/generate-splash" element={<GenerateSplash />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 };
 
 const App = () => {
-  // Check if Supabase is configured before rendering the app
   if (!isSupabaseConfigured()) {
     return <SupabaseConfigError />;
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
