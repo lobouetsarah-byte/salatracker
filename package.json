@@ -5,15 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --mode production",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "mobile:sync": "npm run build && npx cap sync",
-    "mobile:ios": "npm run build && npx cap sync ios && npx cap open ios",
-    "mobile:android": "npm run build && npx cap sync android && npx cap open android",
-    "mobile:run:ios": "npm run build && npx cap sync ios && npx cap run ios",
-    "mobile:run:android": "npm run build && npx cap sync android && npx cap run android"
+    "mobile:sync": "vite build --mode production && npx cap sync",
+    "mobile:ios": "vite build --mode production && npx cap sync ios && npx cap open ios",
+    "mobile:android": "vite build --mode production && npx cap sync android && npx cap open android",
+    "mobile:run:ios": "vite build --mode production && npx cap sync ios && npx cap run ios",
+    "mobile:run:android": "vite build --mode production && npx cap sync android && npx cap run android"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.4",

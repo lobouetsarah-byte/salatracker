@@ -32,9 +32,37 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Configure Supabase environment variables (REQUIRED)
+# See docs/QUICK_START.md for detailed instructions
+# Create .env and .env.production files with your Supabase credentials
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
+
+## ⚙️ Supabase Configuration (IMPORTANT)
+
+This app uses **Supabase** for backend services. Before running the app, you MUST configure environment variables:
+
+### Quick Setup (3 steps)
+
+1. Get your credentials from [Supabase Dashboard](https://supabase.com/dashboard) → Settings → API
+2. Create two files in the project root:
+   - `.env` (for development)
+   - `.env.production` (for mobile/production builds)
+3. Add to both files:
+   ```env
+   VITE_SUPABASE_URL="https://your-project.supabase.co"
+   VITE_SUPABASE_ANON_KEY="your-anon-key-here"
+   ```
+
+### Documentation
+
+- **[Quick Start Guide](./docs/QUICK_START.md)** - 3-step setup (start here!)
+- **[Full Setup Guide](./docs/supabase-env-setup.md)** - Detailed instructions
+- **[Troubleshooting](./docs/troubleshooting.md)** - Common issues
+
+**Note**: If you skip this step, the app will show a configuration error screen instead of working correctly.
 
 **Edit a file directly in GitHub**
 
