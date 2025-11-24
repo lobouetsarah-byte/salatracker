@@ -156,12 +156,8 @@ const Index = () => {
     }
   }, [settings]);
 
-  // Request notification permissions on app load
-  useEffect(() => {
-    if (user && !authLoading) {
-      prayerNotificationService.requestPermissions();
-    }
-  }, [user, authLoading]);
+  // Request notification permissions only when user enables notifications
+  // Removed automatic request - will be requested when user enables settings
 
   // Check badges after prayer updates
   useEffect(() => {

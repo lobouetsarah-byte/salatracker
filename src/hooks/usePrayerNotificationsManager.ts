@@ -23,6 +23,15 @@ export const usePrayerNotificationsManager = ({
     }
 
     const scheduleNotifications = async () => {
+      const hasPermission = await prayerNotificationService.checkPermissions();
+
+      if (!hasPermission) {
+        const granted = await prayerNotificationService.requestPermissions(true);
+        if (!granted) {
+          return;
+        }
+      }
+
       await prayerNotificationService.schedulePrayerNotifications(prayers, prayerStatuses);
     };
 

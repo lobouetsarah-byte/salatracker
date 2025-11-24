@@ -77,9 +77,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        if (error.message?.toLowerCase().includes('email not confirmed') ||
-            error.message?.toLowerCase().includes('email not verified') ||
-            error.message?.toLowerCase().includes('verify')) {
+        const errorMsg = error.message?.toLowerCase() || '';
+
+        if (errorMsg.includes('email not confirmed') ||
+            errorMsg.includes('email not verified') ||
+            errorMsg.includes('verify')) {
           notify.error(
             "Email non vérifié",
             "Votre adresse email n'est pas encore vérifiée. Veuillez cliquer sur le lien de confirmation envoyé par email.",
@@ -104,8 +106,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             }
           );
+        } else if (errorMsg.includes('invalid') && (errorMsg.includes('credential') || errorMsg.includes('password') || errorMsg.includes('email'))) {
+          notify.error(
+            "Identifiants incorrects",
+            "Vérifiez votre adresse email et votre mot de passe."
+          );
+        } else if (errorMsg.includes('network') || errorMsg.includes('fetch') || errorMsg.includes('connection')) {
+          notify.network.offline();
         } else {
-          notify.auth.loginError(error.message);
+          notify.error(
+            "Erreur de connexion",
+            "Une erreur inattendue s'est produite. Veuillez réessayer plus tard."
+          );
         }
       } else {
         notify.auth.loginSuccess();
@@ -113,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       return { error };
     } catch (error: any) {
-      notify.auth.loginError();
+      notify.network.offline();
       return { error };
     }
   };
@@ -131,14 +143,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        notify.auth.signupError(error.message);
+        const errorMsg = error.message?.toLowerCase() || '';
+
+        if (errorMsg.includes('already') && errorMsg.includes('registered')) {
+          notify.error(
+            "Email déjà utilisé",
+            "Un compte existe déjà avec cette adresse email."
+          );
+        } else if (errorMsg.includes('password') && (errorMsg.includes('short') || errorMsg.includes('weak'))) {
+          notify.error(
+            "Mot de passe trop faible",
+            "Le mot de passe doit contenir au moins 6 caractères."
+          );
+        } else if (errorMsg.includes('email') && errorMsg.includes('invalid')) {
+          notify.error(
+            "Email invalide",
+            "Veuillez entrer une adresse email valide."
+          );
+        } else if (errorMsg.includes('network') || errorMsg.includes('fetch') || errorMsg.includes('connection')) {
+          notify.network.offline();
+        } else {
+          notify.error(
+            "Erreur d'inscription",
+            "Une erreur inattendue s'est produite. Veuillez réessayer plus tard."
+          );
+        }
       } else {
         notify.auth.signupSuccess();
       }
 
       return { error };
     } catch (error: any) {
-      notify.auth.signupError();
+      notify.network.offline();
       return { error };
     }
   };

@@ -1,6 +1,7 @@
 import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { Prayer } from '@/hooks/usePrayerTimes';
+import { permissionService } from './PermissionService';
 
 interface NotificationSettings {
   prayerNotificationsEnabled: boolean;
@@ -44,36 +45,14 @@ class PrayerNotificationService {
     localStorage.setItem('prayer_notification_settings', JSON.stringify(this.settings));
   }
 
-  async requestPermissions(): Promise<boolean> {
-    if (!Capacitor.isNativePlatform()) {
-      if ('Notification' in window) {
-        const permission = await Notification.requestPermission();
-        return permission === 'granted';
-      }
-      return false;
-    }
-
-    try {
-      const result = await LocalNotifications.requestPermissions();
-      return result.display === 'granted';
-    } catch (error) {
-      console.error('Error requesting notification permissions:', error);
-      return false;
-    }
+  async requestPermissions(showExplanation = false): Promise<boolean> {
+    const result = await permissionService.requestNotificationPermission(showExplanation);
+    return result.granted;
   }
 
   async checkPermissions(): Promise<boolean> {
-    if (!Capacitor.isNativePlatform()) {
-      return 'Notification' in window && Notification.permission === 'granted';
-    }
-
-    try {
-      const result = await LocalNotifications.checkPermissions();
-      return result.display === 'granted';
-    } catch (error) {
-      console.error('Error checking notification permissions:', error);
-      return false;
-    }
+    const result = await permissionService.checkNotificationPermission();
+    return result.granted;
   }
 
   updateSettings(settings: Partial<NotificationSettings>): void {
