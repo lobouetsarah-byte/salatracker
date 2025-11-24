@@ -12,6 +12,7 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  resendConfirmationEmail: (email: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,7 +77,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        notify.auth.loginError(error.message);
+        if (error.message?.toLowerCase().includes('email not confirmed') ||
+            error.message?.toLowerCase().includes('email not verified') ||
+            error.message?.toLowerCase().includes('verify')) {
+          notify.error(
+            "Email non vérifié",
+            "Votre adresse email n'est pas encore vérifiée. Veuillez cliquer sur le lien de confirmation envoyé par email.",
+            {
+              duration: 10000,
+              action: {
+                label: "Renvoyer l'email",
+                onClick: async () => {
+                  const { error: resendError } = await supabase.auth.resend({
+                    type: 'signup',
+                    email: email,
+                    options: {
+                      emailRedirectTo: `${window.location.origin}/`,
+                    }
+                  });
+                  if (!resendError) {
+                    notify.success("Email renvoyé", "Un nouvel email de confirmation a été envoyé");
+                  } else {
+                    notify.error("Erreur", "Impossible de renvoyer l'email");
+                  }
+                }
+              }
+            }
+          );
+        } else {
+          notify.auth.loginError(error.message);
+        }
       } else {
         notify.auth.loginSuccess();
       }
@@ -113,6 +143,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const resendConfirmationEmail = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        }
+      });
+
+      if (error) {
+        notify.error("Erreur", "Impossible de renvoyer l'email de confirmation");
+        return { error };
+      }
+
+      notify.success("Email envoyé", "Un nouvel email de confirmation a été envoyé");
+      return { error: null };
+    } catch (error: any) {
+      notify.error("Erreur", "Impossible de renvoyer l'email de confirmation");
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     notify.auth.logoutSuccess();
@@ -138,7 +191,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, initialized, signIn, signUp, signOut, deleteAccount }}>
+    <AuthContext.Provider value={{ user, session, loading, initialized, signIn, signUp, signOut, deleteAccount, resendConfirmationEmail }}>
       {children}
     </AuthContext.Provider>
   );

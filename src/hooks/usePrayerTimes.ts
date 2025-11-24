@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LocationSettings } from "./useLocationSettings";
+import { locationService } from "@/services/LocationService";
 
 export interface Prayer {
   name: string;
@@ -157,25 +158,18 @@ export const usePrayerTimes = ({ locationSettings }: UsePrayerTimesProps = {}) =
           await fetchPrayerTimesByCoordinates(latitude, longitude);
         }
       } else {
-        // Auto mode - use geolocation
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              fetchPrayerTimesByCoordinates(position.coords.latitude, position.coords.longitude);
-            },
-            (error) => {
-              console.error("Geolocation error:", error);
-              // Fallback to Mecca if location denied
-              fetchPrayerTimesByCoordinates(21.4225, 39.8262);
-              toast({
-                title: "Location Access",
-                description: "Using default location. Grant location access for accurate prayer times.",
-              });
-            }
-          );
+        // Auto mode - use LocationService for single permission request
+        const position = await locationService.getCurrentPosition();
+
+        if (position) {
+          await fetchPrayerTimesByCoordinates(position.lat, position.lng);
         } else {
-          // Fallback to Mecca
-          fetchPrayerTimesByCoordinates(21.4225, 39.8262);
+          // Fallback to Mecca if location denied or unavailable
+          await fetchPrayerTimesByCoordinates(21.4225, 39.8262);
+          toast({
+            title: "Accès à la localisation",
+            description: "Utilisation de la localisation par défaut. Autorisez l'accès à la localisation pour des horaires précis.",
+          });
         }
       }
     };

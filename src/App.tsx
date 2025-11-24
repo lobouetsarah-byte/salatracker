@@ -9,6 +9,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { SupabaseConfigError } from "@/components/SupabaseConfigError";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { useSwipeBack } from "@/hooks/useSwipeBack";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
@@ -26,6 +27,8 @@ const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [appReady, setAppReady] = useState(false);
   const [initError, setInitError] = useState(false);
+
+  useSwipeBack();
 
   useEffect(() => {
     if (initialized) {
