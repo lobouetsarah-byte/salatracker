@@ -5,6 +5,7 @@ export interface NotificationSettings {
   missedPrayerReminders: boolean;
   morningAdhkarReminder: boolean;
   eveningAdhkarReminder: boolean;
+  adhanSoundEnabled: boolean;
 }
 
 export const useSettings = () => {
@@ -13,6 +14,7 @@ export const useSettings = () => {
     missedPrayerReminders: true,
     morningAdhkarReminder: true,
     eveningAdhkarReminder: true,
+    adhanSoundEnabled: true,
   });
 
   useEffect(() => {

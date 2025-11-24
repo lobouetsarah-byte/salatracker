@@ -1,7 +1,7 @@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Clock, Sunrise, Sunset, Heart } from "lucide-react";
+import { Bell, Clock, Sunrise, Sunset, Heart, Volume2 } from "lucide-react";
 import { NotificationSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
 import { SettingsAccount } from "./SettingsAccount";
@@ -168,6 +168,28 @@ export const Settings = ({ settings, onUpdateSettings, onLogout, userGender }: S
               checked={settings.eveningAdhkarReminder}
               onCheckedChange={(checked) =>
                 onUpdateSettings({ eveningAdhkarReminder: checked })
+              }
+              className="data-[state=checked]:bg-primary"
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-300 border border-primary/10">
+            <div className="space-y-1.5 flex-1">
+              <Label htmlFor="adhan-sound" className="text-base font-semibold flex items-center gap-2 cursor-pointer">
+                <div className="p-1.5 rounded bg-primary/20">
+                  <Volume2 className="w-4 h-4 text-primary" />
+                </div>
+                Adhan sonore
+              </Label>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Jouer l'adhan lors des notifications de prière
+              </p>
+            </div>
+            <Switch
+              id="adhan-sound"
+              checked={settings.adhanSoundEnabled}
+              onCheckedChange={(checked) =>
+                onUpdateSettings({ adhanSoundEnabled: checked })
               }
               className="data-[state=checked]:bg-primary"
             />

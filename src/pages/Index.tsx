@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrayerCard } from "@/components/PrayerCard";
 import { WeeklyStats } from "@/components/WeeklyStats";
 import { Settings } from "@/components/Settings";
 import { Adhkar } from "@/components/Adhkar";
-import { WeeklyHadith } from "@/components/WeeklyHadith";
+import { DailyHadith } from "@/components/DailyHadith";
 import { PeriodStats } from "@/components/PeriodStats";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { usePrayerTrackingSync } from "@/hooks/usePrayerTrackingSync";
@@ -13,6 +13,9 @@ import { usePeriodMode } from "@/hooks/usePeriodMode";
 import { usePeriodDhikrTracking, DhikrType } from "@/hooks/usePeriodDhikrTracking";
 import { usePeriodNotifications } from "@/hooks/usePeriodNotifications";
 import { useBadges } from "@/hooks/useBadges";
+import { useBadgeChecker } from "@/hooks/useBadgeChecker";
+import { usePrayerNotificationsManager } from "@/hooks/usePrayerNotificationsManager";
+import { prayerNotificationService } from "@/services/PrayerNotificationService";
 import { DailySuccess } from "@/components/DailySuccess";
 import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
 import { useNativeNotifications } from "@/hooks/useNativeNotifications";
@@ -85,14 +88,34 @@ const Index = () => {
 
   // Use native notifications on mobile, web notifications otherwise
   const isNative = Capacitor.isNativePlatform();
-  
+
+  // Badge checker
+  const { checkBadges } = useBadgeChecker();
+
+  // Prayer statuses for notifications
+  const prayerStatuses = useMemo(() => {
+    const statuses: { [key: string]: boolean } = {};
+    prayerTimes?.prayers.forEach(prayer => {
+      const status = getPrayerStatus(selectedDateString, prayer.name);
+      statuses[prayer.name] = status === 'on-time' || status === 'late';
+    });
+    return statuses;
+  }, [prayerTimes, selectedDateString, getPrayerStatus]);
+
+  // Prayer notifications manager (Adhan + 30-min reminders)
+  usePrayerNotificationsManager({
+    prayers: prayerTimes?.prayers || null,
+    prayerStatuses,
+    enabled: settings.prayerTimeReminders,
+  });
+
   // Period notifications (always web-based)
   usePeriodNotifications({
     prayers: prayerTimes?.prayers || [],
     isInPeriod,
     settings,
   });
-  
+
   // Regular prayer notifications - hooks must be called unconditionally
   useNativeNotifications(
     prayerTimes?.prayers || [],
@@ -123,15 +146,39 @@ const Index = () => {
     }
   }, [prayerTimes]);
 
+  // Sync notification settings with prayer notification service
+  useEffect(() => {
+    if (settings) {
+      prayerNotificationService.updateSettings({
+        prayerNotificationsEnabled: settings.prayerTimeReminders,
+        adhanSoundEnabled: settings.adhanSoundEnabled,
+      });
+    }
+  }, [settings]);
+
+  // Request notification permissions on app load
+  useEffect(() => {
+    if (user && !authLoading) {
+      prayerNotificationService.requestPermissions();
+    }
+  }, [user, authLoading]);
+
+  // Check badges after prayer updates
+  useEffect(() => {
+    if (user && !dataLoading) {
+      checkBadges();
+    }
+  }, [user, dataLoading, checkBadges]);
+
   // Check daily completion and badges in real-time after prayer/dhikr updates
   const checkBadgesRealTime = async () => {
     if (!user) return;
-    
+
     const today = new Date().toISOString().split('T')[0];
-    
+
     // Only check for today's date
     if (selectedDateString !== today) return;
-    
+
     // Check if all prayers/acts are completed for today
     const isComplete = await checkDailyCompletion(today, isInPeriod);
     
@@ -348,7 +395,7 @@ const Index = () => {
                 <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
                   Hadith du jour
                 </h2>
-                <WeeklyHadith />
+                <DailyHadith />
               </div>
               
               <WeeklyStats 
