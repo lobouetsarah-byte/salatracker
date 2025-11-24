@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Check - Salatrack</title>
+</head>
+<body>
+  <script>
+    const healthData = {
+      status: "ok",
+      version: "1.0.0",
+      timestamp: new Date().toISOString(),
+      service: "Salatrack PWA",
+      uptime: Math.floor(performance.now() / 1000)
+    };
+    
+    document.body.innerHTML = `<pre>${JSON.stringify(healthData, null, 2)}</pre>`;
+    
+    // Renvoyer aussi en JSON pur
+    if (window.location.search.includes('format=json')) {
+      document.body.innerHTML = JSON.stringify(healthData);
+      document.body.style.fontFamily = 'monospace';
+    }
+  </script>
+</body>
+</html>
