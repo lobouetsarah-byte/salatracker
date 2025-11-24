@@ -4,10 +4,14 @@ const config: CapacitorConfig = {
   appId: 'com.salatrack.app',
   appName: 'Salatrack',
   webDir: 'dist',
-  backgroundColor: '#0c3b2e',
+  server: {
+    androidScheme: 'https',
+  },
+  backgroundColor: '#f8fafc',
   ios: {
     contentInset: 'always',
-    scheme: 'Salatrack',
+    scheme: 'https',
+    limitsNavigationsToAppBoundDomains: true,
   },
   android: {
     allowMixedContent: false,
@@ -17,17 +21,21 @@ const config: CapacitorConfig = {
   plugins: {
     LocalNotifications: {
       smallIcon: "ic_stat_icon_config_sample",
-      iconColor: "#0c3b2e",
+      iconColor: "#2563eb",
       sound: "adhan.mp3",
     },
     PushNotifications: {
       presentationOptions: ["badge", "sound", "alert"],
     },
     SplashScreen: {
-      launchShowDuration: 2000,
-      backgroundColor: "#0c3b2e",
+      launchShowDuration: 0,
+      launchAutoHide: true,
+      backgroundColor: "#f8fafc",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
+      iosSpinnerStyle: "small",
+      androidSpinnerStyle: "small",
+      spinnerColor: "#2563eb",
     },
   },
 };

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Salatrack</string>
+    <string name="title_activity_main">Salatrack</string>
+    <string name="package_name">com.salatrack.app</string>
+    <string name="custom_url_scheme">com.salatrack.app</string>
+</resources>
