@@ -187,17 +187,25 @@ const Onboarding = () => {
 
       if (signUpError) throw signUpError;
 
-      // Update profile with validated goals and gender
+      // Create or update profile with validated data
       if (data.user) {
-        const { error: updateError } = await supabase
+        const { error: profileError } = await supabase
           .from('profiles')
-          .update({ 
-            goals: goalsResult.data,
-            gender: genderResult.data
-          })
-          .eq('id', data.user.id);
+          .upsert({
+            user_id: data.user.id,
+            email: emailResult.data,
+            first_name: firstNameResult.data,
+            gender: genderResult.data,
+            prayer_goal: goalsResult.data.prayers || 5,
+            adhkar_goal: goalsResult.data.adhkar || 3
+          }, {
+            onConflict: 'user_id'
+          });
 
-        if (updateError) throw updateError;
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // Don't throw - profile might be created by trigger
+        }
       }
 
       toast({
