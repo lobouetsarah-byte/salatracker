@@ -132,17 +132,28 @@ class PrayerNotificationService {
 
         // Only schedule if in the future (with buffer)
         if (prayerDate > nowPlus5Min) {
-          notifications.push({
+          const notificationConfig: any = {
             id: i + 1,
             title: `${prayer.arabicName} - ${prayer.name}`,
             body: `C'est l'heure de la prière ${prayer.name}`,
             schedule: { at: prayerDate },
-            sound: this.settings.adhanSoundEnabled ? 'adhan.mp3' : undefined,
             actionTypeId: 'PRAYER_NOTIFICATION',
             extra: {
               prayerName: prayer.name,
             },
-          });
+          };
+
+          // Add sound with correct platform-specific format
+          if (this.settings.adhanSoundEnabled) {
+            // iOS uses the filename without extension, Android needs full filename
+            if (Capacitor.getPlatform() === 'ios') {
+              notificationConfig.sound = 'adhan.wav';
+            } else if (Capacitor.getPlatform() === 'android') {
+              notificationConfig.sound = 'adhan.wav';
+            }
+          }
+
+          notifications.push(notificationConfig);
         }
       }
 

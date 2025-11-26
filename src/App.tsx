@@ -31,11 +31,19 @@ const AppContent = () => {
   useSwipeBack();
 
   useEffect(() => {
+    const minSplashTime = 2500; // Minimum 2.5 seconds
+    const splashStartTime = Date.now();
+
     if (initialized) {
       setAppReady(true);
+
+      const elapsedTime = Date.now() - splashStartTime;
+      const remainingTime = Math.max(0, minSplashTime - elapsedTime);
+
       const timer = setTimeout(() => {
         setShowSplash(false);
-      }, 500);
+      }, remainingTime);
+
       return () => clearTimeout(timer);
     }
   }, [initialized]);
@@ -45,7 +53,7 @@ const AppContent = () => {
       if (!initialized && !loading) {
         setInitError(true);
       }
-    }, 30000);
+    }, 10000); // 10 seconds timeout
 
     return () => clearTimeout(errorTimer);
   }, [initialized, loading]);

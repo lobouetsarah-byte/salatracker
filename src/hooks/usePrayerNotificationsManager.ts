@@ -18,11 +18,13 @@ export const usePrayerNotificationsManager = ({
   enabled,
 }: UsePrayerNotificationsManagerProps) => {
   const hasScheduledRef = useRef(false);
+  const lastStatusRef = useRef<string>('');
 
   useEffect(() => {
     if (!enabled) {
       prayerNotificationService.cancelAllNotifications();
       hasScheduledRef.current = false;
+      lastStatusRef.current = '';
       return;
     }
 
@@ -44,26 +46,24 @@ export const usePrayerNotificationsManager = ({
 
         await prayerNotificationService.schedulePrayerNotifications(prayers, prayerStatuses);
         hasScheduledRef.current = true;
+        lastStatusRef.current = JSON.stringify(prayerStatuses);
       };
 
       scheduleNotifications();
+    } else {
+      // Check if prayer status actually changed
+      const currentStatus = JSON.stringify(prayerStatuses);
+      if (currentStatus !== lastStatusRef.current) {
+        lastStatusRef.current = currentStatus;
+
+        // Debounce reschedule
+        const timer = setTimeout(async () => {
+          prayerNotificationService.forceReschedule();
+          await prayerNotificationService.schedulePrayerNotifications(prayers, prayerStatuses);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+      }
     }
-  }, [prayers, enabled]); // Removed prayerStatuses from dependencies to prevent re-scheduling
-
-  // Separate effect for when prayer status changes - force reschedule
-  useEffect(() => {
-    if (!enabled || !prayers || prayers.length === 0) {
-      return;
-    }
-
-    // When a prayer status changes, force a reschedule
-    const reschedule = async () => {
-      prayerNotificationService.forceReschedule();
-      await prayerNotificationService.schedulePrayerNotifications(prayers, prayerStatuses);
-    };
-
-    // Debounce to avoid too many reschedules
-    const timer = setTimeout(reschedule, 1000);
-    return () => clearTimeout(timer);
-  }, [prayerStatuses]);
+  }, [prayers, prayerStatuses, enabled]);
 };
