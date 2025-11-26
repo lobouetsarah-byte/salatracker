@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
+import { App as CapApp } from '@capacitor/app';
 
 export const useSwipeBack = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // iOS edge swipe gesture
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) {
       return;
@@ -18,6 +20,7 @@ export const useSwipeBack = () => {
     const handleTouchStart = (e: TouchEvent) => {
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      // Only detect swipes from left edge (first 50px)
       isSwiping = touchStartX < 50;
     };
 
@@ -29,10 +32,12 @@ export const useSwipeBack = () => {
       const deltaX = touchCurrentX - touchStartX;
       const deltaY = Math.abs(touchCurrentY - touchStartY);
 
+      // Horizontal swipe of at least 100px, with minimal vertical movement
       if (deltaX > 100 && deltaY < 50) {
         const canGoBack = window.history.length > 1 &&
                          location.pathname !== '/' &&
-                         location.pathname !== '/onboarding';
+                         location.pathname !== '/onboarding' &&
+                         location.pathname !== '/auth';
 
         if (canGoBack) {
           navigate(-1);
@@ -56,27 +61,40 @@ export const useSwipeBack = () => {
     };
   }, [navigate, location]);
 
+  // Android hardware back button
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) {
       return;
     }
 
-    const handleBackButton = () => {
-      const canGoBack = window.history.length > 1 &&
-                       location.pathname !== '/' &&
-                       location.pathname !== '/onboarding';
+    let backButtonListener: any;
 
-      if (canGoBack) {
-        navigate(-1);
-      } else {
-        (window as any).navigator.app?.exitApp();
+    const setupBackButton = async () => {
+      try {
+        backButtonListener = await CapApp.addListener('backButton', () => {
+          const canGoBack = window.history.length > 1 &&
+                           location.pathname !== '/' &&
+                           location.pathname !== '/onboarding' &&
+                           location.pathname !== '/auth';
+
+          if (canGoBack) {
+            navigate(-1);
+          } else {
+            // At root - exit app
+            CapApp.exitApp();
+          }
+        });
+      } catch (error) {
+        console.log('Back button listener not available:', error);
       }
     };
 
-    document.addEventListener('backbutton', handleBackButton);
+    setupBackButton();
 
     return () => {
-      document.removeEventListener('backbutton', handleBackButton);
+      if (backButtonListener) {
+        backButtonListener.remove();
+      }
     };
   }, [navigate, location]);
 };
