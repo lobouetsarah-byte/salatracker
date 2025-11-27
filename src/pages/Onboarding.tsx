@@ -192,14 +192,14 @@ const Onboarding = () => {
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
-            user_id: data.user.id,
+            id: data.user.id,
             email: emailResult.data,
             first_name: firstNameResult.data,
             gender: genderResult.data,
             prayer_goal: goalsResult.data.prayers || 5,
             adhkar_goal: goalsResult.data.adhkar || 3
           }, {
-            onConflict: 'user_id'
+            onConflict: 'id'
           });
 
         if (profileError) {
