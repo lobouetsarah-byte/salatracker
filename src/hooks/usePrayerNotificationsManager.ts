@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { prayerNotificationService } from '@/services/PrayerNotificationService';
 import { Prayer } from './usePrayerTimes';
 
@@ -12,58 +12,52 @@ interface UsePrayerNotificationsManagerProps {
   enabled: boolean;
 }
 
+/**
+ * Hook to manage prayer notifications
+ *
+ * This hook ensures notifications are:
+ * - Scheduled ONCE per day
+ * - Only when enabled
+ * - With proper permissions
+ * - Never on loop
+ */
 export const usePrayerNotificationsManager = ({
   prayers,
   prayerStatuses,
   enabled,
 }: UsePrayerNotificationsManagerProps) => {
-  const hasScheduledRef = useRef(false);
-  const lastStatusRef = useRef<string>('');
-
   useEffect(() => {
-    if (!enabled) {
-      prayerNotificationService.cancelAllNotifications();
-      hasScheduledRef.current = false;
-      lastStatusRef.current = '';
-      return;
-    }
+    const scheduleNotifications = async () => {
+      // Update enabled state in service
+      await prayerNotificationService.setNotificationsEnabled(enabled);
 
-    if (!prayers || prayers.length === 0) {
-      return;
-    }
-
-    // Only schedule once when prayers become available
-    if (!hasScheduledRef.current) {
-      const scheduleNotifications = async () => {
-        const hasPermission = await prayerNotificationService.checkPermissions();
-
-        if (!hasPermission) {
-          const granted = await prayerNotificationService.requestPermissions(true);
-          if (!granted) {
-            return;
-          }
-        }
-
-        await prayerNotificationService.schedulePrayerNotifications(prayers, prayerStatuses);
-        hasScheduledRef.current = true;
-        lastStatusRef.current = JSON.stringify(prayerStatuses);
-      };
-
-      scheduleNotifications();
-    } else {
-      // Check if prayer status actually changed
-      const currentStatus = JSON.stringify(prayerStatuses);
-      if (currentStatus !== lastStatusRef.current) {
-        lastStatusRef.current = currentStatus;
-
-        // Debounce reschedule
-        const timer = setTimeout(async () => {
-          prayerNotificationService.forceReschedule();
-          await prayerNotificationService.schedulePrayerNotifications(prayers, prayerStatuses);
-        }, 1000);
-
-        return () => clearTimeout(timer);
+      // Only schedule if enabled and prayers available
+      if (!enabled) {
+        console.log('Notifications disabled');
+        return;
       }
-    }
+
+      if (!prayers || prayers.length === 0) {
+        console.log('No prayers available yet');
+        return;
+      }
+
+      // Check permissions first
+      const hasPermission = await prayerNotificationService.checkPermissions();
+
+      if (!hasPermission) {
+        // Request permission with explanation
+        const granted = await prayerNotificationService.requestPermissions(true);
+        if (!granted) {
+          console.log('Notification permission not granted');
+          return;
+        }
+      }
+
+      // Schedule notifications (service handles once-per-day logic)
+      await prayerNotificationService.schedulePrayerNotifications(prayers, prayerStatuses);
+    };
+
+    scheduleNotifications();
   }, [prayers, prayerStatuses, enabled]);
 };

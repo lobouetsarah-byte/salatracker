@@ -106,7 +106,7 @@ const Index = () => {
   usePrayerNotificationsManager({
     prayers: prayerTimes?.prayers || null,
     prayerStatuses,
-    enabled: settings.prayerTimeReminders,
+    enabled: settings.notificationsEnabled,
   });
 
   // Period notifications (always web-based)
@@ -146,15 +146,7 @@ const Index = () => {
     }
   }, [prayerTimes]);
 
-  // Sync notification settings with prayer notification service
-  useEffect(() => {
-    if (settings) {
-      prayerNotificationService.updateSettings({
-        prayerNotificationsEnabled: settings.prayerTimeReminders,
-        adhanSoundEnabled: settings.adhanSoundEnabled,
-      });
-    }
-  }, [settings]);
+  // Notification settings are managed by the notification service directly
 
   // Request notification permissions only when user enables notifications
   // Removed automatic request - will be requested when user enables settings

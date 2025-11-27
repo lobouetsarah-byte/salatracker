@@ -1,7 +1,7 @@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Clock, Sunrise, Sunset, Heart, Volume2 } from "lucide-react";
+import { Bell, Heart } from "lucide-react";
 import { NotificationSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
 import { SettingsAccount } from "./SettingsAccount";
@@ -78,136 +78,34 @@ export const Settings = ({ settings, onUpdateSettings, onLogout, userGender }: S
             <div className="p-2 rounded-lg bg-primary/10">
               <Bell className="w-5 h-5 text-primary" />
             </div>
-            {t.notificationSettings}
+            Notifications de prière
           </CardTitle>
           <CardDescription className="text-sm">
-            Gérez vos notifications
+            Activez les notifications pour les heures de prière avec l'adhan
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-300 border border-primary/10">
             <div className="space-y-1.5 flex-1">
-              <Label htmlFor="prayer-time" className="text-base font-semibold flex items-center gap-2 cursor-pointer">
+              <Label htmlFor="notifications" className="text-base font-semibold flex items-center gap-2 cursor-pointer">
                 <div className="p-1.5 rounded bg-primary/20">
                   <Bell className="w-4 h-4 text-primary" />
                 </div>
-                {t.prayerTimeNotifications}
+                Notifications de prière
               </Label>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Soyez notifié lors de chaque heure de prière
+                Recevez une notification à chaque heure de prière avec l'adhan, et un rappel 30 minutes avant la prochaine prière si la précédente n'est pas cochée
               </p>
             </div>
             <Switch
-              id="prayer-time"
-              checked={settings.prayerTimeReminders}
+              id="notifications"
+              checked={settings.notificationsEnabled}
               onCheckedChange={(checked) =>
-                onUpdateSettings({ prayerTimeReminders: checked })
+                onUpdateSettings({ notificationsEnabled: checked })
               }
               className="data-[state=checked]:bg-primary"
             />
           </div>
-
-          <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-300 border border-primary/10">
-            <div className="space-y-1.5 flex-1">
-              <Label htmlFor="missed-prayer" className="text-base font-semibold flex items-center gap-2 cursor-pointer">
-                <div className="p-1.5 rounded bg-primary/20">
-                  <Clock className="w-4 h-4 text-primary" />
-                </div>
-                {t.missedPrayerReminders}
-              </Label>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Rappel 30 minutes avant la prochaine prière si la précédente n'est pas cochée
-              </p>
-            </div>
-            <Switch
-              id="missed-prayer"
-              checked={settings.missedPrayerReminders}
-              onCheckedChange={(checked) =>
-                onUpdateSettings({ missedPrayerReminders: checked })
-              }
-              className="data-[state=checked]:bg-primary"
-            />
-          </div>
-
-          <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-300 border border-primary/10">
-            <div className="space-y-1.5 flex-1">
-              <Label htmlFor="morning-adhkar" className="text-base font-semibold flex items-center gap-2 cursor-pointer">
-                <div className="p-1.5 rounded bg-primary/20">
-                  <Sunrise className="w-4 h-4 text-primary" />
-                </div>
-                Rappel adhkar du matin
-              </Label>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Notification quotidienne pour les invocations du matin
-              </p>
-            </div>
-            <Switch
-              id="morning-adhkar"
-              checked={settings.morningAdhkarReminder}
-              onCheckedChange={(checked) =>
-                onUpdateSettings({ morningAdhkarReminder: checked })
-              }
-              className="data-[state=checked]:bg-primary"
-            />
-          </div>
-
-          <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-300 border border-primary/10">
-            <div className="space-y-1.5 flex-1">
-              <Label htmlFor="evening-adhkar" className="text-base font-semibold flex items-center gap-2 cursor-pointer">
-                <div className="p-1.5 rounded bg-primary/20">
-                  <Sunset className="w-4 h-4 text-primary" />
-                </div>
-                Rappel adhkar du soir
-              </Label>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Notification quotidienne pour les invocations du soir
-              </p>
-            </div>
-            <Switch
-              id="evening-adhkar"
-              checked={settings.eveningAdhkarReminder}
-              onCheckedChange={(checked) =>
-                onUpdateSettings({ eveningAdhkarReminder: checked })
-              }
-              className="data-[state=checked]:bg-primary"
-            />
-          </div>
-
-          <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-300 border border-primary/10">
-            <div className="space-y-1.5 flex-1">
-              <Label htmlFor="adhan-sound" className="text-base font-semibold flex items-center gap-2 cursor-pointer">
-                <div className="p-1.5 rounded bg-primary/20">
-                  <Volume2 className="w-4 h-4 text-primary" />
-                </div>
-                Adhan sonore
-              </Label>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Jouer l'adhan lors des notifications de prière
-              </p>
-            </div>
-            <Switch
-              id="adhan-sound"
-              checked={settings.adhanSoundEnabled}
-              onCheckedChange={(checked) =>
-                onUpdateSettings({ adhanSoundEnabled: checked })
-              }
-              className="data-[state=checked]:bg-primary"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-lg bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-xl transition-shadow duration-300">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <div className="p-1.5 rounded bg-primary/20">
-              <Bell className="w-4 h-4 text-primary" />
-            </div>
-            {t.aboutNotifications}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground leading-relaxed">
-          <p>{t.notificationPermission}</p>
         </CardContent>
       </Card>
 

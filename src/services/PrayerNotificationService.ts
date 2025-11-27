@@ -1,28 +1,44 @@
-import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { Prayer } from '@/hooks/usePrayerTimes';
 import { permissionService } from './PermissionService';
-
-interface NotificationSettings {
-  prayerNotificationsEnabled: boolean;
-  adhanSoundEnabled: boolean;
-}
 
 interface PrayerStatus {
   [key: string]: boolean;
 }
 
+/**
+ * Prayer Notification Service
+ *
+ * Rules:
+ * 1. ONE notification per prayer at exact prayer time with Adhan sound
+ * 2. ONE reminder 30 min before next prayer ONLY if previous prayer not marked done
+ * 3. Schedule ONCE per day (not on every render/page change)
+ * 4. Single toggle in Settings to enable/disable all notifications
+ */
 class PrayerNotificationService {
   private static instance: PrayerNotificationService;
-  private settings: NotificationSettings = {
-    prayerNotificationsEnabled: true,
-    adhanSoundEnabled: true,
-  };
   private lastScheduledDate: string = '';
   private isScheduling: boolean = false;
 
+  // Notification IDs (fixed to prevent duplicates)
+  private readonly PRAYER_NOTIFICATION_IDS = {
+    Fajr: 1,
+    Dhuhr: 2,
+    Asr: 3,
+    Maghrib: 4,
+    Isha: 5,
+  };
+
+  private readonly REMINDER_NOTIFICATION_IDS = {
+    Fajr: 101,
+    Dhuhr: 102,
+    Asr: 103,
+    Maghrib: 104,
+    Isha: 105,
+  };
+
   private constructor() {
-    this.loadSettings();
     this.lastScheduledDate = localStorage.getItem('last_notification_schedule_date') || '';
   }
 
@@ -33,64 +49,113 @@ class PrayerNotificationService {
     return PrayerNotificationService.instance;
   }
 
-  private loadSettings(): void {
-    const stored = localStorage.getItem('prayer_notification_settings');
-    if (stored) {
-      try {
-        this.settings = JSON.parse(stored);
-      } catch (e) {
-        console.error('Failed to load notification settings:', e);
-      }
+  /**
+   * Check if notifications are enabled
+   */
+  areNotificationsEnabled(): boolean {
+    const enabled = localStorage.getItem('notifications_enabled');
+    return enabled === 'true';
+  }
+
+  /**
+   * Enable or disable all notifications
+   */
+  async setNotificationsEnabled(enabled: boolean): Promise<void> {
+    localStorage.setItem('notifications_enabled', enabled.toString());
+
+    if (!enabled) {
+      // Cancel all notifications when disabled
+      await this.cancelAllNotifications();
     }
   }
 
-  private saveSettings(): void {
-    localStorage.setItem('prayer_notification_settings', JSON.stringify(this.settings));
-  }
-
-  async requestPermissions(showExplanation = false): Promise<boolean> {
-    const result = await permissionService.requestNotificationPermission(showExplanation);
-    return result.granted;
-  }
-
+  /**
+   * Check if we have notification permissions
+   */
   async checkPermissions(): Promise<boolean> {
-    const result = await permissionService.checkNotificationPermission();
-    return result.granted;
+    if (!Capacitor.isNativePlatform()) {
+      return true; // Web doesn't need explicit permission check
+    }
+
+    try {
+      const result = await LocalNotifications.checkPermissions();
+      return result.display === 'granted';
+    } catch (error) {
+      console.error('Error checking notification permissions:', error);
+      return false;
+    }
   }
 
-  updateSettings(settings: Partial<NotificationSettings>): void {
-    this.settings = { ...this.settings, ...settings };
-    this.saveSettings();
-    // Force reschedule when settings change
+  /**
+   * Request notification permissions
+   */
+  async requestPermissions(showExplanation: boolean = false): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) {
+      return true;
+    }
+
+    try {
+      if (showExplanation) {
+        const granted = await permissionService.requestNotificationPermission();
+        return granted;
+      }
+
+      const result = await LocalNotifications.requestPermissions();
+      return result.display === 'granted';
+    } catch (error) {
+      console.error('Error requesting notification permissions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Cancel all scheduled notifications
+   */
+  async cancelAllNotifications(): Promise<void> {
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+
+    try {
+      // Get all pending notifications
+      const pending = await LocalNotifications.getPending();
+
+      if (pending.notifications.length > 0) {
+        const ids = pending.notifications.map(n => n.id);
+        await LocalNotifications.cancel({ notifications: ids.map(id => ({ id })) });
+        console.log('Cancelled all notifications:', ids);
+      }
+
+      // Clear last scheduled date
+      this.lastScheduledDate = '';
+      localStorage.removeItem('last_notification_schedule_date');
+    } catch (error) {
+      console.error('Error cancelling notifications:', error);
+    }
+  }
+
+  /**
+   * Force reschedule (clear cache)
+   */
+  forceReschedule(): void {
     this.lastScheduledDate = '';
     localStorage.removeItem('last_notification_schedule_date');
   }
 
-  getSettings(): NotificationSettings {
-    return { ...this.settings };
-  }
-
-  private parseTime(timeString: string): { hours: number; minutes: number } {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    return { hours, minutes };
-  }
-
-  private getDateTimeForPrayer(prayerTime: string, forToday = true): Date {
-    const { hours, minutes } = this.parseTime(prayerTime);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-
-    if (forToday && date < new Date()) {
-      // Skip if already passed today
-      return date;
-    }
-
-    return date;
-  }
-
-  async schedulePrayerNotifications(prayers: Prayer[], prayerStatuses: PrayerStatus): Promise<void> {
-    if (!this.settings.prayerNotificationsEnabled) {
-      await this.cancelAllNotifications();
+  /**
+   * Main scheduling function
+   * Only schedules if:
+   * - Notifications are enabled
+   * - Not already scheduled today
+   * - Has permissions
+   */
+  async schedulePrayerNotifications(
+    prayers: Prayer[],
+    prayerStatuses: PrayerStatus
+  ): Promise<void> {
+    // Check if notifications are enabled
+    if (!this.areNotificationsEnabled()) {
+      console.log('Notifications disabled, skipping schedule');
       return;
     }
 
@@ -100,8 +165,8 @@ class PrayerNotificationService {
       return;
     }
 
-    // Only schedule once per day
-    const today = new Date().toISOString().split('T')[0];
+    // Check if already scheduled today
+    const today = new Date().toDateString();
     if (this.lastScheduledDate === today) {
       console.log('Already scheduled for today:', today);
       return;
@@ -110,6 +175,7 @@ class PrayerNotificationService {
     this.isScheduling = true;
 
     try {
+      // Check permissions
       const hasPermission = await this.checkPermissions();
       if (!hasPermission) {
         console.log('No notification permission');
@@ -117,137 +183,103 @@ class PrayerNotificationService {
         return;
       }
 
-      // Cancel all existing notifications first
-      await this.cancelKnownNotifications();
+      if (!Capacitor.isNativePlatform()) {
+        console.log('Not on native platform, skipping native notifications');
+        this.isScheduling = false;
+        return;
+      }
 
-      const notifications: ScheduleOptions[] = [];
-      const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+      console.log('Scheduling notifications for today:', today);
+
+      // Cancel existing notifications first
+      await this.cancelAllNotifications();
+
+      const notifications: any[] = [];
       const now = new Date();
-      const nowPlus5Min = new Date(now.getTime() + 5 * 60 * 1000); // Add 5 min buffer
+      const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
-      // Schedule prayer time notifications (IDs 1-5)
+      // Schedule prayer time notifications (one per prayer)
       for (let i = 0; i < prayers.length && i < 5; i++) {
         const prayer = prayers[i];
-        const prayerDate = this.getDateTimeForPrayer(prayer.time, true);
+        const prayerName = prayerNames[i];
+        const prayerTime = this.parseTime(prayer.time);
 
-        // Only schedule if in the future (with buffer)
-        if (prayerDate > nowPlus5Min) {
-          const notificationConfig: any = {
-            id: i + 1,
+        // Only schedule if time is in the future
+        if (prayerTime > now) {
+          const notification = {
+            id: this.PRAYER_NOTIFICATION_IDS[prayerName as keyof typeof this.PRAYER_NOTIFICATION_IDS],
             title: `${prayer.arabicName} - ${prayer.name}`,
             body: `C'est l'heure de la prière ${prayer.name}`,
-            schedule: { at: prayerDate },
-            actionTypeId: 'PRAYER_NOTIFICATION',
+            schedule: { at: prayerTime },
+            sound: 'adhan.mp3', // Will work on both iOS and Android
+            actionTypeId: 'PRAYER_TIME',
             extra: {
               prayerName: prayer.name,
             },
           };
 
-          // Add sound with correct platform-specific format
-          if (this.settings.adhanSoundEnabled) {
-            // iOS uses the filename without extension, Android needs full filename
-            if (Capacitor.getPlatform() === 'ios') {
-              notificationConfig.sound = 'adhan.wav';
-            } else if (Capacitor.getPlatform() === 'android') {
-              notificationConfig.sound = 'adhan.wav';
-            }
-          }
-
-          notifications.push(notificationConfig);
+          notifications.push(notification);
+          console.log(`Scheduled ${prayerName} prayer at ${prayerTime.toLocaleTimeString()}`);
         }
       }
 
-      // Schedule reminder notifications (IDs 101-104) - only if previous prayer not done
+      // Schedule reminder notifications (30 min before next prayer, only if previous not done)
       for (let i = 0; i < prayers.length - 1 && i < 4; i++) {
-        const previousPrayerDone = prayerStatuses[prayerNames[i]];
+        const nextPrayer = prayers[i + 1];
+        const currentPrayerName = prayerNames[i];
+        const nextPrayerName = prayerNames[i + 1];
 
-        if (!previousPrayerDone) {
-          const nextPrayer = prayers[i + 1];
-          const nextPrayerDate = this.getDateTimeForPrayer(nextPrayer.time, true);
-          const reminderDate = new Date(nextPrayerDate.getTime() - 30 * 60 * 1000);
+        // Check if current prayer is NOT done
+        const isPrayerDone = prayerStatuses[currentPrayerName];
 
-          // Only schedule if in the future (with buffer)
-          if (reminderDate > nowPlus5Min) {
-            notifications.push({
-              id: 101 + i,
-              title: 'Rappel de prière',
-              body: `Vous n'avez pas encore accompli la prière ${prayers[i].name}. La prochaine prière (${nextPrayer.name}) est dans 30 minutes.`,
-              schedule: { at: reminderDate },
-              actionTypeId: 'REMINDER_NOTIFICATION',
+        if (!isPrayerDone) {
+          const nextPrayerTime = this.parseTime(nextPrayer.time);
+          const reminderTime = new Date(nextPrayerTime.getTime() - 30 * 60 * 1000); // 30 min before
+
+          // Only schedule if reminder time is in the future
+          if (reminderTime > now) {
+            const notification = {
+              id: this.REMINDER_NOTIFICATION_IDS[nextPrayerName as keyof typeof this.REMINDER_NOTIFICATION_IDS],
+              title: `Rappel - ${nextPrayer.name}`,
+              body: `La prière ${currentPrayerName} n'a pas été enregistrée. Prochaine prière dans 30 minutes.`,
+              schedule: { at: reminderTime },
+              sound: undefined, // No Adhan for reminders
+              actionTypeId: 'PRAYER_REMINDER',
               extra: {
-                previousPrayer: prayers[i].name,
-                nextPrayer: nextPrayer.name,
+                prayerName: nextPrayer.name,
               },
-            });
+            };
+
+            notifications.push(notification);
+            console.log(`Scheduled reminder for ${nextPrayerName} at ${reminderTime.toLocaleTimeString()}`);
           }
         }
       }
 
-      if (notifications.length === 0) {
-        console.log('No future notifications to schedule for today');
-        this.lastScheduledDate = today;
-        localStorage.setItem('last_notification_schedule_date', today);
-        this.isScheduling = false;
-        return;
+      // Schedule all notifications
+      if (notifications.length > 0) {
+        await LocalNotifications.schedule({ notifications });
+        console.log(`Successfully scheduled ${notifications.length} notifications`);
       }
 
-      if (Capacitor.isNativePlatform()) {
-        try {
-          await LocalNotifications.schedule({ notifications });
-          console.log(`Scheduled ${notifications.length} notifications for today:`, notifications.map(n => n.id));
-          this.lastScheduledDate = today;
-          localStorage.setItem('last_notification_schedule_date', today);
-        } catch (error) {
-          console.error('Error scheduling notifications:', error);
-        }
-      } else {
-        console.log('Web: Would schedule notifications:', notifications.map(n => ({ id: n.id, time: n.schedule })));
-        this.lastScheduledDate = today;
-        localStorage.setItem('last_notification_schedule_date', today);
-      }
+      // Mark as scheduled for today
+      this.lastScheduledDate = today;
+      localStorage.setItem('last_notification_schedule_date', today);
+    } catch (error) {
+      console.error('Error scheduling prayer notifications:', error);
     } finally {
       this.isScheduling = false;
     }
   }
 
-  private async cancelKnownNotifications(): Promise<void> {
-    if (!Capacitor.isNativePlatform()) {
-      return;
-    }
-
-    try {
-      // Cancel known IDs: 1-5 (prayers) and 101-104 (reminders)
-      const idsToCancel = [1, 2, 3, 4, 5, 101, 102, 103, 104];
-      const notifications = idsToCancel.map(id => ({ id }));
-      await LocalNotifications.cancel({ notifications });
-      console.log('Cancelled known notification IDs:', idsToCancel);
-    } catch (error) {
-      console.error('Error canceling notifications:', error);
-    }
-  }
-
-  async cancelAllNotifications(): Promise<void> {
-    if (!Capacitor.isNativePlatform()) {
-      return;
-    }
-
-    try {
-      const pending = await LocalNotifications.getPending();
-      if (pending.notifications.length > 0) {
-        const ids = pending.notifications.map(n => ({ id: n.id }));
-        await LocalNotifications.cancel({ notifications: ids });
-        console.log('Cancelled all pending notifications');
-      }
-      this.lastScheduledDate = '';
-      localStorage.removeItem('last_notification_schedule_date');
-    } catch (error) {
-      console.error('Error canceling notifications:', error);
-    }
-  }
-
-  forceReschedule(): void {
-    this.lastScheduledDate = '';
-    localStorage.removeItem('last_notification_schedule_date');
+  /**
+   * Parse time string (HH:MM) to Date object for today
+   */
+  private parseTime(timeStr: string): Date {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date;
   }
 }
 
