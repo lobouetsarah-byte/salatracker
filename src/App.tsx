@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SplashScreen } from "@/components/SplashScreen";
 import { SupabaseConfigError } from "@/components/SupabaseConfigError";
@@ -21,67 +21,79 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Context to provide splash state to child components
+export const SplashContext = React.createContext<{ isSplashDismissed: boolean }>({
+  isSplashDismissed: false,
+});
+
 const AppContent = () => {
   const { initialized, loading } = useAuth();
-  const location = useLocation();
-  const [showSplash, setShowSplash] = useState(true);
-  const [appReady, setAppReady] = useState(false);
-  const [initError, setInitError] = useState(false);
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [hasSplashMinimumTimeElapsed, setHasSplashMinimumTimeElapsed] = useState(false);
+  const [isSplashDismissed, setIsSplashDismissed] = useState(false);
 
   useSwipeBack();
 
+  // Minimum splash duration (2.5 seconds)
   useEffect(() => {
-    const minSplashTime = 2500; // Minimum 2.5 seconds
-    const splashStartTime = Date.now();
+    const MINIMUM_SPLASH_DURATION = 2500; // 2.5 seconds
+    const timer = setTimeout(() => {
+      setHasSplashMinimumTimeElapsed(true);
+    }, MINIMUM_SPLASH_DURATION);
 
-    if (initialized) {
-      setAppReady(true);
+    return () => clearTimeout(timer);
+  }, []);
 
-      const elapsedTime = Date.now() - splashStartTime;
-      const remainingTime = Math.max(0, minSplashTime - elapsedTime);
+  // Check if app is ready (auth initialized)
+  useEffect(() => {
+    if (initialized && !loading) {
+      setIsAppReady(true);
+    }
+  }, [initialized, loading]);
 
+  // Dismiss splash when both conditions are met
+  useEffect(() => {
+    if (isAppReady && hasSplashMinimumTimeElapsed && !isSplashDismissed) {
+      // Add small delay for exit animation
       const timer = setTimeout(() => {
-        setShowSplash(false);
-      }, remainingTime);
+        setIsSplashDismissed(true);
+      }, 700); // Match exit animation duration
 
       return () => clearTimeout(timer);
     }
-  }, [initialized]);
+  }, [isAppReady, hasSplashMinimumTimeElapsed, isSplashDismissed]);
 
-  useEffect(() => {
-    const errorTimer = setTimeout(() => {
-      if (!initialized && !loading) {
-        setInitError(true);
-      }
-    }, 10000); // 10 seconds timeout
+  // Show splash screen until both conditions are met
+  const shouldShowSplash = !isSplashDismissed;
 
-    return () => clearTimeout(errorTimer);
-  }, [initialized, loading]);
-
-  if (!initialized || showSplash) {
+  if (shouldShowSplash) {
     return (
       <SplashScreen
-        isReady={appReady}
-        timeoutDuration={30000}
+        isReady={isAppReady && hasSplashMinimumTimeElapsed}
+        timeoutDuration={10000} // 10 seconds max timeout
       />
     );
   }
 
+  // Main app routes (only rendered after splash is dismissed)
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/auth" element={<Auth />} />
-      <Route path="/onboarding" element={<Onboarding />} />
-      <Route path="/how-it-works" element={<HowItWorks />} />
-      <Route path="/terms" element={<TermsOfService />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/generate-splash" element={<GenerateSplash />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <SplashContext.Provider value={{ isSplashDismissed }}>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/generate-splash" element={<GenerateSplash />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </SplashContext.Provider>
   );
 };
 
 const App = () => {
+  // Check Supabase configuration before rendering app
   if (!isSupabaseConfigured()) {
     return <SupabaseConfigError />;
   }
