@@ -282,7 +282,7 @@ const Index = () => {
   }
 
   return (
-    <div className={`min-h-screen pb-20 transition-colors duration-500 ${isInPeriod ? "period-mode bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
+    <div className={`flex flex-col h-screen overflow-hidden transition-colors duration-500 ${isInPeriod ? "period-mode bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
       {/* Fixed Header with Logo */}
       <div 
         className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-500 ${
@@ -313,7 +313,7 @@ const Index = () => {
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8" style={{ paddingTop: 'calc(96px + env(safe-area-inset-top))' }}>
+      <div className="flex-1 overflow-y-auto max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8" style={{ paddingTop: 'calc(96px + env(safe-area-inset-top))', paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
         {/* Date Picker and Location (Prayers Tab Only) */}
         <div className="animate-fade-in">
           {activeTab === "prayers" && (
@@ -427,7 +427,13 @@ const Index = () => {
                 ) : (
                   <div className="bg-primary/10 px-3 py-1 rounded-full">
                     <span className="text-sm font-medium text-primary">
-                      {stats.onTime + stats.late}/{stats.total}
+                      {(() => {
+                        const completedCount = prayerTimes?.prayers.filter(prayer => {
+                          const status = getPrayerStatus(selectedDateString, prayer.name);
+                          return status === "on-time" || status === "late";
+                        }).length || 0;
+                        return `${completedCount}/5`;
+                      })()}
                     </span>
                   </div>
                 )}

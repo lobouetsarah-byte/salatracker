@@ -180,4 +180,46 @@ All colors MUST be HSL.
   .animate-progress-bar {
     animation: progress-bar 2s ease-in-out infinite;
   }
+
+  /* Mobile performance optimizations */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  /* Hardware acceleration for smooth animations */
+  .animate-fade-in,
+  .animate-scale-in,
+  [class*="animate-"] {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Optimize scrolling performance */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Reduce paint areas for backdrop blur */
+  .backdrop-blur-xl,
+  .backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    will-change: backdrop-filter;
+  }
+
+  /* Optimize transitions */
+  .transition-all,
+  .transition-colors,
+  .transition-opacity {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Fixed positioning optimization */
+  .fixed {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
 }
