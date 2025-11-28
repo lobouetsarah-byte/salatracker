@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, XCircle, Trash2, LogIn, Heart, Sparkles, BookHeart } from "lucide-react";
 import { PrayerStatus } from "@/hooks/usePrayerTracking";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -322,14 +322,13 @@ export const PrayerCard = ({
 
       {/* Status selection dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>
               {name} - {time}
             </DialogTitle>
           </DialogHeader>
-          
-          
+
           <div className="space-y-3 mt-4">
             <Button
               onClick={() => handleStatusClick("on-time")}
@@ -381,6 +380,9 @@ export const PrayerCard = ({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Connexion requise</DialogTitle>
+            <DialogDescription>
+              Connectez-vous pour sauvegarder vos prières et dhikr
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <p className="text-muted-foreground">

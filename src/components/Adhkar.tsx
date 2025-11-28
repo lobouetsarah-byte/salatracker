@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useState, useEffect, useRef } from "react";
@@ -505,6 +505,9 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
             <DialogTitle className="text-lg sm:text-xl">
               {selectedDhikr && (language === "fr" ? selectedDhikr.name : selectedDhikr.nameEn)}
             </DialogTitle>
+            <DialogDescription>
+              {selectedDhikr && `Temps estimé: ${selectedDhikr.estimatedTime}`}
+            </DialogDescription>
           </DialogHeader>
 
           {selectedDhikr && (

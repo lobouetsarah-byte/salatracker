@@ -17,7 +17,7 @@ export const DailySuccess = ({ open, onClose, isInPeriod }: DailySuccessProps) =
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md" aria-describedby={undefined}>
         <div className="flex flex-col items-center text-center space-y-6 py-6">
           <div className="text-7xl animate-bounce">{emoji}</div>
           

@@ -14,11 +14,8 @@ import { usePeriodDhikrTracking, DhikrType } from "@/hooks/usePeriodDhikrTrackin
 import { usePeriodNotifications } from "@/hooks/usePeriodNotifications";
 import { useBadges } from "@/hooks/useBadges";
 import { useBadgeChecker } from "@/hooks/useBadgeChecker";
-import { usePrayerNotificationsManager } from "@/hooks/usePrayerNotificationsManager";
-import { prayerNotificationService } from "@/services/PrayerNotificationService";
+import { useNotificationManager } from "@/hooks/useNotificationManager";
 import { DailySuccess } from "@/components/DailySuccess";
-import { usePrayerNotifications } from "@/hooks/usePrayerNotifications";
-import { useNativeNotifications } from "@/hooks/useNativeNotifications";
 import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useLocationSettings } from "@/hooks/useLocationSettings";
@@ -102,11 +99,11 @@ const Index = () => {
     return statuses;
   }, [prayerTimes, selectedDateString, getPrayerStatus]);
 
-  // Prayer notifications manager (Adhan + 30-min reminders)
-  usePrayerNotificationsManager({
+  // UNIFIED notification manager - handles ALL notification logic
+  useNotificationManager({
     prayers: prayerTimes?.prayers || null,
     prayerStatuses,
-    enabled: settings.notificationsEnabled,
+    enabled: settings.notificationsEnabled && !isInPeriod,
   });
 
   // Period notifications (always web-based)
@@ -115,21 +112,6 @@ const Index = () => {
     isInPeriod,
     settings,
   });
-
-  // Regular prayer notifications - hooks must be called unconditionally
-  useNativeNotifications(
-    prayerTimes?.prayers || [],
-    getPrayerStatus,
-    settings,
-    isNative && !isInPeriod // Pass condition as parameter
-  );
-  
-  usePrayerNotifications(
-    prayerTimes?.prayers || [],
-    getPrayerStatus,
-    settings,
-    !isNative && !isInPeriod // Pass condition as parameter
-  );
 
   useEffect(() => {
     if (prayerTimes?.prayers) {
