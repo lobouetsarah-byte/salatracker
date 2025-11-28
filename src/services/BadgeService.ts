@@ -139,7 +139,7 @@ class BadgeService {
       `🎉 Nouveau badge débloqué !`,
       `${badge.icon} ${badge.name}: ${badge.description}`,
       {
-        duration: 6000,
+        duration: 3000, // Auto-dismiss after 3 seconds
       }
     );
   }

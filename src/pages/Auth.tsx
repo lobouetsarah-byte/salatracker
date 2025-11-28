@@ -10,6 +10,7 @@ import salatrackLogo from "@/assets/salatrack-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notifications";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { z } from "zod";
 
 // Move schemas outside component to avoid recreation on every render
@@ -21,6 +22,7 @@ const Auth = () => {
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading, signIn } = useAuth();
   const { t } = useLanguage();
+  useSwipeBack(); // Enable swipe-back navigation
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);

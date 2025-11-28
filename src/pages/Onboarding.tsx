@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { ArrowRight, ArrowLeft, TrendingUp, Calendar, BookOpen, Sparkles, User, Users } from "lucide-react";
 import salatrackLogo from "@/assets/salatrack-logo.png";
 import { z } from "zod";
@@ -22,6 +23,7 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t, language } = useLanguage();
+  useSwipeBack(); // Enable swipe-back navigation
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   

@@ -100,10 +100,11 @@ const Index = () => {
   }, [prayerTimes, selectedDateString, getPrayerStatus]);
 
   // UNIFIED notification manager - handles ALL notification logic
+  // Adhan notifications ALWAYS fire regardless of period mode
   useNotificationManager({
     prayers: prayerTimes?.prayers || null,
     prayerStatuses,
-    enabled: settings.notificationsEnabled && !isInPeriod,
+    enabled: settings.notificationsEnabled, // Always enabled when user enables notifications, even in period mode
   });
 
   // Period notifications (always web-based)

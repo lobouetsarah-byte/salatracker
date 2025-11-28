@@ -34,10 +34,8 @@ export const useSwipeBack = () => {
 
       // Horizontal swipe of at least 100px, with minimal vertical movement
       if (deltaX > 100 && deltaY < 50) {
-        const canGoBack = window.history.length > 1 &&
-                         location.pathname !== '/' &&
-                         location.pathname !== '/onboarding' &&
-                         location.pathname !== '/auth';
+        // Allow back navigation from all pages except the main app root
+        const canGoBack = window.history.length > 1 && location.pathname !== '/';
 
         if (canGoBack) {
           navigate(-1);
@@ -72,10 +70,8 @@ export const useSwipeBack = () => {
     const setupBackButton = async () => {
       try {
         backButtonListener = await CapApp.addListener('backButton', () => {
-          const canGoBack = window.history.length > 1 &&
-                           location.pathname !== '/' &&
-                           location.pathname !== '/onboarding' &&
-                           location.pathname !== '/auth';
+          // Allow back navigation from all pages except the main app root
+          const canGoBack = window.history.length > 1 && location.pathname !== '/';
 
           if (canGoBack) {
             navigate(-1);
