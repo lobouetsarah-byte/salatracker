@@ -3,36 +3,52 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { PrayerStatus } from "./usePrayerTracking";
 
+/**
+ * Hook pour le suivi des prières avec synchronisation Supabase
+ *
+ * Comportement:
+ * - Utilisateur connecté: Données stockées dans Supabase (par user_id)
+ * - Utilisateur non connecté: Données stockées dans localStorage uniquement
+ * - Changement de compte: Chaque utilisateur voit SEULEMENT ses propres données
+ * - localStorage est effacé lors de la connexion/déconnexion pour éviter les conflits
+ */
 export const usePrayerTrackingSync = () => {
   const { user } = useAuth();
   const [prayerData, setPrayerData] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
+  // Charger les données au montage et lors du changement d'utilisateur
   useEffect(() => {
     if (user) {
-      loadPrayerData();
+      // Utilisateur connecté: Charger depuis Supabase
+      loadPrayerDataFromSupabase();
+      // Nettoyer le localStorage pour éviter les conflits entre comptes
+      localStorage.removeItem("prayerTracking");
     } else {
-      // Load from localStorage if not authenticated
-      const stored = localStorage.getItem("prayerTracking");
-      if (stored) {
-        setPrayerData(JSON.parse(stored));
-      }
-      setLoading(false);
+      // Utilisateur non connecté: Charger depuis localStorage
+      loadPrayerDataFromLocalStorage();
     }
-  }, [user]);
+  }, [user?.id]); // Important: user?.id pour détecter le changement de compte
 
-  const loadPrayerData = async () => {
+  /**
+   * Charger les données depuis Supabase (utilisateur connecté)
+   */
+  const loadPrayerDataFromSupabase = async () => {
     if (!user) return;
 
     try {
       const { data, error } = await supabase
         .from("prayer_tracking")
         .select("*")
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .order("prayer_date", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur lors du chargement des prières depuis Supabase:", error);
+        throw error;
+      }
 
-      // Convert to the format expected by the app
+      // Convertir au format attendu par l'app
       const formatted: any = {};
       data?.forEach((item) => {
         const dateKey = item.prayer_date;
@@ -45,13 +61,36 @@ export const usePrayerTrackingSync = () => {
       setPrayerData(formatted);
       setLoading(false);
     } catch (error) {
+      console.error("Échec du chargement des données de prière:", error);
+      setPrayerData({});
       setLoading(false);
     }
   };
 
+  /**
+   * Charger les données depuis localStorage (utilisateur non connecté)
+   */
+  const loadPrayerDataFromLocalStorage = () => {
+    try {
+      const stored = localStorage.getItem("prayerTracking");
+      if (stored) {
+        setPrayerData(JSON.parse(stored));
+      } else {
+        setPrayerData({});
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement depuis localStorage:", error);
+      setPrayerData({});
+    }
+    setLoading(false);
+  };
+
+  /**
+   * Mettre à jour le statut d'une prière
+   */
   const updatePrayerStatus = async (date: string, prayerName: string, status: PrayerStatus) => {
     if (user) {
-      // Save to Supabase
+      // Utilisateur connecté: Sauvegarder dans Supabase
       try {
         const { error } = await supabase
           .from("prayer_tracking")
@@ -60,17 +99,23 @@ export const usePrayerTrackingSync = () => {
             prayer_date: date,
             prayer_name: prayerName,
             status,
+            updated_at: new Date().toISOString(),
           }, {
             onConflict: "user_id,prayer_date,prayer_name",
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Erreur lors de la sauvegarde dans Supabase:", error);
+          throw error;
+        }
       } catch (error) {
-        // Silent fail - data will be saved to localStorage
+        console.error("Échec de la sauvegarde de la prière:", error);
+        // Ne pas continuer si la sauvegarde échoue pour un utilisateur connecté
+        return;
       }
     }
 
-    // Update local state
+    // Mettre à jour l'état local
     const newData = {
       ...prayerData,
       [date]: {
@@ -79,14 +124,19 @@ export const usePrayerTrackingSync = () => {
       },
     };
     setPrayerData(newData);
-    
-    // Also save to localStorage as backup
-    localStorage.setItem("prayerTracking", JSON.stringify(newData));
+
+    // Sauvegarder dans localStorage UNIQUEMENT si non connecté
+    if (!user) {
+      localStorage.setItem("prayerTracking", JSON.stringify(newData));
+    }
   };
 
+  /**
+   * Supprimer le statut d'une prière
+   */
   const deletePrayerStatus = async (date: string, prayerName: string) => {
     if (user) {
-      // Delete from Supabase
+      // Utilisateur connecté: Supprimer de Supabase
       try {
         const { error } = await supabase
           .from("prayer_tracking")
@@ -95,30 +145,44 @@ export const usePrayerTrackingSync = () => {
           .eq("prayer_date", date)
           .eq("prayer_name", prayerName);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Erreur lors de la suppression dans Supabase:", error);
+          throw error;
+        }
       } catch (error) {
-        // Silent fail - data will be deleted from localStorage
+        console.error("Échec de la suppression de la prière:", error);
+        return;
       }
     }
 
-    // Update local state
+    // Mettre à jour l'état local
     if (prayerData[date]) {
       const newDateData = { ...prayerData[date] };
       delete newDateData[prayerName];
-      
+
       const newData = {
         ...prayerData,
         [date]: newDateData,
       };
       setPrayerData(newData);
-      localStorage.setItem("prayerTracking", JSON.stringify(newData));
+
+      // Sauvegarder dans localStorage UNIQUEMENT si non connecté
+      if (!user) {
+        localStorage.setItem("prayerTracking", JSON.stringify(newData));
+      }
     }
   };
 
+  /**
+   * Obtenir le statut d'une prière
+   */
   const getPrayerStatus = (date: string, prayerName: string): PrayerStatus => {
     return prayerData[date]?.[prayerName] || "pending";
   };
 
+  /**
+   * Obtenir les statistiques pour une période
+   */
   const getStats = (period: "daily" | "weekly" | "monthly") => {
     const today = new Date();
     let startDate: Date;
@@ -131,7 +195,7 @@ export const usePrayerTrackingSync = () => {
     } else {
       startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     }
-    
+
     let onTime = 0;
     let late = 0;
     let missed = 0;
@@ -152,6 +216,9 @@ export const usePrayerTrackingSync = () => {
     return { onTime, late, missed, total };
   };
 
+  /**
+   * Obtenir les statistiques personnalisées
+   */
   const getCustomStats = (startDate: Date, endDate: Date) => {
     let onTime = 0;
     let late = 0;

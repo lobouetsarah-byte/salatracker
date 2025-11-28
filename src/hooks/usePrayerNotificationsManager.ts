@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { prayerNotificationService } from '@/services/PrayerNotificationService';
 import { Prayer } from './usePrayerTimes';
 
@@ -15,49 +15,58 @@ interface UsePrayerNotificationsManagerProps {
 /**
  * Hook to manage prayer notifications
  *
- * This hook ensures notifications are:
- * - Scheduled ONCE per day
- * - Only when enabled
- * - With proper permissions
- * - Never on loop
+ * Flow:
+ * 1. When enabled changes to TRUE: Request permission once, then schedule
+ * 2. When enabled changes to FALSE: Cancel all notifications
+ * 3. When prayers update: Re-schedule if enabled (service prevents duplicates)
+ * 4. Never loops - uses debouncing and service-level caching
  */
 export const usePrayerNotificationsManager = ({
   prayers,
   prayerStatuses,
   enabled,
 }: UsePrayerNotificationsManagerProps) => {
+  const permissionRequested = useRef(false);
+  const lastEnabled = useRef(enabled);
+
   useEffect(() => {
-    const scheduleNotifications = async () => {
-      // Update enabled state in service
+    const manageNotifications = async () => {
+      // Update enabled state in service (always sync)
       await prayerNotificationService.setNotificationsEnabled(enabled);
 
-      // Only schedule if enabled and prayers available
+      // If disabled, stop here (service already canceled notifications)
       if (!enabled) {
-        console.log('Notifications disabled');
+        permissionRequested.current = false; // Reset for next enable
+        lastEnabled.current = false;
         return;
       }
 
+      // If no prayers yet, wait
       if (!prayers || prayers.length === 0) {
-        console.log('No prayers available yet');
         return;
       }
 
-      // Check permissions first
+      // Check if we need to request permission (only once when first enabled)
       const hasPermission = await prayerNotificationService.checkPermissions();
 
-      if (!hasPermission) {
-        // Request permission with explanation
+      if (!hasPermission && !permissionRequested.current) {
+        permissionRequested.current = true;
+
+        // Request permission with French explanation
         const granted = await prayerNotificationService.requestPermissions(true);
+
         if (!granted) {
-          console.log('Notification permission not granted');
-          return;
+          return; // User denied, stop here
         }
       }
 
-      // Schedule notifications (service handles once-per-day logic)
+      // Schedule notifications
+      // Service handles: once-per-day logic, duplicate prevention, etc.
       await prayerNotificationService.schedulePrayerNotifications(prayers, prayerStatuses);
+
+      lastEnabled.current = enabled;
     };
 
-    scheduleNotifications();
+    manageNotifications();
   }, [prayers, prayerStatuses, enabled]);
 };
