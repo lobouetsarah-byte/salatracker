@@ -78,10 +78,10 @@ export const Settings = ({ settings, onUpdateSettings, onLogout, userGender }: S
             <div className="p-2 rounded-lg bg-primary/10">
               <Bell className="w-5 h-5 text-primary" />
             </div>
-            Notifications de prière
+            Notifications
           </CardTitle>
           <CardDescription className="text-sm">
-            Activez les notifications pour les heures de prière avec l'adhan
+            Activez les notifications pour les prières et adhkar
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -91,10 +91,10 @@ export const Settings = ({ settings, onUpdateSettings, onLogout, userGender }: S
                 <div className="p-1.5 rounded bg-primary/20">
                   <Bell className="w-4 h-4 text-primary" />
                 </div>
-                Notifications de prière
+                Activer toutes les notifications
               </Label>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Recevez une notification à chaque heure de prière avec l'adhan, et un rappel 30 minutes avant la prochaine prière si la précédente n'est pas cochée
+                Recevez des notifications pour les heures de prière (avec l'adhan), les rappels si une prière n'est pas cochée, et les adhkar du matin (7h) et du soir (18h)
               </p>
             </div>
             <Switch

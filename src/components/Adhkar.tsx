@@ -7,6 +7,8 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2, Pause, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Dhikr {
   id: string;
@@ -198,6 +200,7 @@ interface AdhkarProps {
 
 export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   const { t, language } = useLanguage();
+  const { user } = useAuth();
   const [selectedDhikr, setSelectedDhikr] = useState<Dhikr | null>(null);
   const [currentSentence, setCurrentSentence] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -224,16 +227,48 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
     }
   }, []);
 
-  // Load completion status from localStorage
+  // Load completion status from Supabase for logged-in users, localStorage for others
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    const stored = localStorage.getItem(`adhkar-${today}`);
-    if (stored) {
-      const data = JSON.parse(stored);
-      if (data.morning) setCompletedMorning(new Set(data.morning));
-      if (data.evening) setCompletedEvening(new Set(data.evening));
-    }
-  }, []);
+    const loadCompletionStatus = async () => {
+      const today = new Date().toISOString().split("T")[0];
+
+      if (user) {
+        // Load from Supabase for logged-in users
+        const { data, error } = await supabase
+          .from('adhkar_logs')
+          .select('dhikr_id, dhikr_category')
+          .eq('user_id', user.id)
+          .eq('adhkar_date', today)
+          .eq('completed', true);
+
+        if (data && !error) {
+          const morningSet = new Set<string>();
+          const eveningSet = new Set<string>();
+
+          data.forEach(log => {
+            if (log.dhikr_category === 'morning') {
+              morningSet.add(log.dhikr_id);
+            } else if (log.dhikr_category === 'evening') {
+              eveningSet.add(log.dhikr_id);
+            }
+          });
+
+          setCompletedMorning(morningSet);
+          setCompletedEvening(eveningSet);
+        }
+      } else {
+        // Load from localStorage for non-logged-in users
+        const stored = localStorage.getItem(`adhkar-${today}`);
+        if (stored) {
+          const data = JSON.parse(stored);
+          if (data.morning) setCompletedMorning(new Set(data.morning));
+          if (data.evening) setCompletedEvening(new Set(data.evening));
+        }
+      }
+    };
+
+    loadCompletionStatus();
+  }, [user]);
 
   const handleDhikrClick = (dhikr: Dhikr, type: "morning" | "evening") => {
     setSelectedDhikr(dhikr);
@@ -242,11 +277,11 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
     setDialogOpen(true);
   };
 
-  const markAsComplete = () => {
+  const markAsComplete = async () => {
     if (!selectedDhikr) return;
 
     const today = new Date().toISOString().split("T")[0];
-    const newCompleted = activeTab === "morning" 
+    const newCompleted = activeTab === "morning"
       ? new Set([...completedMorning, selectedDhikr.id])
       : new Set([...completedEvening, selectedDhikr.id]);
 
@@ -256,44 +291,63 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
       setCompletedEvening(newCompleted);
     }
 
-    const stored = localStorage.getItem(`adhkar-${today}`);
-    const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
-    data[activeTab] = Array.from(newCompleted);
-    localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
+    if (user) {
+      // Save to Supabase for logged-in users
+      await supabase
+        .from('adhkar_logs')
+        .upsert({
+          user_id: user.id,
+          adhkar_date: today,
+          dhikr_id: selectedDhikr.id,
+          dhikr_category: activeTab,
+          completed: true,
+        }, {
+          onConflict: 'user_id,adhkar_date,dhikr_id'
+        });
+    } else {
+      // Save to localStorage for non-logged-in users
+      const stored = localStorage.getItem(`adhkar-${today}`);
+      const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
+      data[activeTab] = Array.from(newCompleted);
+      localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
+    }
 
     // Check if all adhkar in this category are complete
     const adhkarList = activeTab === "morning" ? morningAdhkar : eveningAdhkar;
     const allComplete = adhkarList.every(dhikr => newCompleted.has(dhikr.id));
-    
+
     if (allComplete) {
       // Check if we haven't shown congrats yet today
       const congratsKey = `adhkar-congrats-${activeTab}-${today}`;
       if (!localStorage.getItem(congratsKey)) {
         toast.success(
-          language === "fr" 
-            ? `🎉 Bravo ! Tous les adhkar du ${activeTab === "morning" ? "matin" : "soir"} sont complétés !` 
-            : `🎉 Congratulations! All ${activeTab} adhkar completed!`,
-          { duration: 6000 }
+          language === "fr"
+            ? `✨ Masha'Allah ! Tous les adhkar du ${activeTab === "morning" ? "matin" : "soir"} sont complétés !`
+            : `✨ Masha'Allah! All ${activeTab} adhkar completed!`,
+          { duration: 4000 }
         );
         localStorage.setItem(congratsKey, "true");
-        
+
         // Trigger badge check
         if (onCompletion) {
           onCompletion();
         }
       }
     } else {
-      toast.success(language === "fr" ? "Adhkar complété!" : "Adhkar completed!");
+      toast.success(
+        language === "fr" ? "✨ Adhkar complété ! Masha'Allah !" : "✨ Adhkar completed! Masha'Allah!",
+        { duration: 3000 }
+      );
     }
-    
+
     setDialogOpen(false);
   };
 
-  const undoComplete = () => {
+  const undoComplete = async () => {
     if (!selectedDhikr) return;
 
     const today = new Date().toISOString().split("T")[0];
-    const newCompleted = activeTab === "morning" 
+    const newCompleted = activeTab === "morning"
       ? new Set([...completedMorning].filter(id => id !== selectedDhikr.id))
       : new Set([...completedEvening].filter(id => id !== selectedDhikr.id));
 
@@ -303,16 +357,30 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
       setCompletedEvening(newCompleted);
     }
 
-    const stored = localStorage.getItem(`adhkar-${today}`);
-    const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
-    data[activeTab] = Array.from(newCompleted);
-    localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
+    if (user) {
+      // Delete from Supabase for logged-in users
+      await supabase
+        .from('adhkar_logs')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('adhkar_date', today)
+        .eq('dhikr_id', selectedDhikr.id);
+    } else {
+      // Update localStorage for non-logged-in users
+      const stored = localStorage.getItem(`adhkar-${today}`);
+      const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
+      data[activeTab] = Array.from(newCompleted);
+      localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
+    }
 
     // Clear congrats flag since not all are complete anymore
     const congratsKey = `adhkar-congrats-${activeTab}-${today}`;
     localStorage.removeItem(congratsKey);
 
-    toast.info(language === "fr" ? "Adhkar marqué comme non complété" : "Adhkar marked as incomplete");
+    toast.info(
+      language === "fr" ? "Adhkar marqué comme non complété" : "Adhkar marked as incomplete",
+      { duration: 2000 }
+    );
   };
 
   const isCompleted = (dhikrId: string) => {
@@ -396,10 +464,10 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
     const congratsKey = `adhkar-congrats-${today}`;
     const stored = localStorage.getItem(congratsKey);
     const data = stored ? JSON.parse(stored) : { morning: false, evening: false };
-    
+
     if (allMorningCompleted && morningAdhkar.length > 0 && !data.morning) {
-      toast.success("🎉 Masha'Allah ! Vous avez complété tous les adhkar du matin !", {
-        duration: 5000,
+      toast.success("✨ Masha'Allah ! Vous avez complété tous les adhkar du matin !", {
+        duration: 4000,
         icon: <Sparkles className="w-5 h-5 text-yellow-500" />,
         className: "animate-scale-in",
       });
@@ -408,8 +476,8 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
     }
 
     if (allEveningCompleted && eveningAdhkar.length > 0 && !data.evening) {
-      toast.success("🎉 Masha'Allah ! Vous avez complété tous les adhkar du soir !", {
-        duration: 5000,
+      toast.success("✨ Masha'Allah ! Vous avez complété tous les adhkar du soir !", {
+        duration: 4000,
         icon: <Sparkles className="w-5 h-5 text-yellow-500" />,
         className: "animate-scale-in",
       });

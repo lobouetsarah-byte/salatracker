@@ -32,7 +32,7 @@ export const LocationDialog = ({ open, onOpenChange }: LocationDialogProps) => {
     setLocalManualMode(checked);
     if (!checked) {
       setAutoMode();
-      toast.success("Mode automatique activé");
+      toast.success("Mode automatique activé", { duration: 3000 });
       setTimeout(() => window.location.reload(), 500);
     }
   };
@@ -43,25 +43,25 @@ export const LocationDialog = ({ open, onOpenChange }: LocationDialogProps) => {
       const lon = parseFloat(longitude);
       
       if (isNaN(lat) || isNaN(lon)) {
-        toast.error("Veuillez entrer des coordonnées valides");
+        toast.error("Veuillez entrer des coordonnées valides", { duration: 3000 });
         return;
       }
 
       if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-        toast.error("Coordonnées hors limites");
+        toast.error("Coordonnées hors limites", { duration: 3000 });
         return;
       }
 
       setManualMode({ latitude: lat, longitude: lon });
-      toast.success("Localisation manuelle enregistrée");
+      toast.success("Localisation manuelle enregistrée", { duration: 3000 });
     } else {
       if (!city.trim()) {
-        toast.error("Veuillez entrer une ville");
+        toast.error("Veuillez entrer une ville", { duration: 3000 });
         return;
       }
 
       setManualMode({ city: city.trim(), country: DEFAULT_COUNTRY });
-      toast.success(`Localisation enregistrée: ${city}, ${DEFAULT_COUNTRY}`);
+      toast.success(`Localisation enregistrée: ${city}, ${DEFAULT_COUNTRY}`, { duration: 3000 });
     }
     
     onOpenChange(false);

@@ -180,6 +180,53 @@ class NotificationManager {
   }
 
   /**
+   * Schedule adhkar notifications
+   * - Morning adhkar at 7 AM
+   * - Evening adhkar at 6 PM
+   */
+  async scheduleAdhkarNotifications(): Promise<void> {
+    if (!this.state.notificationsEnabled || !this.isNative()) {
+      return;
+    }
+
+    const now = new Date();
+
+    // Morning adhkar at 7 AM
+    const morningTime = new Date();
+    morningTime.setHours(7, 0, 0, 0);
+
+    if (morningTime > now) {
+      await LocalNotifications.schedule({
+        notifications: [{
+          id: 200,
+          title: '☀️ Adhkar du Matin',
+          body: '✨ C\'est le moment de faire vos adhkar du matin. Qu\'Allah vous récompense ! 🤲',
+          schedule: { at: morningTime },
+          sound: undefined,
+          actionTypeId: 'ADHKAR_MORNING',
+        }]
+      });
+    }
+
+    // Evening adhkar at 6 PM
+    const eveningTime = new Date();
+    eveningTime.setHours(18, 0, 0, 0);
+
+    if (eveningTime > now) {
+      await LocalNotifications.schedule({
+        notifications: [{
+          id: 201,
+          title: '🌙 Adhkar du Soir',
+          body: '✨ C\'est le moment de faire vos adhkar du soir. Masha\'Allah ! 🤲',
+          schedule: { at: eveningTime },
+          sound: undefined,
+          actionTypeId: 'ADHKAR_EVENING',
+        }]
+      });
+    }
+  }
+
+  /**
    * Schedule prayer notifications for today
    * ONLY if:
    * - Notifications are enabled
@@ -234,11 +281,13 @@ class NotificationManager {
       const notifications: any[] = [];
       const now = new Date();
       const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+      const prayerEmojis = ['🌙', '☀️', '🌤️', '🌅', '🌃'];
 
-      // Schedule prayer time notifications (with Adhan)
+      // Schedule prayer time notifications (with Adhan and emojis)
       for (let i = 0; i < Math.min(prayers.length, 5); i++) {
         const prayer = prayers[i];
         const prayerName = prayerNames[i];
+        const emoji = prayerEmojis[i];
         const [hours, minutes] = prayer.time.split(':').map(Number);
 
         const prayerTime = new Date();
@@ -248,8 +297,8 @@ class NotificationManager {
         if (prayerTime > now) {
           notifications.push({
             id: i + 1,
-            title: `${prayer.arabicName} - ${prayer.name}`,
-            body: `C'est l'heure de la prière ${prayer.name}`,
+            title: `${emoji} ${prayer.arabicName} - ${prayer.name}`,
+            body: `🕌 C'est l'heure de la prière ${prayer.name}. Qu'Allah accepte votre prière ! 🤲`,
             schedule: { at: prayerTime },
             sound: 'adhan.mp3',
             actionTypeId: 'PRAYER_TIME',
@@ -276,8 +325,8 @@ class NotificationManager {
           if (reminderTime > now) {
             notifications.push({
               id: 100 + i + 1,
-              title: `Rappel - ${nextPrayer.name}`,
-              body: `La prière ${currentPrayerName} n'a pas été enregistrée. Prochaine prière dans 30 minutes.`,
+              title: `⏰ Rappel - ${nextPrayer.name}`,
+              body: `La prière ${currentPrayerName} n'a pas été enregistrée. Prochaine prière dans 30 minutes. 🕌`,
               schedule: { at: reminderTime },
               sound: undefined,
               actionTypeId: 'PRAYER_REMINDER',
@@ -290,10 +339,14 @@ class NotificationManager {
       // Schedule all notifications
       if (notifications.length > 0) {
         await LocalNotifications.schedule({ notifications });
-        console.log(`✅ ${notifications.length} notifications planifiées`);
+        console.log(`✅ ${notifications.length} prayer notifications planifiées`);
       } else {
-        console.log('ℹ️ Aucune notification à planifier (toutes passées)');
+        console.log('ℹ️ Aucune prayer notification à planifier (toutes passées)');
       }
+
+      // Schedule adhkar notifications
+      await this.scheduleAdhkarNotifications();
+      console.log('✅ Adhkar notifications planifiées');
 
       // Mark as scheduled
       this.state.lastScheduledDate = today;
