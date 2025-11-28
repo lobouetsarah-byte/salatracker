@@ -219,7 +219,10 @@ const Onboarding = () => {
         title: language === "fr" ? "Compte créé avec succès !" : "Account created successfully!",
       });
 
-      navigate("/how-it-works");
+      // Small delay to ensure auth state is updated before navigation
+      setTimeout(() => {
+        navigate("/how-it-works");
+      }, 100);
     } catch (error: any) {
       toast({
         title: language === "fr" ? "Erreur" : "Error",

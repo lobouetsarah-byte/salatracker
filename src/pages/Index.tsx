@@ -241,7 +241,32 @@ const Index = () => {
     return prayerMinutes < currentMinutes;
   };
 
-  const stats = getStats(statsPeriod);
+  // Calculate stats based on selected date and period
+  const stats = useMemo(() => {
+    if (statsPeriod === "daily") {
+      const startDate = new Date(selectedDate);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(selectedDate);
+      endDate.setHours(23, 59, 59, 999);
+      return getCustomStats(startDate, endDate);
+    } else if (statsPeriod === "weekly") {
+      const weekStart = new Date(selectedDate);
+      const day = weekStart.getDay();
+      const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+      weekStart.setDate(diff);
+      weekStart.setHours(0, 0, 0, 0);
+
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+
+      return getCustomStats(weekStart, weekEnd);
+    } else {
+      const monthStart = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+      const monthEnd = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0, 23, 59, 59, 999);
+      return getCustomStats(monthStart, monthEnd);
+    }
+  }, [selectedDate, statsPeriod, getCustomStats]);
 
   const handleSignOut = async () => {
     setIsLoggingOut(true);
@@ -371,11 +396,12 @@ const Index = () => {
                 <DailyHadith />
               </div>
               
-              <WeeklyStats 
-                stats={stats} 
+              <WeeklyStats
+                stats={stats}
                 period={statsPeriod}
                 onPeriodChange={setStatsPeriod}
                 getCustomStats={getCustomStats}
+                externalSelectedDate={selectedDate}
               />
               {isInPeriod && <PeriodStats />}
             </div>

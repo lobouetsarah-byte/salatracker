@@ -45,11 +45,8 @@ const Auth = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (user && !isResettingPassword) {
-      navigate("/");
-    }
-  }, [user, navigate, isResettingPassword]);
+  // Don't redirect on user change - navigation is handled by form submissions
+  // This prevents blank page issues after login/signup
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +85,10 @@ const Auth = () => {
     } else {
       setLoginAttempts(0);
       setCooldownUntil(null);
-      navigate("/");
+      // Small delay to ensure auth state is updated before navigation
+      setTimeout(() => {
+        navigate("/");
+      }, 100);
     }
   };
 
