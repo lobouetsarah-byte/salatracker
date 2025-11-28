@@ -528,6 +528,23 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
     );
   };
 
+  // If not logged in, show login prompt
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
+        <BookOpen className="w-16 h-16 text-muted-foreground mb-4" />
+        <h3 className="text-xl font-semibold mb-2">
+          {language === "fr" ? "Connexion requise" : "Login required"}
+        </h3>
+        <p className="text-muted-foreground mb-4">
+          {language === "fr"
+            ? "Connectez-vous pour suivre vos adhkar et voir vos statistiques."
+            : "Log in to track your adhkar and see your stats."}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "morning" | "evening")} className="w-full">

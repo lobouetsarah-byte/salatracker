@@ -41,8 +41,11 @@ export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditFirstName, setShowEditFirstName] = useState(false);
   const [showEditGoals, setShowEditGoals] = useState(false);
+  const [showEditDailyGoals, setShowEditDailyGoals] = useState(false);
   const [newFirstName, setNewFirstName] = useState("");
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const [prayerGoal, setPrayerGoal] = useState(5);
+  const [adhkarGoal, setAdhkarGoal] = useState(2);
 
   const goalOptions = [
     { 
@@ -75,17 +78,19 @@ export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
 
   const loadProfile = async () => {
     if (!user) return;
-    
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single();
-    
+
     if (!error && data) {
       setProfile(data);
       setNewFirstName(data.first_name || "");
       setSelectedGoals(data.goals || []);
+      setPrayerGoal(data.prayer_goal || 5);
+      setAdhkarGoal(data.adhkar_goal || 2);
     }
   };
 
@@ -168,11 +173,61 @@ export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
   };
 
   const toggleGoal = (goalId: string) => {
-    setSelectedGoals(prev => 
-      prev.includes(goalId) 
+    setSelectedGoals(prev =>
+      prev.includes(goalId)
         ? prev.filter(g => g !== goalId)
         : [...prev, goalId]
     );
+  };
+
+  const handleUpdateDailyGoals = async () => {
+    if (!user) return;
+
+    // Validate goals are within acceptable range
+    if (prayerGoal < 0 || prayerGoal > 5) {
+      toast({
+        title: language === "fr" ? "Objectif invalide" : "Invalid goal",
+        description: language === "fr" ? "L'objectif de prières doit être entre 0 et 5" : "Prayer goal must be between 0 and 5",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (adhkarGoal < 0 || adhkarGoal > 10) {
+      toast({
+        title: language === "fr" ? "Objectif invalide" : "Invalid goal",
+        description: language === "fr" ? "L'objectif d'adhkar doit être entre 0 et 10" : "Adhkar goal must be between 0 and 10",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          prayer_goal: prayerGoal,
+          adhkar_goal: adhkarGoal
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: language === "fr" ? "Objectifs quotidiens mis à jour" : "Daily goals updated",
+      });
+      setShowEditDailyGoals(false);
+      loadProfile();
+    } catch (error: any) {
+      toast({
+        title: t.errorOccurred,
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -328,6 +383,74 @@ export const SettingsAccount = ({ onLogout }: SettingsAccountProps) => {
                 ) : (
                   <p>—</p>
                 )}
+              </div>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Daily Goals */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">
+                {language === "fr" ? "Objectifs quotidiens" : "Daily Goals"}
+              </Label>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowEditDailyGoals(!showEditDailyGoals)}
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+            </div>
+            {showEditDailyGoals ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="prayer-goal">
+                    {language === "fr" ? "Objectif de prières par jour" : "Daily prayer goal"}: {prayerGoal}
+                  </Label>
+                  <Input
+                    id="prayer-goal"
+                    type="range"
+                    min="0"
+                    max="5"
+                    value={prayerGoal}
+                    onChange={(e) => setPrayerGoal(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {language === "fr" ? "0 = aucune prière, 5 = toutes les prières" : "0 = no prayers, 5 = all prayers"}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="adhkar-goal">
+                    {language === "fr" ? "Objectif d'adhkar par jour" : "Daily adhkar goal"}: {adhkarGoal}
+                  </Label>
+                  <Input
+                    id="adhkar-goal"
+                    type="range"
+                    min="0"
+                    max="10"
+                    value={adhkarGoal}
+                    onChange={(e) => setAdhkarGoal(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {language === "fr" ? "Nombre d'adhkar à accomplir chaque jour" : "Number of adhkar to complete each day"}
+                  </p>
+                </div>
+                <Button onClick={handleUpdateDailyGoals} disabled={loading} className="w-full">
+                  {language === "fr" ? "Enregistrer" : "Save"}
+                </Button>
+              </div>
+            ) : (
+              <div className="text-muted-foreground">
+                <p>
+                  {language === "fr" ? "Prières" : "Prayers"}: {profile?.prayer_goal || 5} / {language === "fr" ? "jour" : "day"}
+                </p>
+                <p>
+                  {language === "fr" ? "Adhkar" : "Adhkar"}: {profile?.adhkar_goal || 2} / {language === "fr" ? "jour" : "day"}
+                </p>
               </div>
             )}
           </div>

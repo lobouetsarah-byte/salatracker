@@ -422,7 +422,7 @@ const Index = () => {
               </div>
               
               {prayerTimes?.prayers.map((prayer, index) => (
-                <div key={prayer.name} className="animate-scale-in" style={{ animationDelay: `${index * 50}ms` }}>
+                <div key={`${selectedDateString}-${prayer.name}`} className="animate-scale-in" style={{ animationDelay: `${index * 50}ms` }}>
                   <PrayerCard
                     name={prayer.name}
                     time={prayer.time}
