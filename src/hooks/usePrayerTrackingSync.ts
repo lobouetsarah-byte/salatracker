@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { PrayerStatus } from "./usePrayerTracking";
@@ -175,10 +175,11 @@ export const usePrayerTrackingSync = () => {
 
   /**
    * Obtenir le statut d'une prière
+   * Wrapped in useCallback to ensure stable reference and proper reactivity
    */
-  const getPrayerStatus = (date: string, prayerName: string): PrayerStatus => {
+  const getPrayerStatus = useCallback((date: string, prayerName: string): PrayerStatus => {
     return prayerData[date]?.[prayerName] || "pending";
-  };
+  }, [prayerData]); // Re-create when prayerData changes
 
   /**
    * Obtenir les statistiques pour une période

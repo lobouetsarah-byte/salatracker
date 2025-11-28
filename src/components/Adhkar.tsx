@@ -3,12 +3,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2, Pause, Sparkles, BookOpen, LogIn } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2, Pause, Sparkles, BookOpen, LogIn, Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface Dhikr {
   id: string;
@@ -201,6 +205,8 @@ interface AdhkarProps {
 export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const selectedDateString = selectedDate.toISOString().split("T")[0];
   const [selectedDhikr, setSelectedDhikr] = useState<Dhikr | null>(null);
   const [currentSentence, setCurrentSentence] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -211,6 +217,7 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   const voicesLoaded = useRef(false);
   const [hasShownMorningCongrats, setHasShownMorningCongrats] = useState(false);
   const [hasShownEveningCongrats, setHasShownEveningCongrats] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   // Load voices when available
   useEffect(() => {
@@ -228,6 +235,7 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   }, []);
 
   // Load completion status from Supabase for logged-in users ONLY
+  // Re-load when selectedDateString changes
   useEffect(() => {
     const loadCompletionStatus = async () => {
       if (!user) {
@@ -237,14 +245,12 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
         return;
       }
 
-      const today = new Date().toISOString().split("T")[0];
-
-      // Load from Supabase for logged-in users
+      // Load from Supabase for the SELECTED date
       const { data, error } = await supabase
         .from('adhkar_logs')
         .select('dhikr_id, dhikr_category')
         .eq('user_id', user.id)
-        .eq('adhkar_date', today)
+        .eq('adhkar_date', selectedDateString)
         .eq('completed', true);
 
       if (data && !error) {
@@ -265,7 +271,7 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
     };
 
     loadCompletionStatus();
-  }, [user]);
+  }, [user, selectedDateString]); // Re-load when date changes!
 
   const handleDhikrClick = (dhikr: Dhikr, type: "morning" | "evening") => {
     setSelectedDhikr(dhikr);
@@ -286,7 +292,6 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
       return;
     }
 
-    const today = new Date().toISOString().split("T")[0];
     const newCompleted = activeTab === "morning"
       ? new Set([...completedMorning, selectedDhikr.id])
       : new Set([...completedEvening, selectedDhikr.id]);
@@ -297,12 +302,12 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
       setCompletedEvening(newCompleted);
     }
 
-    // Save to Supabase (user is guaranteed to exist here)
+    // Save to Supabase for the SELECTED date (user is guaranteed to exist here)
     await supabase
       .from('adhkar_logs')
       .upsert({
         user_id: user.id,
-        adhkar_date: today,
+        adhkar_date: selectedDateString, // Use selected date, not today
         dhikr_id: selectedDhikr.id,
         dhikr_category: activeTab,
         completed: true,
@@ -315,8 +320,8 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
     const allComplete = adhkarList.every(dhikr => newCompleted.has(dhikr.id));
 
     if (allComplete) {
-      // Check if we haven't shown congrats yet today
-      const congratsKey = `adhkar-congrats-${activeTab}-${today}`;
+      // Check if we haven't shown congrats yet for this date
+      const congratsKey = `adhkar-congrats-${activeTab}-${selectedDateString}`;
       if (!localStorage.getItem(congratsKey)) {
         toast.success(
           language === "fr"
@@ -344,7 +349,6 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   const undoComplete = async () => {
     if (!selectedDhikr || !user) return;
 
-    const today = new Date().toISOString().split("T")[0];
     const newCompleted = activeTab === "morning"
       ? new Set([...completedMorning].filter(id => id !== selectedDhikr.id))
       : new Set([...completedEvening].filter(id => id !== selectedDhikr.id));
@@ -355,16 +359,16 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
       setCompletedEvening(newCompleted);
     }
 
-    // Delete from Supabase (user is guaranteed to exist here)
+    // Delete from Supabase for the SELECTED date (user is guaranteed to exist here)
     await supabase
       .from('adhkar_logs')
       .delete()
       .eq('user_id', user.id)
-      .eq('adhkar_date', today)
+      .eq('adhkar_date', selectedDateString) // Use selected date, not today
       .eq('dhikr_id', selectedDhikr.id);
 
     // Clear congrats flag since not all are complete anymore
-    const congratsKey = `adhkar-congrats-${activeTab}-${today}`;
+    const congratsKey = `adhkar-congrats-${activeTab}-${selectedDateString}`;
     localStorage.removeItem(congratsKey);
 
     toast.info(
@@ -567,6 +571,33 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Date Picker */}
+      <div className="flex justify-center animate-fade-in">
+        <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+          <PopoverTrigger asChild>
+            <button className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50 hover:bg-card/70 hover:border-primary/30 transition-all cursor-pointer">
+              <CalendarIcon className="w-4 h-4 text-primary" />
+              <span className="font-medium text-sm">{format(selectedDate, "dd MMMM yyyy", { locale: fr })}</span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="center">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => {
+                if (date) {
+                  setSelectedDate(date);
+                  setDatePickerOpen(false);
+                }
+              }}
+              disabled={(date) => date > new Date()}
+              initialFocus
+              className="pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "morning" | "evening")} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-auto p-1">
           <TabsTrigger value="morning" className="flex items-center justify-start gap-2 py-3 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">

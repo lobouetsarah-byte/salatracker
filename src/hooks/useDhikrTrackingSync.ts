@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -116,9 +116,9 @@ export const useDhikrTrackingSync = () => {
     }
   };
 
-  const getDhikrStatus = (date: string, prayerName: string): boolean => {
+  const getDhikrStatus = useCallback((date: string, prayerName: string): boolean => {
     return dhikrData[date]?.[prayerName] || false;
-  };
+  }, [dhikrData]); // Re-create when dhikrData changes
 
   return {
     toggleDhikr,
