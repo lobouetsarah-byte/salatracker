@@ -32,7 +32,20 @@ export const useWeeklyHadith = () => {
           .eq("week_number", currentWeek)
           .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          // Check for schema cache error (PGRST205)
+          if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+            console.error("Table 'hadiths' non trouvée dans le schéma Supabase:", error);
+            toast({
+              title: "Erreur de configuration",
+              description: "Une erreur de configuration du serveur s'est produite. Merci de réessayer plus tard.",
+              variant: "destructive",
+            });
+            setLoading(false);
+            return;
+          }
+          throw error;
+        }
 
         if (data) {
           setHadith(data);
@@ -45,11 +58,18 @@ export const useWeeklyHadith = () => {
             .limit(1)
             .maybeSingle();
 
-          if (fallbackError) throw fallbackError;
+          if (fallbackError) {
+            if (fallbackError.code === 'PGRST205' || fallbackError.message?.includes('schema cache')) {
+              console.error("Table 'hadiths' non trouvée:", fallbackError);
+              setLoading(false);
+              return;
+            }
+            throw fallbackError;
+          }
           setHadith(fallbackData);
         }
       } catch (error: any) {
-        console.error("Error loading hadith:", error);
+        console.error("Erreur lors du chargement du hadith:", error);
         toast({
           title: "Erreur",
           description: "Impossible de charger le hadith de la semaine",

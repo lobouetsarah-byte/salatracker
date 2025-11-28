@@ -62,7 +62,16 @@ export const usePeriodMode = () => {
         .eq("is_active", true)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+          console.error("Table 'period_tracking' non trouvée:", error);
+          setIsInPeriod(false);
+          setCurrentPeriodId(null);
+          setLoading(false);
+          return;
+        }
+        throw error;
+      }
 
       if (data) {
         setIsInPeriod(true);
@@ -71,8 +80,15 @@ export const usePeriodMode = () => {
         setIsInPeriod(false);
         setCurrentPeriodId(null);
       }
-    } catch (error) {
-      console.error("Error loading period status:", error);
+    } catch (error: any) {
+      console.error("Erreur lors du chargement du statut de période:", error);
+      if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+        toast({
+          title: "Erreur de configuration",
+          description: "Une erreur de configuration du serveur s'est produite.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }

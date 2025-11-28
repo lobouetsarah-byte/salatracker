@@ -32,10 +32,25 @@ export const useBadges = () => {
         .eq("user_id", user.id)
         .order("earned_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        // Check for schema cache error
+        if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+          console.error("Table 'badges' non trouvée dans le schéma Supabase:", error);
+          setBadges([]);
+          return;
+        }
+        throw error;
+      }
       setBadges(data || []);
-    } catch (error) {
-      console.error("Error loading badges:", error);
+    } catch (error: any) {
+      console.error("Erreur lors du chargement des badges:", error);
+      if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+        toast({
+          title: "Erreur de configuration",
+          description: "Une erreur de configuration du serveur s'est produite.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -64,7 +79,13 @@ export const useBadges = () => {
           badge_description: description,
         });
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+          console.error("Table 'badges' non trouvée:", error);
+          return false;
+        }
+        throw error;
+      }
 
       toast({
         title: "🎉 Nouveau badge !",
@@ -74,8 +95,15 @@ export const useBadges = () => {
 
       await loadBadges();
       return true;
-    } catch (error) {
-      console.error("Error awarding badge:", error);
+    } catch (error: any) {
+      console.error("Erreur lors de l'attribution du badge:", error);
+      if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+        toast({
+          title: "Erreur de configuration",
+          description: "Impossible d'attribuer le badge. Configuration serveur incorrecte.",
+          variant: "destructive",
+        });
+      }
       return false;
     }
   };
