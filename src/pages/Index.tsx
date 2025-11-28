@@ -264,7 +264,7 @@ const Index = () => {
   }
 
   return (
-    <div className={`flex flex-col h-screen overflow-hidden transition-colors duration-500 ${isInPeriod ? "period-mode bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`}>
+    <div className={`flex flex-col transition-colors duration-500 ${isInPeriod ? "period-mode bg-[hsl(var(--period-bg))]" : "bg-white dark:bg-white"}`} style={{ height: '100vh', width: '100%', position: 'fixed', top: 0, left: 0, overflow: 'hidden' }}>
       {/* Fixed Header with Logo */}
       <div 
         className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-500 ${

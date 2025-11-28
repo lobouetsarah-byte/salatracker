@@ -12,6 +12,7 @@ import { notify } from "@/lib/notifications";
 import { useLanguage } from "@/hooks/useLanguage";
 import { z } from "zod";
 
+// Move schemas outside component to avoid recreation on every render
 const emailSchema = z.string().trim().email("Adresse email invalide").max(255, "L'email est trop long");
 const passwordSchema = z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères").max(72, "Le mot de passe est trop long (maximum 72 caractères)");
 

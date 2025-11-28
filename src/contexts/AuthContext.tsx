@@ -79,34 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) {
         const errorMsg = error.message?.toLowerCase() || '';
 
-        if (errorMsg.includes('email not confirmed') ||
-            errorMsg.includes('email not verified') ||
-            errorMsg.includes('verify')) {
-          notify.error(
-            "Email non vérifié",
-            "Votre adresse email n'est pas encore vérifiée. Veuillez cliquer sur le lien de confirmation envoyé par email.",
-            {
-              duration: 10000,
-              action: {
-                label: "Renvoyer l'email",
-                onClick: async () => {
-                  const { error: resendError } = await supabase.auth.resend({
-                    type: 'signup',
-                    email: email,
-                    options: {
-                      emailRedirectTo: `${window.location.origin}/`,
-                    }
-                  });
-                  if (!resendError) {
-                    notify.success("Email renvoyé", "Un nouvel email de confirmation a été envoyé");
-                  } else {
-                    notify.error("Erreur", "Impossible de renvoyer l'email");
-                  }
-                }
-              }
-            }
-          );
-        } else if (errorMsg.includes('invalid') && (errorMsg.includes('credential') || errorMsg.includes('password') || errorMsg.includes('email'))) {
+        if (errorMsg.includes('invalid') && (errorMsg.includes('credential') || errorMsg.includes('password') || errorMsg.includes('email'))) {
           notify.error(
             "Identifiants incorrects",
             "Vérifiez votre adresse email et votre mot de passe."

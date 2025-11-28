@@ -29,6 +29,8 @@ const Onboarding = () => {
   const [firstName, setFirstName] = useState("");
   const [gender, setGender] = useState<"male" | "female" | "">("");
   const [goals, setGoals] = useState<string[]>([]);
+  const [prayerGoal, setPrayerGoal] = useState(5);
+  const [adhkarGoal, setAdhkarGoal] = useState(2);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -98,6 +100,9 @@ const Onboarding = () => {
       }
     }
     if (step === 4) {
+      // Goals validation - no action needed, sliders ensure valid values
+    }
+    if (step === 5) {
       const result = emailSchema.safeParse(email);
       if (!result.success) {
         toast({
@@ -196,8 +201,8 @@ const Onboarding = () => {
             email: emailResult.data,
             first_name: firstNameResult.data,
             gender: genderResult.data,
-            prayer_goal: goalsResult.data.prayers || 5,
-            adhkar_goal: goalsResult.data.adhkar || 3
+            prayer_goal: prayerGoal,
+            adhkar_goal: adhkarGoal
           }, {
             onConflict: 'id'
           });
@@ -237,7 +242,7 @@ const Onboarding = () => {
               {language === "fr" ? "Créer un compte" : "Create Account"}
             </CardTitle>
             <CardDescription>
-              {language === "fr" ? `Étape ${step} sur 5` : `Step ${step} of 5`}
+              {language === "fr" ? `Étape ${step} sur 6` : `Step ${step} of 6`}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -382,6 +387,64 @@ const Onboarding = () => {
 
             {step === 4 && (
               <div className="space-y-4">
+                <div className="space-y-3">
+                  <Label className="text-lg">
+                    {language === "fr" ? "Définissez vos objectifs quotidiens" : "Set your daily goals"}
+                  </Label>
+                  <div className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="prayer-goal" className="flex items-center justify-between">
+                        <span>{language === "fr" ? "Prières par jour" : "Prayers per day"}</span>
+                        <span className="text-lg font-bold text-primary">{prayerGoal}</span>
+                      </Label>
+                      <input
+                        type="range"
+                        id="prayer-goal"
+                        min="1"
+                        max="5"
+                        value={prayerGoal}
+                        onChange={(e) => setPrayerGoal(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                      <p className="text-xs text-muted-foreground text-center">
+                        {language === "fr" ? "De 1 à 5 prières" : "From 1 to 5 prayers"}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="adhkar-goal" className="flex items-center justify-between">
+                        <span>{language === "fr" ? "Sessions d'adhkar par jour" : "Adhkar sessions per day"}</span>
+                        <span className="text-lg font-bold text-primary">{adhkarGoal}</span>
+                      </Label>
+                      <input
+                        type="range"
+                        id="adhkar-goal"
+                        min="1"
+                        max="4"
+                        value={adhkarGoal}
+                        onChange={(e) => setAdhkarGoal(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                      <p className="text-xs text-muted-foreground text-center">
+                        {language === "fr" ? "De 1 à 4 sessions" : "From 1 to 4 sessions"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleBack} variant="outline" className="flex-1 h-12">
+                    <ArrowLeft className="mr-2 w-4 h-4" />
+                    {language === "fr" ? "Retour" : "Back"}
+                  </Button>
+                  <Button onClick={handleNext} className="flex-1 h-12">
+                    {language === "fr" ? "Suivant" : "Next"}
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step === 5 && (
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">
                     {language === "fr" ? "Votre adresse email" : "Your email address"}
@@ -408,7 +471,7 @@ const Onboarding = () => {
               </div>
             )}
 
-            {step === 5 && (
+            {step === 6 && (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="password">
