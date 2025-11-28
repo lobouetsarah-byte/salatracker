@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2, Pause, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, CheckCircle, Check, Volume2, Pause, Sparkles, BookOpen, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -227,43 +227,40 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
     }
   }, []);
 
-  // Load completion status from Supabase for logged-in users, localStorage for others
+  // Load completion status from Supabase for logged-in users ONLY
   useEffect(() => {
     const loadCompletionStatus = async () => {
+      if (!user) {
+        // Clear completion status when not logged in
+        setCompletedMorning(new Set());
+        setCompletedEvening(new Set());
+        return;
+      }
+
       const today = new Date().toISOString().split("T")[0];
 
-      if (user) {
-        // Load from Supabase for logged-in users
-        const { data, error } = await supabase
-          .from('adhkar_logs')
-          .select('dhikr_id, dhikr_category')
-          .eq('user_id', user.id)
-          .eq('adhkar_date', today)
-          .eq('completed', true);
+      // Load from Supabase for logged-in users
+      const { data, error } = await supabase
+        .from('adhkar_logs')
+        .select('dhikr_id, dhikr_category')
+        .eq('user_id', user.id)
+        .eq('adhkar_date', today)
+        .eq('completed', true);
 
-        if (data && !error) {
-          const morningSet = new Set<string>();
-          const eveningSet = new Set<string>();
+      if (data && !error) {
+        const morningSet = new Set<string>();
+        const eveningSet = new Set<string>();
 
-          data.forEach(log => {
-            if (log.dhikr_category === 'morning') {
-              morningSet.add(log.dhikr_id);
-            } else if (log.dhikr_category === 'evening') {
-              eveningSet.add(log.dhikr_id);
-            }
-          });
+        data.forEach(log => {
+          if (log.dhikr_category === 'morning') {
+            morningSet.add(log.dhikr_id);
+          } else if (log.dhikr_category === 'evening') {
+            eveningSet.add(log.dhikr_id);
+          }
+        });
 
-          setCompletedMorning(morningSet);
-          setCompletedEvening(eveningSet);
-        }
-      } else {
-        // Load from localStorage for non-logged-in users
-        const stored = localStorage.getItem(`adhkar-${today}`);
-        if (stored) {
-          const data = JSON.parse(stored);
-          if (data.morning) setCompletedMorning(new Set(data.morning));
-          if (data.evening) setCompletedEvening(new Set(data.evening));
-        }
+        setCompletedMorning(morningSet);
+        setCompletedEvening(eveningSet);
       }
     };
 
@@ -278,7 +275,16 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   };
 
   const markAsComplete = async () => {
-    if (!selectedDhikr) return;
+    if (!selectedDhikr || !user) {
+      // Block completion if not logged in
+      toast.error(
+        language === "fr"
+          ? "Connexion requise pour enregistrer vos adhkar"
+          : "Login required to save your adhkar",
+        { duration: 3000 }
+      );
+      return;
+    }
 
     const today = new Date().toISOString().split("T")[0];
     const newCompleted = activeTab === "morning"
@@ -291,26 +297,18 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
       setCompletedEvening(newCompleted);
     }
 
-    if (user) {
-      // Save to Supabase for logged-in users
-      await supabase
-        .from('adhkar_logs')
-        .upsert({
-          user_id: user.id,
-          adhkar_date: today,
-          dhikr_id: selectedDhikr.id,
-          dhikr_category: activeTab,
-          completed: true,
-        }, {
-          onConflict: 'user_id,adhkar_date,dhikr_id'
-        });
-    } else {
-      // Save to localStorage for non-logged-in users
-      const stored = localStorage.getItem(`adhkar-${today}`);
-      const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
-      data[activeTab] = Array.from(newCompleted);
-      localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
-    }
+    // Save to Supabase (user is guaranteed to exist here)
+    await supabase
+      .from('adhkar_logs')
+      .upsert({
+        user_id: user.id,
+        adhkar_date: today,
+        dhikr_id: selectedDhikr.id,
+        dhikr_category: activeTab,
+        completed: true,
+      }, {
+        onConflict: 'user_id,adhkar_date,dhikr_id'
+      });
 
     // Check if all adhkar in this category are complete
     const adhkarList = activeTab === "morning" ? morningAdhkar : eveningAdhkar;
@@ -344,7 +342,7 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   };
 
   const undoComplete = async () => {
-    if (!selectedDhikr) return;
+    if (!selectedDhikr || !user) return;
 
     const today = new Date().toISOString().split("T")[0];
     const newCompleted = activeTab === "morning"
@@ -357,21 +355,13 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
       setCompletedEvening(newCompleted);
     }
 
-    if (user) {
-      // Delete from Supabase for logged-in users
-      await supabase
-        .from('adhkar_logs')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('adhkar_date', today)
-        .eq('dhikr_id', selectedDhikr.id);
-    } else {
-      // Update localStorage for non-logged-in users
-      const stored = localStorage.getItem(`adhkar-${today}`);
-      const data = stored ? JSON.parse(stored) : { morning: [], evening: [] };
-      data[activeTab] = Array.from(newCompleted);
-      localStorage.setItem(`adhkar-${today}`, JSON.stringify(data));
-    }
+    // Delete from Supabase (user is guaranteed to exist here)
+    await supabase
+      .from('adhkar_logs')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('adhkar_date', today)
+      .eq('dhikr_id', selectedDhikr.id);
 
     // Clear congrats flag since not all are complete anymore
     const congratsKey = `adhkar-congrats-${activeTab}-${today}`;
@@ -531,15 +521,45 @@ export const Adhkar = ({ onCompletion }: AdhkarProps = {}) => {
   // If not logged in, show login prompt
   if (!user) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
-        <BookOpen className="w-16 h-16 text-muted-foreground mb-4" />
-        <h3 className="text-xl font-semibold mb-2">
-          {language === "fr" ? "Connexion requise" : "Login required"}
-        </h3>
-        <p className="text-muted-foreground mb-4">
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center space-y-6">
+        <div className="space-y-4">
+          <BookOpen className="w-20 h-20 text-primary mx-auto" />
+          <h3 className="text-2xl font-bold text-foreground">
+            {language === "fr" ? "Connexion requise" : "Login required"}
+          </h3>
+          <p className="text-muted-foreground max-w-md">
+            {language === "fr"
+              ? "Connectez-vous pour suivre vos adhkar quotidiens et enregistrer votre progression spirituelle."
+              : "Log in to track your daily adhkar and save your spiritual progress."}
+          </p>
+        </div>
+
+        <Card className="w-full max-w-md p-6 bg-muted/30">
+          <div className="space-y-3 text-sm text-left">
+            <p className="font-semibold text-foreground">
+              {language === "fr" ? "Avec un compte, vous pouvez :" : "With an account, you can:"}
+            </p>
+            <ul className="space-y-2 text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <span>{language === "fr" ? "Enregistrer vos adhkar complétés chaque jour" : "Save your completed adhkar each day"}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <span>{language === "fr" ? "Suivre vos statistiques et votre progression" : "Track your statistics and progress"}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <span>{language === "fr" ? "Synchroniser vos données sur tous vos appareils" : "Sync your data across all your devices"}</span>
+              </li>
+            </ul>
+          </div>
+        </Card>
+
+        <p className="text-sm text-muted-foreground">
           {language === "fr"
-            ? "Connectez-vous pour suivre vos adhkar et voir vos statistiques."
-            : "Log in to track your adhkar and see your stats."}
+            ? "Allez dans l'onglet Réglages pour vous connecter ou créer un compte"
+            : "Go to Settings tab to log in or create an account"}
         </p>
       </div>
     );

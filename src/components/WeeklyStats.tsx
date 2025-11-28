@@ -23,13 +23,18 @@ interface WeeklyStatsProps {
     missed: number;
     total: number;
   };
+  externalSelectedDate?: Date;
 }
 
-export const WeeklyStats = ({ stats, period, onPeriodChange, getCustomStats }: WeeklyStatsProps) => {
+export const WeeklyStats = ({ stats, period, onPeriodChange, getCustomStats, externalSelectedDate }: WeeklyStatsProps) => {
   const { t } = useLanguage();
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [internalSelectedDate, setInternalSelectedDate] = useState<Date>(new Date());
   const [compareMode, setCompareMode] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+
+  // Use external date if provided, otherwise use internal
+  const selectedDate = externalSelectedDate || internalSelectedDate;
+  const setSelectedDate = externalSelectedDate ? () => {} : setInternalSelectedDate;
 
   const completionRate = stats.total > 0 
     ? Math.round(((stats.onTime + stats.late) / stats.total) * 100) 
